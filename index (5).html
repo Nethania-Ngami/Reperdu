@@ -1,0 +1,1953 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Reperdu — Retrouvez vos objets perdus</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://js.stripe.com/v3/"></script>
+<style>
+/* ============================================================
+   VARIABLES & RESET
+============================================================ */
+:root {
+  --green-900: #1B5E20;
+  --green-700: #2E7D32;
+  --green-600: #388E3C;
+  --green-400: #66BB6A;
+  --green-200: #A5D6A7;
+  --green-100: #E8F5E9;
+  --green-50:  #F1F8F1;
+  --white: #FFFFFF;
+  --gray-900: #212121;
+  --gray-700: #424242;
+  --gray-500: #9E9E9E;
+  --gray-200: #EEEEEE;
+  --gray-100: #F5F5F5;
+  --shadow-card: 0 2px 12px rgba(46,125,50,0.08),0 1px 3px rgba(0,0,0,0.06);
+  --shadow-hover: 0 8px 32px rgba(46,125,50,0.16),0 2px 8px rgba(0,0,0,0.08);
+  --shadow-modal: 0 24px 80px rgba(0,0,0,0.22);
+  --radius: 14px;
+  --radius-sm: 8px;
+  --radius-full: 999px;
+  --transition: 0.2s cubic-bezier(0.4,0,0.2,1);
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{font-family:'Poppins',sans-serif;color:var(--gray-900);background:var(--white);line-height:1.6;overflow-x:hidden}
+img{max-width:100%;display:block}
+button,input,select,textarea{font-family:inherit}
+a{text-decoration:none;color:inherit}
+
+/* ============================================================
+   TYPOGRAPHY
+============================================================ */
+h1{font-size:clamp(2rem,4vw,3.2rem);font-weight:800;letter-spacing:-0.03em;line-height:1.1}
+h2{font-size:clamp(1.6rem,3vw,2.4rem);font-weight:800;letter-spacing:-0.03em;line-height:1.15}
+h3{font-size:1.1rem;font-weight:700}
+
+/* ============================================================
+   BUTTONS
+============================================================ */
+.btn{display:inline-flex;align-items:center;gap:8px;padding:.7rem 1.5rem;border-radius:var(--radius-full);font-weight:600;font-size:.9rem;cursor:pointer;border:none;transition:all var(--transition)}
+.btn-primary{background:var(--green-700);color:#fff}
+.btn-primary:hover{background:var(--green-900);transform:translateY(-2px);box-shadow:0 6px 20px rgba(46,125,50,0.3)}
+.btn-secondary{background:transparent;color:var(--green-700);border:2px solid var(--green-200)}
+.btn-secondary:hover{border-color:var(--green-700);background:var(--green-100)}
+.btn-white{background:#fff;color:var(--green-700);font-weight:700}
+.btn-white:hover{background:var(--green-100);transform:translateY(-2px)}
+.btn-outline-white{background:transparent;color:#fff;border:2px solid rgba(255,255,255,0.45)}
+.btn-outline-white:hover{border-color:#fff;background:rgba(255,255,255,0.1)}
+.btn-danger{background:#ef4444;color:#fff}
+.btn-danger:hover{background:#dc2626}
+.btn-sm{padding:.4rem 1rem;font-size:.8rem}
+.btn-full{width:100%;justify-content:center}
+.btn:disabled{opacity:.5;cursor:not-allowed;transform:none!important}
+
+/* ============================================================
+   FORMS
+============================================================ */
+.form-group{margin-bottom:1rem}
+.form-label{display:block;font-size:.82rem;font-weight:600;color:var(--gray-700);margin-bottom:.4rem}
+.form-input{width:100%;padding:.7rem 1rem;border:1.5px solid var(--gray-200);border-radius:var(--radius-sm);font-size:.9rem;color:var(--gray-900);outline:none;transition:border-color var(--transition);background:#fff}
+.form-input:focus{border-color:var(--green-700);box-shadow:0 0 0 3px rgba(46,125,50,0.1)}
+.form-select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%239E9E9E' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 1rem center;padding-right:2.5rem}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:1rem}
+textarea.form-input{resize:vertical}
+.form-error{color:#ef4444;font-size:.75rem;margin-top:.25rem}
+
+/* ============================================================
+   CARDS
+============================================================ */
+.card{background:#fff;border-radius:var(--radius);border:1px solid var(--gray-200);box-shadow:var(--shadow-card)}
+.card-hover{transition:all var(--transition)}
+.card-hover:hover{transform:translateY(-4px);box-shadow:var(--shadow-hover);border-color:var(--green-200)}
+
+/* ============================================================
+   BADGES
+============================================================ */
+.badge{display:inline-flex;align-items:center;gap:4px;padding:.22rem .65rem;border-radius:var(--radius-full);font-size:.7rem;font-weight:700}
+.badge-online{background:var(--green-100);color:var(--green-700)}
+.badge-pending{background:#FFF3E0;color:#E65100}
+.badge-recovered{background:#E3F2FD;color:#1565C0}
+.badge-archived{background:var(--gray-100);color:var(--gray-500)}
+
+/* ============================================================
+   NAVBAR
+============================================================ */
+#navbar{position:sticky;top:0;z-index:100;background:rgba(255,255,255,0.97);backdrop-filter:blur(12px);border-bottom:1px solid var(--gray-200);padding:0 5vw;display:flex;align-items:center;justify-content:space-between;height:64px;transition:box-shadow var(--transition)}
+#navbar.scrolled{box-shadow:0 2px 12px rgba(0,0,0,0.07)}
+.nav-logo{display:flex;align-items:center;gap:10px;cursor:pointer}
+.nav-logo-mark{width:34px;height:34px;background:linear-gradient(135deg,var(--green-700),var(--green-400));border-radius:9px;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:900;font-size:16px}
+.nav-logo-text{font-size:1.3rem;font-weight:800;color:var(--green-900);letter-spacing:-0.03em}
+.nav-logo-text span{color:var(--green-400)}
+.nav-links{display:flex;align-items:center;gap:2rem}
+.nav-links a{font-size:.88rem;font-weight:500;color:var(--gray-500);transition:color var(--transition);cursor:pointer}
+.nav-links a:hover,.nav-links a.active{color:var(--green-700)}
+.nav-actions{display:flex;align-items:center;gap:.6rem}
+.nav-user{display:flex;align-items:center;gap:.5rem;padding:.4rem .8rem;border-radius:var(--radius-full);border:1px solid var(--gray-200);cursor:pointer;font-size:.85rem;font-weight:500;position:relative}
+.nav-user:hover{border-color:var(--green-200);background:var(--green-50)}
+.nav-avatar{width:26px;height:26px;border-radius:50%;background:var(--green-100);display:flex;align-items:center;justify-content:center;font-size:.75rem;font-weight:700;color:var(--green-700)}
+.nav-dropdown{position:absolute;top:calc(100% + 8px);right:0;background:#fff;border:1px solid var(--gray-200);border-radius:var(--radius);box-shadow:var(--shadow-hover);padding:.4rem;min-width:180px;display:none}
+.nav-dropdown.open{display:block}
+.nav-dropdown a{display:block;padding:.6rem .8rem;font-size:.85rem;font-weight:500;color:var(--gray-700);border-radius:8px;cursor:pointer;transition:background var(--transition)}
+.nav-dropdown a:hover{background:var(--green-50);color:var(--green-700)}
+.nav-dropdown a.danger{color:#ef4444}
+.nav-dropdown a.danger:hover{background:#fef2f2}
+.nav-dropdown hr{border:none;border-top:1px solid var(--gray-200);margin:.3rem 0}
+
+/* ============================================================
+   PAGES (router)
+============================================================ */
+.page{display:none;animation:fadeIn .25s ease-out}
+.page.active{display:block}
+@keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+
+/* ============================================================
+   LANDING PAGE
+============================================================ */
+.hero{max-width:1200px;margin:0 auto;padding:5rem 5vw 4rem;display:grid;grid-template-columns:1fr 1fr;gap:4rem;align-items:center;min-height:calc(100vh - 64px)}
+.hero-eyebrow{display:inline-flex;align-items:center;gap:8px;background:var(--green-100);border:1px solid var(--green-200);border-radius:var(--radius-full);padding:.3rem 1rem;font-size:.75rem;font-weight:700;color:var(--green-700);letter-spacing:.05em;text-transform:uppercase;margin-bottom:1.5rem}
+.hero-dot{width:6px;height:6px;border-radius:50%;background:var(--green-400);animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.5;transform:scale(.8)}}
+.hero h1{margin-bottom:1.2rem}
+.hero h1 .accent{color:var(--green-700)}
+.hero-sub{font-size:1.05rem;color:var(--gray-500);line-height:1.75;margin-bottom:2rem;max-width:480px}
+.hero-cta{display:flex;gap:.75rem;flex-wrap:wrap;margin-bottom:2.5rem}
+.hero-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:1.5rem;padding-top:2rem;border-top:1px solid var(--gray-200)}
+.hero-stat-num{font-size:1.6rem;font-weight:800;color:var(--green-700);letter-spacing:-0.03em}
+.hero-stat-label{font-size:.75rem;color:var(--gray-500);margin-top:2px}
+.hero-visual{position:relative}
+.hero-cards{display:flex;flex-direction:column;gap:.75rem}
+.hero-card{background:#fff;border:1px solid var(--gray-200);border-radius:var(--radius);padding:.9rem 1.1rem;display:flex;align-items:center;gap:.9rem;transition:all var(--transition);cursor:pointer}
+.hero-card:hover{transform:translateX(4px);border-color:var(--green-200);box-shadow:var(--shadow-card)}
+.hero-card-icon{width:46px;height:46px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0}
+.hero-card-info{flex:1;min-width:0}
+.hero-card-name{font-size:.875rem;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.hero-card-meta{font-size:.73rem;color:var(--gray-500);margin-top:2px}
+.hero-notif{position:absolute;top:-16px;right:-16px;background:#fff;border:1px solid var(--gray-200);border-radius:var(--radius);padding:.7rem 1rem;box-shadow:var(--shadow-hover);display:flex;align-items:center;gap:8px;font-size:.78rem;font-weight:500;animation:floatY 3s ease-in-out infinite;z-index:2}
+@keyframes floatY{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+
+/* Steps */
+.steps-section{background:var(--gray-100);padding:5rem 5vw}
+.steps-section .inner{max-width:1100px;margin:0 auto}
+.section-label{font-size:.72rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--green-700);display:flex;align-items:center;gap:8px;margin-bottom:.6rem}
+.section-label::before{content:'';width:20px;height:2px;background:var(--green-400)}
+.steps-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1.5rem;margin-top:2.5rem}
+.step-card{background:#fff;border:1px solid var(--gray-200);border-radius:var(--radius);padding:2rem 1.75rem;transition:all var(--transition)}
+.step-card:hover{transform:translateY(-4px);box-shadow:var(--shadow-hover);border-color:var(--green-200)}
+.step-num{width:52px;height:52px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1.2rem;font-weight:800;margin-bottom:1rem}
+.step-num.main{background:var(--green-700);color:#fff}
+.step-num.side{background:var(--green-100);color:var(--green-700);border:2px solid var(--green-200)}
+.step-icon{font-size:1.6rem;margin-bottom:.6rem}
+.step-desc{font-size:.875rem;color:var(--gray-500);line-height:1.65;margin-top:.4rem}
+
+/* Stats banner */
+.stats-banner{background:linear-gradient(135deg,var(--green-700) 0%,var(--green-600) 50%,var(--green-400) 100%);padding:4rem 5vw}
+.stats-banner .inner{max-width:1000px;margin:0 auto;display:grid;grid-template-columns:repeat(4,1fr);gap:2rem;text-align:center}
+.banner-num{font-size:2.8rem;font-weight:900;color:#fff;letter-spacing:-0.04em;line-height:1}
+.banner-label{font-size:.85rem;color:rgba(255,255,255,.75);font-weight:500;margin-top:.3rem}
+
+/* CTA section */
+.cta-section{padding:6rem 5vw;text-align:center}
+.cta-box{max-width:700px;margin:0 auto;background:linear-gradient(135deg,var(--green-700),var(--green-600));border-radius:24px;padding:4rem 3rem;position:relative;overflow:hidden}
+.cta-box::before{content:'';position:absolute;width:280px;height:280px;background:rgba(255,255,255,.06);border-radius:50%;top:-80px;right:-60px}
+.cta-box h2{color:#fff;margin-bottom:1rem}
+.cta-box p{color:rgba(255,255,255,.8);font-size:1rem;margin-bottom:2rem}
+.cta-actions{display:flex;gap:.75rem;justify-content:center;flex-wrap:wrap}
+
+/* ============================================================
+   EXPLORER
+============================================================ */
+.explorer-header{background:#fff;border-bottom:1px solid var(--gray-200);padding:2.5rem 5vw}
+.explorer-header .inner{max-width:1200px;margin:0 auto}
+.explorer-body{max-width:1200px;margin:0 auto;padding:2rem 5vw}
+.filters-bar{background:#fff;border:1px solid var(--gray-200);border-radius:var(--radius);padding:1.2rem;margin-bottom:1.5rem}
+.filters-search{display:flex;gap:.5rem;margin-bottom:1rem}
+.filters-search input{flex:1}
+.filter-pills{display:flex;gap:.5rem;flex-wrap:wrap}
+.filter-pill{padding:.35rem .9rem;border-radius:var(--radius-full);font-size:.78rem;font-weight:600;border:1.5px solid var(--gray-200);background:#fff;color:var(--gray-500);cursor:pointer;transition:all var(--transition)}
+.filter-pill:hover{border-color:var(--green-400);color:var(--green-700)}
+.filter-pill.active{background:var(--green-700);color:#fff;border-color:var(--green-700)}
+.objects-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:1.2rem}
+.obj-card{border-radius:var(--radius);overflow:hidden;background:#fff;border:1px solid var(--gray-200);cursor:pointer;transition:all var(--transition)}
+.obj-card:hover{transform:translateY(-4px);box-shadow:var(--shadow-hover);border-color:var(--green-200)}
+.obj-img{height:160px;display:flex;align-items:center;justify-content:center;font-size:60px;position:relative;overflow:hidden}
+.obj-img img{width:100%;height:100%;object-fit:cover;position:absolute;inset:0}
+.obj-body{padding:1rem}
+.obj-cat{font-size:.68rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--green-700);margin-bottom:.3rem}
+.obj-name{font-size:.9rem;font-weight:600;margin-bottom:.3rem;line-height:1.3}
+.obj-place{font-size:.75rem;color:var(--gray-500)}
+.obj-footer{display:flex;align-items:center;justify-content:space-between;padding:.7rem 1rem;border-top:1px solid var(--gray-100)}
+.obj-date{font-size:.72rem;color:var(--gray-500)}
+.empty-state{text-align:center;padding:5rem 2rem;color:var(--gray-500)}
+.empty-state .icon{font-size:4rem;margin-bottom:1rem}
+.empty-state h3{font-size:1.2rem;font-weight:700;color:var(--gray-700);margin-bottom:.5rem}
+
+/* ============================================================
+   OBJECT DETAIL
+============================================================ */
+.object-detail{max-width:900px;margin:0 auto;padding:2rem 5vw}
+.obj-detail-grid{display:grid;grid-template-columns:1.6fr 1fr;gap:2rem;align-items:start}
+.obj-detail-img{border-radius:var(--radius);overflow:hidden;background:var(--green-50);height:320px;display:flex;align-items:center;justify-content:center;font-size:100px;position:relative}
+.obj-detail-img img{width:100%;height:100%;object-fit:cover;position:absolute;inset:0}
+.obj-detail-thumbs{display:flex;gap:.5rem;margin-top:.75rem}
+.obj-detail-thumb{width:60px;height:60px;border-radius:8px;overflow:hidden;border:2px solid var(--gray-200);cursor:pointer;font-size:24px;display:flex;align-items:center;justify-content:center;background:var(--green-50)}
+.obj-detail-thumb:hover{border-color:var(--green-400)}
+.obj-info-card{padding:1.5rem}
+.obj-info-row{display:flex;align-items:start;gap:.75rem;padding:.75rem;background:var(--gray-100);border-radius:var(--radius-sm);margin-bottom:.5rem}
+.obj-info-icon{font-size:16px;margin-top:1px}
+.obj-info-label{font-size:.7rem;font-weight:700;text-transform:uppercase;color:var(--gray-500);letter-spacing:.05em}
+.obj-info-value{font-size:.9rem;font-weight:600}
+.tags-row{display:flex;flex-wrap:wrap;gap:.4rem;margin-top:.5rem}
+.tag{background:var(--green-100);color:var(--green-700);border-radius:var(--radius-full);padding:.2rem .65rem;font-size:.72rem;font-weight:600;border:1px solid var(--green-200)}
+
+/* ============================================================
+   USER DASHBOARD
+============================================================ */
+.dashboard{max-width:960px;margin:0 auto;padding:2rem 5vw}
+.dash-header{display:flex;justify-content:space-between;align-items:start;margin-bottom:2rem;flex-wrap:wrap;gap:1rem}
+.dash-tabs{display:flex;gap:.3rem;background:var(--gray-100);border-radius:var(--radius-full);padding:4px;margin-bottom:1.5rem}
+.dash-tab{padding:.5rem 1.2rem;border-radius:var(--radius-full);font-size:.85rem;font-weight:600;cursor:pointer;border:none;background:transparent;color:var(--gray-500);transition:all var(--transition)}
+.dash-tab.active{background:#fff;color:var(--green-700);box-shadow:0 1px 4px rgba(0,0,0,.08)}
+.dash-kpis{display:grid;grid-template-columns:repeat(3,1fr);gap:1rem;margin-bottom:1.5rem}
+.kpi{background:#fff;border:1px solid var(--gray-200);border-radius:var(--radius);padding:1.2rem}
+.kpi-value{font-size:1.8rem;font-weight:800;color:var(--gray-900);letter-spacing:-0.03em}
+.kpi-label{font-size:.75rem;color:var(--gray-500);margin-top:2px}
+.decl-list{display:flex;flex-direction:column;gap:.75rem}
+.decl-item{background:#fff;border:1px solid var(--gray-200);border-radius:var(--radius);padding:1.1rem;display:flex;align-items:center;gap:1rem;transition:all var(--transition)}
+.decl-item:hover{border-color:var(--green-200);box-shadow:var(--shadow-card)}
+.decl-icon{width:44px;height:44px;background:var(--green-100);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0}
+.decl-info{flex:1;min-width:0}
+.decl-name{font-size:.9rem;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.decl-meta{font-size:.75rem;color:var(--gray-500);margin-top:2px}
+.match-found{background:var(--green-100);border:1px solid var(--green-200);border-radius:var(--radius-sm);padding:.5rem .8rem;margin-top:.5rem;font-size:.78rem;font-weight:600;color:var(--green-700);cursor:pointer;display:flex;align-items:center;gap:.4rem}
+.match-found:hover{background:var(--green-200)}
+.notif-list{display:flex;flex-direction:column;gap:.5rem}
+.notif-item{display:flex;align-items:start;gap:.75rem;padding:.9rem;background:#fff;border:1px solid var(--gray-200);border-radius:var(--radius)}
+.notif-item.unread{background:rgba(232,245,233,.4);border-color:var(--green-200)}
+.notif-icon{width:32px;height:32px;border-radius:50%;background:var(--green-100);display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0}
+.notif-title{font-size:.85rem;font-weight:600}
+.notif-msg{font-size:.78rem;color:var(--gray-500);margin-top:2px}
+.notif-time{font-size:.7rem;color:var(--gray-500);margin-top:4px}
+
+/* ============================================================
+   ADMIN DASHBOARD
+============================================================ */
+.admin-layout{display:flex;min-height:100vh}
+.admin-sidebar{width:220px;background:#fff;border-right:1px solid var(--gray-200);display:flex;flex-direction:column;position:fixed;height:100%;z-index:50}
+.sidebar-logo{padding:1.2rem 1rem;border-bottom:1px solid var(--gray-200)}
+.sidebar-nav{flex:1;padding:.75rem;overflow-y:auto}
+.sidebar-item{display:flex;align-items:center;gap:.7rem;padding:.65rem .8rem;border-radius:10px;font-size:.85rem;font-weight:500;cursor:pointer;transition:all var(--transition);color:var(--gray-500);border:none;background:transparent;width:100%;text-align:left}
+.sidebar-item:hover{background:var(--green-50);color:var(--green-700)}
+.sidebar-item.active{background:var(--green-700);color:#fff}
+.sidebar-item .icon{font-size:16px;width:20px;text-align:center}
+.sidebar-footer{padding:.75rem;border-top:1px solid var(--gray-200)}
+.admin-main{margin-left:220px;flex:1;padding:2rem}
+.admin-inner{max-width:1100px;margin:0 auto}
+.admin-kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:1rem;margin-bottom:1.5rem}
+.admin-table{width:100%;border-collapse:collapse;font-size:.875rem}
+.admin-table th{text-align:left;padding:.7rem 1rem;font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--gray-500);border-bottom:1px solid var(--gray-200);background:var(--gray-100)}
+.admin-table td{padding:.8rem 1rem;border-bottom:1px solid var(--gray-200);vertical-align:middle}
+.admin-table tr:hover td{background:var(--gray-100)}
+.admin-table .obj-cell{display:flex;align-items:center;gap:.6rem}
+.score-bar{height:6px;border-radius:3px;background:var(--gray-200);margin-top:4px;overflow:hidden}
+.score-bar-fill{height:100%;border-radius:3px;background:var(--green-400)}
+.score-bar-fill.high{background:var(--green-700)}
+.score-bar-fill.low{background:#f59e0b}
+.action-btns{display:flex;gap:.4rem}
+
+/* ============================================================
+   ETABLISSEMENT DASHBOARD
+============================================================ */
+.estab-layout{display:flex;min-height:100vh}
+.estab-main{margin-left:220px;flex:1;padding:2rem}
+.qr-box{background:var(--green-50);border:2px dashed var(--green-200);border-radius:var(--radius);padding:1.5rem;text-align:center}
+.qr-code{margin:1rem auto;max-width:180px}
+
+/* ============================================================
+   MODALS
+============================================================ */
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:200;align-items:center;justify-content:center;padding:1rem}
+.modal-overlay.open{display:flex}
+.modal{background:#fff;border-radius:20px;padding:2rem;max-width:540px;width:100%;max-height:90vh;overflow-y:auto;box-shadow:var(--shadow-modal);animation:slideUp .28s cubic-bezier(0.4,0,.2,1)}
+@keyframes slideUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:none}}
+.modal-header{display:flex;align-items:start;justify-content:space-between;margin-bottom:1.5rem}
+.modal-title{font-size:1.25rem;font-weight:800;letter-spacing:-0.02em}
+.modal-sub{font-size:.85rem;color:var(--gray-500);margin-top:.2rem}
+.modal-close{width:30px;height:30px;border-radius:50%;background:var(--gray-100);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:14px;color:var(--gray-500);flex-shrink:0;transition:background var(--transition)}
+.modal-close:hover{background:var(--gray-200)}
+.success-state{text-align:center;padding:2rem 0}
+.success-icon{font-size:4rem;margin-bottom:1rem}
+
+/* ============================================================
+   TOAST
+============================================================ */
+#toast-container{position:fixed;bottom:1.5rem;right:1.5rem;z-index:999;display:flex;flex-direction:column;gap:.5rem}
+.toast{display:flex;align-items:center;gap:.7rem;padding:.85rem 1.25rem;border-radius:12px;box-shadow:0 8px 30px rgba(0,0,0,.15);font-size:.875rem;font-weight:500;max-width:320px;animation:toastIn .3s cubic-bezier(0.4,0,.2,1);color:#fff}
+@keyframes toastIn{from{opacity:0;transform:translateX(20px)}to{opacity:1;transform:none}}
+.toast.success{background:#1B5E20}
+.toast.error{background:#C62828}
+.toast.info{background:#1565C0}
+.toast-icon{font-size:16px}
+
+/* ============================================================
+   LOADER
+============================================================ */
+.loader{display:flex;align-items:center;justify-content:center;padding:3rem}
+.spinner{width:36px;height:36px;border:3px solid var(--green-200);border-top-color:var(--green-700);border-radius:50%;animation:spin .7s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.btn-spinner{width:16px;height:16px;border:2px solid rgba(255,255,255,.4);border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite;flex-shrink:0}
+
+/* ============================================================
+   FOOTER
+============================================================ */
+footer{background:var(--gray-900);color:rgba(255,255,255,.6);padding:4rem 5vw 2rem}
+.footer-inner{max-width:1200px;margin:0 auto}
+.footer-grid{display:grid;grid-template-columns:1.5fr 1fr 1fr 1fr;gap:3rem;margin-bottom:3rem}
+.footer-logo-text{font-size:1.2rem;font-weight:800;color:var(--green-200);letter-spacing:-0.03em}
+.footer-logo-text span{color:var(--green-400)}
+.footer-desc{font-size:.85rem;line-height:1.7;margin-top:.75rem;max-width:240px}
+.footer-col h4{color:#fff;font-size:.85rem;font-weight:700;margin-bottom:1rem}
+.footer-col a{display:block;font-size:.83rem;margin-bottom:.6rem;cursor:pointer;transition:color var(--transition)}
+.footer-col a:hover{color:var(--green-200)}
+.footer-bottom{border-top:1px solid rgba(255,255,255,.1);padding-top:1.5rem;display:flex;justify-content:space-between;font-size:.78rem;flex-wrap:wrap;gap:.75rem}
+.footer-bottom-links{display:flex;gap:1.5rem}
+.footer-bottom-links a{cursor:pointer;transition:color var(--transition)}
+.footer-bottom-links a:hover{color:var(--green-200)}
+
+/* ============================================================
+   RESPONSIVE
+============================================================ */
+@media(max-width:1024px){
+  .admin-sidebar,.admin-layout .admin-sidebar,.estab-layout .admin-sidebar{display:none}
+  .admin-main,.estab-main{margin-left:0}
+  .admin-kpis{grid-template-columns:1fr 1fr}
+  .footer-grid{grid-template-columns:1fr 1fr}
+  .stats-banner .inner{grid-template-columns:1fr 1fr}
+}
+@media(max-width:768px){
+  .hero{grid-template-columns:1fr;min-height:auto;gap:2rem;padding:3rem 5vw}
+  .hero-visual{display:none}
+  .steps-grid,.form-row{grid-template-columns:1fr}
+  .dash-kpis,.admin-kpis{grid-template-columns:1fr 1fr}
+  .obj-detail-grid{grid-template-columns:1fr}
+  .nav-links{display:none}
+  .footer-grid{grid-template-columns:1fr}
+  .stats-banner .inner{grid-template-columns:1fr 1fr}
+  .hero-stats{grid-template-columns:1fr 1fr 1fr}
+}
+@media(max-width:480px){
+  .dash-kpis,.admin-kpis,.hero-stats{grid-template-columns:1fr 1fr}
+  .cta-box{padding:2.5rem 1.5rem}
+}
+</style>
+</head>
+<body>
+
+<!-- ============================================================
+     CONFIG — Remplace si besoin
+============================================================ -->
+<script>
+const CONFIG = {
+  SUPABASE_URL: 'https://oilrcdzdchmjzhlahaex.supabase.co',
+  SUPABASE_ANON_KEY: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9pbHJjZHpkY2htanpobGFoYWV4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQwMDYzNjQsImV4cCI6MjA4OTU4MjM2NH0.aeWw_8u5UlM9iPCTQMSlrmXQfmRSYJvKmoaXGOLaP5Q',
+  N8N_URL: 'https://n8n-s1ug.onrender.com',
+  APP_NAME: 'Reperdu',
+}
+</script>
+
+<!-- TOAST -->
+<div id="toast-container"></div>
+
+<!-- NAVBAR -->
+<nav id="navbar">
+  <div class="nav-logo" onclick="navigate('home')">
+    <div class="nav-logo-mark">R</div>
+    <span class="nav-logo-text">Re<span>perdu</span></span>
+  </div>
+  <div class="nav-links">
+    <a onclick="navigate('home')" id="nav-home">Accueil</a>
+    <a onclick="navigate('explorer')" id="nav-explorer">Explorer</a>
+    <a onclick="navigate('home'); scrollToSection('#comment')" id="nav-comment">Comment ça marche</a>
+    <a onclick="navigate('home'); scrollToSection('#etablissements')" id="nav-estab">Établissements</a>
+  </div>
+  <div class="nav-actions" id="nav-actions">
+    <!-- filled by JS -->
+  </div>
+</nav>
+
+<!-- ============================================================
+     PAGE: HOME
+============================================================ -->
+<div id="page-home" class="page">
+  <!-- HERO -->
+  <section class="hero">
+    <div>
+      <div class="hero-eyebrow"><div class="hero-dot"></div>Plateforme objets trouvés N°1</div>
+      <h1>Retrouvez vos objets perdus dans les <span class="accent">bars, boîtes</span> et <span class="accent">hôtels</span> partenaires</h1>
+      <p class="hero-sub">Reperdu connecte les clients avec les établissements grâce à un matching intelligent. Déclarez votre perte, notre IA cherche pour vous.</p>
+      <div class="hero-cta">
+        <button class="btn btn-primary" onclick="navigate('explorer')">🔍 Voir les objets trouvés</button>
+        <button class="btn btn-secondary" onclick="openModal('modal-declare')">✍️ Déclarer un objet perdu</button>
+      </div>
+      <div class="hero-stats">
+        <div><div class="hero-stat-num" id="stat-total">—</div><div class="hero-stat-label">Objets trouvés</div></div>
+        <div><div class="hero-stat-num" id="stat-rate">—</div><div class="hero-stat-label">Taux de récupération</div></div>
+        <div><div class="hero-stat-num" id="stat-estabs">—</div><div class="hero-stat-label">Établissements</div></div>
+      </div>
+    </div>
+    <div class="hero-visual">
+      <div class="hero-notif">🔔 <strong>Correspondance trouvée !</strong>&nbsp;Votre iPhone 14</div>
+      <div class="hero-cards" id="hero-cards">
+        <div class="hero-card"><div class="hero-card-icon" style="background:#E8F5E9">📱</div><div class="hero-card-info"><div class="hero-card-name">iPhone 14 Pro – Noir sidéral</div><div class="hero-card-meta">📍 Le Comptoir, Paris · Il y a 2h</div></div><span class="badge badge-online">Nouveau</span></div>
+        <div class="hero-card"><div class="hero-card-icon" style="background:#FFF3E0">👜</div><div class="hero-card-info"><div class="hero-card-name">Sac à main cuir marron</div><div class="hero-card-meta">📍 Rex Club, Paris · Hier soir</div></div><span class="badge badge-online">En ligne</span></div>
+        <div class="hero-card"><div class="hero-card-icon" style="background:#E3F2FD">🔑</div><div class="hero-card-info"><div class="hero-card-name">Trousseau de clés + porte-clé</div><div class="hero-card-meta">📍 Hôtel Acanthe, Lyon · 23 mars</div></div><span class="badge badge-recovered">Récupéré</span></div>
+        <div class="hero-card"><div class="hero-card-icon" style="background:#E8F5E9">👓</div><div class="hero-card-info"><div class="hero-card-name">Lunettes Ray-Ban Tortoise</div><div class="hero-card-meta">📍 Social Club, Paris · 22 mars</div></div><span class="badge badge-online">En ligne</span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- HOW IT WORKS -->
+  <section class="steps-section" id="comment">
+    <div class="inner">
+      <div class="section-label">Processus simple</div>
+      <h2>Comment ça marche ?</h2>
+      <div class="steps-grid">
+        <div class="step-card"><div class="step-num side">01</div><div class="step-icon">✍️</div><h3>Déclarez votre objet</h3><p class="step-desc">Remplissez un formulaire rapide : description, date, lieu approximatif. Ajoutez une photo si possible.</p></div>
+        <div class="step-card"><div class="step-num main">02</div><div class="step-icon">🤖</div><h3>Notre IA cherche pour vous</h3><p class="step-desc">Le système compare automatiquement votre description avec les objets collectés dans tous nos établissements partenaires.</p></div>
+        <div class="step-card"><div class="step-num side">03</div><div class="step-icon">🔔</div><h3>Notification instantanée</h3><p class="step-desc">Dès une correspondance, vous êtes alerté par email. Convenez d'un retrait sur place ou d'une livraison.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- RECENT OBJECTS -->
+  <section style="padding:5rem 5vw">
+    <div style="max-width:1200px;margin:0 auto">
+      <div style="display:flex;align-items:end;justify-content:space-between;margin-bottom:2rem;flex-wrap:wrap;gap:1rem">
+        <div><div class="section-label">Objets trouvés</div><h2 style="margin-top:.3rem">Derniers objets disponibles</h2></div>
+        <button class="btn btn-secondary" onclick="navigate('explorer')">Voir tout →</button>
+      </div>
+      <div class="objects-grid" id="home-objects-grid">
+        <div class="loader"><div class="spinner"></div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- STATS BANNER -->
+  <div class="stats-banner">
+    <div class="inner">
+      <div><div class="banner-num" id="banner-total">—</div><div class="banner-label">Objets répertoriés</div></div>
+      <div><div class="banner-num" id="banner-rate">—</div><div class="banner-label">Taux de récupération</div></div>
+      <div><div class="banner-num" id="banner-estabs">—</div><div class="banner-label">Établissements partenaires</div></div>
+      <div><div class="banner-num">4.8★</div><div class="banner-label">Note moyenne</div></div>
+    </div>
+  </div>
+
+  <!-- ESTABLISHMENTS -->
+  <section style="padding:5rem 5vw;background:var(--gray-100)" id="etablissements">
+    <div style="max-width:1200px;margin:0 auto">
+      <div style="text-align:center;margin-bottom:3rem"><div class="section-label" style="justify-content:center">Réseau partenaire</div><h2>Établissements partenaires</h2><p style="color:var(--gray-500);margin-top:.5rem">Bars, boîtes de nuit et hôtels qui font confiance à Reperdu</p></div>
+      <div class="objects-grid" id="home-estabs-grid"><div class="loader"><div class="spinner"></div></div></div>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section class="cta-section">
+    <div class="cta-box">
+      <h2>Votre établissement perd des objets chaque soir ?</h2>
+      <p>Rejoignez le réseau Reperdu. QR code, dashboard, notifications automatiques, matching IA — tout est inclus.</p>
+      <div class="cta-actions">
+        <button class="btn btn-white" onclick="openModal('modal-login')">🏢 Devenir partenaire</button>
+        <button class="btn btn-outline-white" onclick="navigate('explorer')">🔍 Chercher un objet</button>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <div class="footer-inner">
+      <div class="footer-grid">
+        <div>
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:.75rem"><div class="nav-logo-mark">R</div><span class="footer-logo-text">Re<span>perdu</span></span></div>
+          <p class="footer-desc">La plateforme intelligente pour retrouver vos objets perdus dans les établissements partenaires.</p>
+        </div>
+        <div class="footer-col"><h4>Plateforme</h4><a onclick="navigate('explorer')">Explorer les objets</a><a onclick="openModal('modal-declare')">Déclarer un objet</a><a onclick="navigate('home');scrollToSection('#comment')">Comment ça marche</a><a onclick="navigate('user-dashboard')">Mon espace</a></div>
+        <div class="footer-col"><h4>Établissements</h4><a onclick="openModal('modal-login')">Devenir partenaire</a><a onclick="navigate('admin')">Dashboard admin</a><a onclick="navigate('home');scrollToSection('#etablissements')">Partenaires actuels</a></div>
+        <div class="footer-col"><h4>Entreprise</h4><a>À propos</a><a>FAQ</a><a>Contact</a><a>Mentions légales</a></div>
+      </div>
+      <div class="footer-bottom">
+        <span>© 2026 Reperdu. Tous droits réservés.</span>
+        <div class="footer-bottom-links"><a>Confidentialité</a><a>CGU</a><a>Cookies</a></div>
+      </div>
+    </div>
+  </footer>
+</div>
+
+<!-- ============================================================
+     PAGE: EXPLORER
+============================================================ -->
+<div id="page-explorer" class="page">
+  <div class="explorer-header">
+    <div class="inner">
+      <div class="section-label">Objets trouvés</div>
+      <h1 style="font-size:clamp(1.6rem,3vw,2.4rem);margin:.3rem 0 .5rem">Explorer les objets</h1>
+      <p style="color:var(--gray-500);font-size:.9rem">Parcourez les objets trouvés dans nos établissements partenaires</p>
+    </div>
+  </div>
+  <div class="explorer-body">
+    <div class="filters-bar">
+      <div class="filters-search">
+        <input type="text" class="form-input" id="search-input" placeholder="Rechercher un objet..." oninput="debounceSearch()">
+        <button class="btn btn-primary" onclick="loadObjects()">Chercher</button>
+      </div>
+      <div class="filter-pills" id="filter-pills">
+        <span class="filter-pill active" data-cat="all" onclick="setFilter(this)">Tous</span>
+        <span class="filter-pill" data-cat="phone" onclick="setFilter(this)">📱 Téléphones</span>
+        <span class="filter-pill" data-cat="bag" onclick="setFilter(this)">👜 Sacs</span>
+        <span class="filter-pill" data-cat="keys" onclick="setFilter(this)">🔑 Clés</span>
+        <span class="filter-pill" data-cat="clothing" onclick="setFilter(this)">👗 Vêtements</span>
+        <span class="filter-pill" data-cat="glasses" onclick="setFilter(this)">👓 Lunettes</span>
+        <span class="filter-pill" data-cat="wallet" onclick="setFilter(this)">💳 Portefeuilles</span>
+        <span class="filter-pill" data-cat="jewelry" onclick="setFilter(this)">💍 Bijoux</span>
+        <span class="filter-pill" data-cat="electronics" onclick="setFilter(this)">💻 Électronique</span>
+        <span class="filter-pill" data-cat="other" onclick="setFilter(this)">📦 Autre</span>
+      </div>
+    </div>
+    <div id="explorer-count" style="font-size:.85rem;color:var(--gray-500);margin-bottom:1rem"></div>
+    <div class="objects-grid" id="explorer-grid">
+      <div class="loader"><div class="spinner"></div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================
+     PAGE: OBJECT DETAIL
+============================================================ -->
+<div id="page-object" class="page">
+  <div class="object-detail">
+    <button class="btn btn-secondary btn-sm" onclick="history.back(); navigate('explorer')" style="margin-bottom:1.5rem">← Retour</button>
+    <div id="object-detail-content"><div class="loader"><div class="spinner"></div></div></div>
+  </div>
+</div>
+
+<!-- ============================================================
+     PAGE: DÉCLARER
+============================================================ -->
+<div id="page-declarer" class="page">
+  <div style="max-width:680px;margin:0 auto;padding:2.5rem 5vw">
+    <button class="btn btn-secondary btn-sm" onclick="navigate('home')" style="margin-bottom:1.5rem">← Retour</button>
+    <div class="card" style="padding:2.5rem" id="declare-form-container">
+      <h2 style="margin-bottom:.5rem">✍️ Déclarer un objet perdu</h2>
+      <p style="color:var(--gray-500);font-size:.9rem;margin-bottom:2rem">Notre IA cherchera automatiquement dans tous nos établissements partenaires.</p>
+      <form id="declare-form" onsubmit="submitDeclaration(event)">
+        <div class="form-row">
+          <div class="form-group"><label class="form-label">Prénom et nom *</label><input class="form-input" id="d-name" placeholder="Marie Dupont" required></div>
+          <div class="form-group"><label class="form-label">Email *</label><input class="form-input" type="email" id="d-email" placeholder="marie@email.com" required></div>
+        </div>
+        <div class="form-group"><label class="form-label">Catégorie *</label>
+          <div class="filter-pills" id="declare-cats" style="margin-top:.4rem">
+            <span class="filter-pill active" data-cat="phone" onclick="selectDeclareCategory(this)">📱 Téléphone</span>
+            <span class="filter-pill" data-cat="bag" onclick="selectDeclareCategory(this)">👜 Sac</span>
+            <span class="filter-pill" data-cat="keys" onclick="selectDeclareCategory(this)">🔑 Clés</span>
+            <span class="filter-pill" data-cat="clothing" onclick="selectDeclareCategory(this)">👗 Vêtement</span>
+            <span class="filter-pill" data-cat="glasses" onclick="selectDeclareCategory(this)">👓 Lunettes</span>
+            <span class="filter-pill" data-cat="wallet" onclick="selectDeclareCategory(this)">💳 Portefeuille</span>
+            <span class="filter-pill" data-cat="jewelry" onclick="selectDeclareCategory(this)">💍 Bijou</span>
+            <span class="filter-pill" data-cat="other" onclick="selectDeclareCategory(this)">📦 Autre</span>
+          </div>
+        </div>
+        <div class="form-group"><label class="form-label">Titre de l'objet *</label><input class="form-input" id="d-title" placeholder="Ex : iPhone 14 Pro noir, Sac Vuitton marron..." required></div>
+        <div class="form-group"><label class="form-label">Description détaillée *</label><textarea class="form-input" id="d-desc" rows="4" placeholder="Couleur, marque, contenu, signes distinctifs... Plus c'est précis, mieux l'IA peut trouver." required></textarea></div>
+        <div class="form-row">
+          <div class="form-group"><label class="form-label">Date de perte *</label><input class="form-input" type="date" id="d-date" required></div>
+          <div class="form-group"><label class="form-label">Lieu approximatif *</label><input class="form-input" id="d-location" placeholder="Ex : Rex Club, Paris 2e" required></div>
+        </div>
+        <div style="background:var(--green-100);border-radius:var(--radius-sm);padding:.9rem 1rem;font-size:.82rem;color:var(--green-900);margin-bottom:1.5rem">
+          🤖 Après soumission, notre IA analyse votre description et la compare à tous les objets trouvés. Vous recevrez un email si une correspondance est détectée.
+        </div>
+        <button type="submit" class="btn btn-primary btn-full" id="declare-submit">Envoyer ma déclaration →</button>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================
+     PAGE: USER DASHBOARD
+============================================================ -->
+<div id="page-user-dashboard" class="page">
+  <div class="dashboard">
+    <div class="dash-header">
+      <div><h2 id="dash-welcome">Mon espace</h2><p style="color:var(--gray-500);font-size:.875rem" id="dash-email"></p></div>
+      <button class="btn btn-primary" onclick="navigate('declarer')"><span>+</span> Nouvelle déclaration</button>
+    </div>
+    <div class="dash-kpis">
+      <div class="kpi"><div class="kpi-value" id="kpi-decls">—</div><div class="kpi-label">Déclarations</div></div>
+      <div class="kpi"><div class="kpi-value" id="kpi-claims">—</div><div class="kpi-label">Demandes C'est à moi</div></div>
+      <div class="kpi"><div class="kpi-value" id="kpi-notifs">—</div><div class="kpi-label">Notifications</div></div>
+    </div>
+    <div class="dash-tabs">
+      <button class="dash-tab active" onclick="switchDashTab(this,'tab-decls')">Mes déclarations</button>
+      <button class="dash-tab" onclick="switchDashTab(this,'tab-claims')">Mes demandes</button>
+      <button class="dash-tab" onclick="switchDashTab(this,'tab-notifs')">Notifications</button>
+    </div>
+    <div id="tab-decls"><div class="decl-list" id="decl-list"><div class="loader"><div class="spinner"></div></div></div></div>
+    <div id="tab-claims" style="display:none"><div class="decl-list" id="claims-list"><div class="loader"><div class="spinner"></div></div></div></div>
+    <div id="tab-notifs" style="display:none"><div class="notif-list" id="notif-list"><div class="loader"><div class="spinner"></div></div></div></div>
+  </div>
+</div>
+
+<!-- ============================================================
+     PAGE: ADMIN DASHBOARD
+============================================================ -->
+<div id="page-admin" class="page">
+  <div class="admin-layout">
+    <aside class="admin-sidebar">
+      <div class="sidebar-logo">
+        <div style="display:flex;align-items:center;gap:8px"><div class="nav-logo-mark" style="width:28px;height:28px;font-size:13px">R</div><span style="font-weight:800;color:var(--green-900);font-size:1rem">Re<span style="color:var(--green-400)">perdu</span></span></div>
+        <div style="font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--gray-500);margin-top:4px">Administration</div>
+      </div>
+      <nav class="sidebar-nav">
+        <button class="sidebar-item active" onclick="switchAdminSection('admin-overview',this)"><span class="icon">📊</span> Dashboard</button>
+        <button class="sidebar-item" onclick="switchAdminSection('admin-objects',this)"><span class="icon">📦</span> Objets</button>
+        <button class="sidebar-item" onclick="switchAdminSection('admin-claims',this)"><span class="icon">✋</span> Demandes</button>
+        <button class="sidebar-item" onclick="switchAdminSection('admin-establishments',this)"><span class="icon">🏢</span> Établissements</button>
+        <button class="sidebar-item" onclick="switchAdminSection('admin-declarations',this)"><span class="icon">📋</span> Déclarations</button>
+      </nav>
+      <div class="sidebar-footer">
+        <button class="sidebar-item" onclick="signOut()" style="color:#ef4444"><span class="icon">🚪</span> Déconnexion</button>
+      </div>
+    </aside>
+    <main class="admin-main">
+      <div class="admin-inner">
+        <!-- Overview -->
+        <div id="admin-overview">
+          <h2 style="margin-bottom:.5rem">Dashboard</h2>
+          <p style="color:var(--gray-500);font-size:.875rem;margin-bottom:1.5rem">Vue d'ensemble de la plateforme</p>
+          <div class="admin-kpis" id="admin-kpis"><div class="loader"><div class="spinner"></div></div></div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;margin-top:1.5rem">
+            <div class="card"><div style="padding:1.2rem 1.2rem .8rem;border-bottom:1px solid var(--gray-200);display:flex;justify-content:space-between;align-items:center"><h3 style="font-size:1rem">Demandes récentes</h3><button class="btn btn-secondary btn-sm" onclick="switchAdminSection('admin-claims',null)">Voir tout</button></div><div id="admin-recent-claims"><div class="loader"><div class="spinner"></div></div></div></div>
+            <div class="card"><div style="padding:1.2rem 1.2rem .8rem;border-bottom:1px solid var(--gray-200);display:flex;justify-content:space-between;align-items:center"><h3 style="font-size:1rem">Objets récents</h3><button class="btn btn-secondary btn-sm" onclick="switchAdminSection('admin-objects',null)">Voir tout</button></div><div id="admin-recent-objects"><div class="loader"><div class="spinner"></div></div></div></div>
+          </div>
+        </div>
+        <!-- Objects -->
+        <div id="admin-objects" style="display:none">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1.5rem;flex-wrap:wrap;gap:1rem">
+            <h2>Gestion des objets</h2>
+            <div style="display:flex;gap:.5rem">
+              <button class="btn btn-secondary btn-sm" onclick="exportCSV('objects')">⬇️ Export CSV</button>
+              <button class="btn btn-primary btn-sm" onclick="openModal('modal-add-object')">+ Ajouter un objet</button>
+            </div>
+          </div>
+          <div id="admin-objects-content"><div class="loader"><div class="spinner"></div></div></div>
+        </div>
+        <!-- Claims -->
+        <div id="admin-claims" style="display:none">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem;flex-wrap:wrap;gap:.75rem">
+            <h2>Demandes "C'est à moi"</h2>
+            <div style="display:flex;gap:.4rem;flex-wrap:wrap" id="claim-status-filters">
+              <span class="filter-pill active" data-status="pending" onclick="setClaimFilter(this)">En attente</span>
+              <span class="filter-pill" data-status="under_review" onclick="setClaimFilter(this)">En examen</span>
+              <span class="filter-pill" data-status="accepted" onclick="setClaimFilter(this)">Acceptées</span>
+              <span class="filter-pill" data-status="refused" onclick="setClaimFilter(this)">Refusées</span>
+              <span class="filter-pill" data-status="recovered" onclick="setClaimFilter(this)">Récupérés</span>
+            </div>
+          </div>
+          <div id="admin-claims-content"><div class="loader"><div class="spinner"></div></div></div>
+        </div>
+        <!-- Establishments -->
+        <div id="admin-establishments" style="display:none">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1.5rem">
+            <h2>Établissements partenaires</h2>
+            <button class="btn btn-primary btn-sm" onclick="openModal('modal-add-establishment')">+ Ajouter</button>
+          </div>
+          <div id="admin-establishments-content"><div class="loader"><div class="spinner"></div></div></div>
+        </div>
+        <!-- Declarations -->
+        <div id="admin-declarations" style="display:none">
+          <h2 style="margin-bottom:1.5rem">Déclarations de perte</h2>
+          <div id="admin-declarations-content"><div class="loader"><div class="spinner"></div></div></div>
+        </div>
+      </div>
+    </main>
+  </div>
+</div>
+
+<!-- ============================================================
+     PAGE: ETABLISSEMENT
+============================================================ -->
+<div id="page-etablissement" class="page">
+  <div class="admin-layout">
+    <aside class="admin-sidebar">
+      <div class="sidebar-logo">
+        <div style="display:flex;align-items:center;gap:8px"><div class="nav-logo-mark" style="width:28px;height:28px;font-size:13px">R</div><span style="font-weight:800;color:var(--green-900);font-size:1rem">Re<span style="color:var(--green-400)">perdu</span></span></div>
+        <div style="font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--gray-500);margin-top:4px" id="estab-sidebar-name">Mon établissement</div>
+      </div>
+      <nav class="sidebar-nav">
+        <button class="sidebar-item active" onclick="switchEstabSection('estab-dashboard',this)"><span class="icon">📊</span> Dashboard</button>
+        <button class="sidebar-item" onclick="switchEstabSection('estab-objects',this)"><span class="icon">📦</span> Mes objets</button>
+        <button class="sidebar-item" onclick="switchEstabSection('estab-claims',this)"><span class="icon">✋</span> Demandes</button>
+        <button class="sidebar-item" onclick="switchEstabSection('estab-qr',this)"><span class="icon">📱</span> QR Code</button>
+      </nav>
+      <div class="sidebar-footer">
+        <button class="sidebar-item" onclick="signOut()" style="color:#ef4444"><span class="icon">🚪</span> Déconnexion</button>
+      </div>
+    </aside>
+    <main class="estab-main">
+      <div class="admin-inner">
+        <div id="estab-dashboard">
+          <h2 style="margin-bottom:.5rem" id="estab-name-header">Mon établissement</h2>
+          <p style="color:var(--gray-500);font-size:.875rem;margin-bottom:1.5rem" id="estab-address-header"></p>
+          <div class="admin-kpis" id="estab-kpis"><div class="loader"><div class="spinner"></div></div></div>
+          <div style="margin-top:1.5rem">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem">
+              <h3>Objets trouvés récemment</h3>
+              <button class="btn btn-primary btn-sm" onclick="openModal('modal-add-object')">+ Ajouter un objet</button>
+            </div>
+            <div class="card" id="estab-objects-table"><div class="loader"><div class="spinner"></div></div></div>
+          </div>
+        </div>
+        <div id="estab-objects" style="display:none">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1.5rem">
+            <h2>Mes objets trouvés</h2>
+            <button class="btn btn-primary btn-sm" onclick="openModal('modal-add-object')">+ Ajouter</button>
+          </div>
+          <div class="card" id="estab-all-objects"><div class="loader"><div class="spinner"></div></div></div>
+        </div>
+        <div id="estab-claims" style="display:none">
+          <h2 style="margin-bottom:1.5rem">Demandes de récupération</h2>
+          <div id="estab-claims-content"><div class="loader"><div class="spinner"></div></div></div>
+        </div>
+        <div id="estab-qr" style="display:none">
+          <h2 style="margin-bottom:1.5rem">Mon QR Code</h2>
+          <div class="card" style="padding:2rem;max-width:400px">
+            <div class="qr-box" id="qr-display">
+              <div style="font-size:3rem;margin-bottom:.75rem">📱</div>
+              <p style="font-size:.9rem;color:var(--gray-500);margin-bottom:1rem">Votre QR code donne accès à votre page publique</p>
+              <button class="btn btn-primary btn-sm" onclick="generateQR()">Générer le QR Code</button>
+            </div>
+            <div style="margin-top:1.5rem;font-size:.82rem;color:var(--gray-500)">
+              <p style="font-weight:600;color:var(--gray-700);margin-bottom:.4rem">À quoi ça sert ?</p>
+              <p>Affichez ce QR code dans votre établissement. Vos clients peuvent le scanner pour :</p>
+              <ul style="padding-left:1.2rem;margin-top:.4rem;line-height:1.8">
+                <li>Voir tous les objets trouvés chez vous</li>
+                <li>Déclarer un objet perdu directement</li>
+                <li>Réclamer un objet qui leur appartient</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+</div>
+
+<!-- ============================================================
+     MODALS
+============================================================ -->
+
+<!-- LOGIN -->
+<div id="modal-login" class="modal-overlay" onclick="closeModalOut(event,'modal-login')">
+  <div class="modal">
+    <div class="modal-header">
+      <div><div class="modal-title">Connexion</div><div class="modal-sub">Accédez à votre espace Reperdu</div></div>
+      <button class="modal-close" onclick="closeModal('modal-login')">✕</button>
+    </div>
+    <div id="auth-mode-tabs" style="display:flex;background:var(--gray-100);border-radius:var(--radius-full);padding:4px;margin-bottom:1.5rem">
+      <button class="dash-tab active" style="flex:1" onclick="setAuthMode('login',this)">Connexion</button>
+      <button class="dash-tab" style="flex:1" onclick="setAuthMode('signup',this)">Inscription</button>
+    </div>
+    <form id="auth-form" onsubmit="submitAuth(event)">
+      <div class="form-group" id="auth-name-group" style="display:none"><label class="form-label">Nom complet</label><input class="form-input" id="auth-name" placeholder="Marie Dupont"></div>
+      <div class="form-group"><label class="form-label">Email *</label><input class="form-input" id="auth-email" type="email" placeholder="vous@email.com" required></div>
+      <div class="form-group"><label class="form-label">Mot de passe *</label><input class="form-input" id="auth-password" type="password" placeholder="••••••••" minlength="8" required></div>
+      <button type="submit" class="btn btn-primary btn-full" id="auth-submit">Se connecter</button>
+      <p style="text-align:center;font-size:.8rem;color:var(--gray-500);margin-top:1rem"><a onclick="setAuthMode('reset',null)" style="color:var(--green-700);cursor:pointer;font-weight:600">Mot de passe oublié ?</a></p>
+    </form>
+  </div>
+</div>
+
+<!-- DECLARE LOST (from modal) -->
+<div id="modal-declare" class="modal-overlay" onclick="closeModalOut(event,'modal-declare')">
+  <div class="modal">
+    <div class="modal-header">
+      <div><div class="modal-title">✍️ Déclarer un objet perdu</div><div class="modal-sub">Notre IA cherchera une correspondance automatiquement</div></div>
+      <button class="modal-close" onclick="closeModal('modal-declare')">✕</button>
+    </div>
+    <div id="modal-declare-inner">
+      <div class="form-row">
+        <div class="form-group"><label class="form-label">Nom complet *</label><input class="form-input" id="md-name" placeholder="Marie Dupont" required></div>
+        <div class="form-group"><label class="form-label">Email *</label><input class="form-input" id="md-email" type="email" placeholder="marie@email.com" required></div>
+      </div>
+      <div class="form-group"><label class="form-label">Titre *</label><input class="form-input" id="md-title" placeholder="Ex : iPhone 14 Pro noir..."></div>
+      <div class="form-group"><label class="form-label">Description *</label><textarea class="form-input" id="md-desc" rows="3" placeholder="Couleur, marque, contenu, signes distinctifs..."></textarea></div>
+      <div class="form-row">
+        <div class="form-group"><label class="form-label">Date de perte</label><input class="form-input" type="date" id="md-date"></div>
+        <div class="form-group"><label class="form-label">Lieu</label><input class="form-input" id="md-location" placeholder="Rex Club, Paris..."></div>
+      </div>
+      <button class="btn btn-primary btn-full" onclick="submitModalDeclaration()" id="md-submit">Envoyer →</button>
+    </div>
+  </div>
+</div>
+
+<!-- CLAIM (C'est à moi) -->
+<div id="modal-claim" class="modal-overlay" onclick="closeModalOut(event,'modal-claim')">
+  <div class="modal">
+    <div class="modal-header">
+      <div><div class="modal-title">✋ C'est mon objet !</div><div class="modal-sub" id="claim-object-name"></div></div>
+      <button class="modal-close" onclick="closeModal('modal-claim')">✕</button>
+    </div>
+    <div id="modal-claim-inner">
+      <div class="form-row">
+        <div class="form-group"><label class="form-label">Nom complet *</label><input class="form-input" id="cl-name" placeholder="Marie Dupont" required></div>
+        <div class="form-group"><label class="form-label">Email *</label><input class="form-input" id="cl-email" type="email" placeholder="marie@email.com" required></div>
+      </div>
+      <div class="form-group"><label class="form-label">Téléphone</label><input class="form-input" id="cl-phone" type="tel" placeholder="+33 6 XX XX XX XX"></div>
+      <div class="form-group"><label class="form-label">Décrivez votre objet précisément *</label><textarea class="form-input" id="cl-desc" rows="3" placeholder="Couleur exacte, contenu, marque, signes particuliers..." required></textarea></div>
+      <div class="form-row">
+        <div class="form-group"><label class="form-label">Date de perte</label><input class="form-input" type="date" id="cl-date"></div>
+        <div class="form-group"><label class="form-label">Lieu approximatif</label><input class="form-input" id="cl-location" placeholder="Salle principale..."></div>
+      </div>
+      <div style="background:var(--green-100);border-radius:var(--radius-sm);padding:.8rem 1rem;font-size:.8rem;color:var(--green-900);margin-bottom:1rem">
+        🔒 Vos informations sont confidentielles. Notre équipe vérifiera votre demande sous 48h.
+      </div>
+      <button class="btn btn-primary btn-full" onclick="submitClaim()" id="cl-submit">Envoyer ma demande →</button>
+    </div>
+  </div>
+</div>
+
+<!-- ADD OBJECT (admin/estab) -->
+<div id="modal-add-object" class="modal-overlay" onclick="closeModalOut(event,'modal-add-object')">
+  <div class="modal" style="max-width:580px">
+    <div class="modal-header">
+      <div><div class="modal-title">📦 Ajouter un objet trouvé</div><div class="modal-sub">L'IA analysera et cherchera une correspondance</div></div>
+      <button class="modal-close" onclick="closeModal('modal-add-object')">✕</button>
+    </div>
+    <div class="form-group"><label class="form-label">Catégorie *</label>
+      <div class="filter-pills" id="add-obj-cats" style="margin-top:.4rem">
+        <span class="filter-pill active" data-cat="phone" onclick="selectAddCategory(this)">📱 Téléphone</span>
+        <span class="filter-pill" data-cat="bag" onclick="selectAddCategory(this)">👜 Sac</span>
+        <span class="filter-pill" data-cat="keys" onclick="selectAddCategory(this)">🔑 Clés</span>
+        <span class="filter-pill" data-cat="clothing" onclick="selectAddCategory(this)">👗 Vêtement</span>
+        <span class="filter-pill" data-cat="glasses" onclick="selectAddCategory(this)">👓 Lunettes</span>
+        <span class="filter-pill" data-cat="wallet" onclick="selectAddCategory(this)">💳 Portefeuille</span>
+        <span class="filter-pill" data-cat="jewelry" onclick="selectAddCategory(this)">💍 Bijou</span>
+        <span class="filter-pill" data-cat="other" onclick="selectAddCategory(this)">📦 Autre</span>
+      </div>
+    </div>
+    <div class="form-group"><label class="form-label">Titre *</label><input class="form-input" id="ao-title" placeholder="Ex: iPhone 14 Pro noir, Sac cuir marron..."></div>
+    <div class="form-group"><label class="form-label">Description *</label><textarea class="form-input" id="ao-desc" rows="3" placeholder="Couleur, marque, état, caractéristiques..."></textarea></div>
+    <div class="form-group" id="ao-estab-group">
+      <label class="form-label">Établissement *</label>
+      <select class="form-input form-select" id="ao-establishment"></select>
+    </div>
+    <div class="form-row">
+      <div class="form-group"><label class="form-label">Emplacement trouvé</label><input class="form-input" id="ao-location" placeholder="Table 5, bar..."></div>
+      <div class="form-group"><label class="form-label">Lieu de stockage</label><input class="form-input" id="ao-storage" placeholder="Coffre, bureau..."></div>
+    </div>
+    <div class="form-group"><label class="form-label">Note interne</label><input class="form-input" id="ao-notes" placeholder="Note pour l'équipe..."></div>
+    <button class="btn btn-primary btn-full" onclick="submitAddObject()" id="ao-submit">Ajouter l'objet →</button>
+  </div>
+</div>
+
+<!-- ADD ESTABLISHMENT -->
+<div id="modal-add-establishment" class="modal-overlay" onclick="closeModalOut(event,'modal-add-establishment')">
+  <div class="modal">
+    <div class="modal-header">
+      <div><div class="modal-title">🏢 Ajouter un établissement</div></div>
+      <button class="modal-close" onclick="closeModal('modal-add-establishment')">✕</button>
+    </div>
+    <div class="form-row">
+      <div class="form-group"><label class="form-label">Nom *</label><input class="form-input" id="ae-name" placeholder="Le Comptoir Général"></div>
+      <div class="form-group"><label class="form-label">Type *</label>
+        <select class="form-input form-select" id="ae-type">
+          <option value="bar">Bar</option><option value="nightclub">Boîte de nuit</option><option value="hotel">Hôtel</option><option value="restaurant">Restaurant</option><option value="other">Autre</option>
+        </select>
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group"><label class="form-label">Email *</label><input class="form-input" type="email" id="ae-email" placeholder="contact@etablissement.fr"></div>
+      <div class="form-group"><label class="form-label">Téléphone</label><input class="form-input" id="ae-phone" placeholder="+33 1 XX XX XX XX"></div>
+    </div>
+    <div class="form-group"><label class="form-label">Adresse *</label><input class="form-input" id="ae-address" placeholder="80 Quai de Jemmapes"></div>
+    <div class="form-row">
+      <div class="form-group"><label class="form-label">Ville *</label><input class="form-input" id="ae-city" placeholder="Paris"></div>
+      <div class="form-group"><label class="form-label">Code postal</label><input class="form-input" id="ae-postal" placeholder="75010"></div>
+    </div>
+    <div class="form-group"><label class="form-label">Plan</label>
+      <select class="form-input form-select" id="ae-plan">
+        <option value="basic">Basic</option><option value="premium">Premium</option><option value="elite">Elite</option><option value="hotel">Hôtel</option>
+      </select>
+    </div>
+    <button class="btn btn-primary btn-full" onclick="submitAddEstablishment()" id="ae-submit">Créer l'établissement →</button>
+  </div>
+</div>
+
+<!-- ============================================================
+     JAVASCRIPT
+============================================================ -->
+<script>
+// ──────────────────────────────────────────────────────────────
+// INIT SUPABASE
+// ──────────────────────────────────────────────────────────────
+const { createClient } = supabase
+const sb = createClient(CONFIG.SUPABASE_URL, CONFIG.SUPABASE_ANON_KEY)
+
+let currentUser = null
+let currentProfile = null
+let currentPage = 'home'
+let activeCategory = 'all'
+let declarationCategory = 'phone'
+let addObjectCategory = 'phone'
+let currentObjectId = null
+let currentClaimObjectId = null
+let searchDebounce = null
+let claimStatusFilter = 'pending'
+let estabProfile = null
+
+// ──────────────────────────────────────────────────────────────
+// TOAST
+// ──────────────────────────────────────────────────────────────
+function toast(msg, type='success', duration=4000) {
+  const icons = {success:'✅', error:'❌', info:'ℹ️'}
+  const t = document.createElement('div')
+  t.className = `toast ${type}`
+  t.innerHTML = `<span class="toast-icon">${icons[type]}</span><span>${msg}</span>`
+  document.getElementById('toast-container').appendChild(t)
+  setTimeout(() => t.remove(), duration)
+}
+
+// ──────────────────────────────────────────────────────────────
+// ROUTER
+// ──────────────────────────────────────────────────────────────
+function navigate(page, data=null) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'))
+  currentPage = page
+  const el = document.getElementById(`page-${page}`)
+  if (el) el.classList.add('active')
+  window.scrollTo(0, 0)
+
+  // Load page data
+  if (page === 'home') { loadHomeStats(); loadHomeObjects(); loadHomeEstabs() }
+  if (page === 'explorer') loadObjects()
+  if (page === 'object' && data) { currentObjectId = data; loadObjectDetail(data) }
+  if (page === 'user-dashboard') loadUserDashboard()
+  if (page === 'admin') { checkAdminAccess(); loadAdminOverview() }
+  if (page === 'etablissement') loadEstabDashboard()
+  if (page === 'declarer') { document.getElementById('d-date').max = new Date().toISOString().split('T')[0] }
+}
+
+function scrollToSection(id) {
+  setTimeout(() => {
+    const el = document.querySelector(id)
+    if (el) el.scrollIntoView({ behavior:'smooth' })
+  }, 100)
+}
+
+// ──────────────────────────────────────────────────────────────
+// AUTH
+// ──────────────────────────────────────────────────────────────
+async function initAuth() {
+  const { data: { session } } = await sb.auth.getSession()
+  if (session) await setUser(session.user)
+
+  sb.auth.onAuthStateChange(async (event, session) => {
+    if (session) { await setUser(session.user); renderNavActions() }
+    else { currentUser = null; currentProfile = null; renderNavActions() }
+  })
+  renderNavActions()
+}
+
+async function setUser(user) {
+  currentUser = user
+  const { data } = await sb.from('profiles').select('*').eq('id', user.id).single()
+  currentProfile = data
+}
+
+function renderNavActions() {
+  const el = document.getElementById('nav-actions')
+  if (!currentUser) {
+    el.innerHTML = `
+      <button class="btn btn-secondary btn-sm" onclick="openModal('modal-login')">Connexion</button>
+      <button class="btn btn-primary btn-sm" onclick="openModal('modal-declare')">Déclarer un objet</button>`
+  } else {
+    const initial = (currentProfile?.full_name || currentUser.email)[0].toUpperCase()
+    const role = currentProfile?.role || 'user'
+    const dashLink = role === 'admin' || role === 'superadmin' ? `<a onclick="navigate('admin');closeDropdown()">🏠 Dashboard Admin</a>` :
+                     role === 'establishment' ? `<a onclick="navigate('etablissement');closeDropdown()">🏢 Dashboard Établissement</a>` : ''
+    el.innerHTML = `
+      <div class="nav-user" onclick="toggleDropdown()">
+        <div class="nav-avatar">${initial}</div>
+        <span>${currentProfile?.full_name?.split(' ')[0] || 'Mon compte'}</span>
+        <div class="nav-dropdown" id="nav-dd">
+          ${dashLink}
+          <a onclick="navigate('user-dashboard');closeDropdown()">👤 Mon espace</a>
+          <hr>
+          <a class="danger" onclick="signOut()">🚪 Déconnexion</a>
+        </div>
+      </div>`
+  }
+}
+
+function toggleDropdown() {
+  document.getElementById('nav-dd')?.classList.toggle('open')
+}
+function closeDropdown() {
+  document.getElementById('nav-dd')?.classList.remove('open')
+}
+document.addEventListener('click', e => {
+  if (!e.target.closest('.nav-user')) closeDropdown()
+})
+
+let authMode = 'login'
+function setAuthMode(mode, btn) {
+  authMode = mode
+  if (btn) {
+    document.querySelectorAll('#auth-mode-tabs .dash-tab').forEach(t => t.classList.remove('active'))
+    btn.classList.add('active')
+  }
+  document.getElementById('auth-name-group').style.display = mode === 'signup' ? 'block' : 'none'
+  document.getElementById('auth-submit').textContent = mode === 'login' ? 'Se connecter' : mode === 'signup' ? 'Créer mon compte' : 'Envoyer le lien'
+}
+
+async function submitAuth(e) {
+  e.preventDefault()
+  const email = document.getElementById('auth-email').value
+  const password = document.getElementById('auth-password').value
+  const btn = document.getElementById('auth-submit')
+  btn.disabled = true
+  btn.innerHTML = '<div class="btn-spinner"></div> Chargement...'
+
+  try {
+    if (authMode === 'login') {
+      const { error } = await sb.auth.signInWithPassword({ email, password })
+      if (error) throw error
+      closeModal('modal-login')
+      toast('Connexion réussie ! 🎉')
+      await new Promise(r => setTimeout(r, 500))
+      const role = currentProfile?.role
+      if (role === 'admin' || role === 'superadmin') navigate('admin')
+      else if (role === 'establishment') navigate('etablissement')
+      else navigate('user-dashboard')
+    } else if (authMode === 'signup') {
+      const name = document.getElementById('auth-name').value
+      const { error } = await sb.auth.signUp({ email, password, options: { data: { full_name: name } } })
+      if (error) throw error
+      closeModal('modal-login')
+      toast('Compte créé ! Vérifiez votre email pour confirmer.')
+    } else {
+      const { error } = await sb.auth.resetPasswordForEmail(email)
+      if (error) throw error
+      closeModal('modal-login')
+      toast('Email de réinitialisation envoyé !')
+    }
+  } catch(err) {
+    toast(err.message || 'Erreur de connexion', 'error')
+  } finally {
+    btn.disabled = false
+    btn.textContent = authMode === 'login' ? 'Se connecter' : authMode === 'signup' ? 'Créer mon compte' : 'Envoyer le lien'
+  }
+}
+
+async function signOut() {
+  await sb.auth.signOut()
+  currentUser = null; currentProfile = null
+  renderNavActions()
+  navigate('home')
+  toast('Déconnecté')
+}
+
+// ──────────────────────────────────────────────────────────────
+// HOME PAGE
+// ──────────────────────────────────────────────────────────────
+async function loadHomeStats() {
+  const [{ count: total }, { count: recovered }, { count: estabs }] = await Promise.all([
+    sb.from('objects').select('*', { count:'exact', head:true }),
+    sb.from('objects').select('*', { count:'exact', head:true }).eq('status','recovered'),
+    sb.from('establishments').select('*', { count:'exact', head:true }).eq('is_active',true),
+  ])
+  const rate = total > 0 ? Math.round((recovered/total)*100) : 0
+  document.getElementById('stat-total').textContent = (total||0).toLocaleString('fr-FR')
+  document.getElementById('stat-rate').textContent = rate + '%'
+  document.getElementById('stat-estabs').textContent = (estabs||0) + '+'
+  document.getElementById('banner-total').textContent = (total||0).toLocaleString('fr-FR')
+  document.getElementById('banner-rate').textContent = rate + '%'
+  document.getElementById('banner-estabs').textContent = (estabs||0)
+}
+
+async function loadHomeObjects() {
+  const { data } = await sb.from('objects').select('*, establishment:establishments(name,city)').eq('status','online').order('created_at',{ascending:false}).limit(6)
+  const grid = document.getElementById('home-objects-grid')
+  if (!data?.length) { grid.innerHTML = '<div class="empty-state"><div class="icon">📦</div><p>Aucun objet disponible</p></div>'; return }
+  grid.innerHTML = data.map(o => renderObjectCard(o)).join('')
+}
+
+async function loadHomeEstabs() {
+  const { data } = await sb.from('establishments').select('*').eq('is_active',true).order('total_objects',{ascending:false}).limit(6)
+  const grid = document.getElementById('home-estabs-grid')
+  if (!data?.length) { grid.innerHTML = '<div class="empty-state"><p>Aucun établissement partenaire</p></div>'; return }
+  grid.innerHTML = data.map(e => `
+    <div class="card card-hover" style="padding:1.5rem;cursor:pointer" onclick="navigate('explorer')">
+      <span style="display:inline-flex;align-items:center;gap:5px;background:var(--green-100);color:var(--green-700);font-size:.68rem;font-weight:700;text-transform:uppercase;letter-spacing:.05em;padding:.2rem .6rem;border-radius:var(--radius-full);margin-bottom:.75rem">
+        ${e.type==='bar'?'🍸':e.type==='nightclub'?'🎵':'🏨'} ${e.type==='bar'?'Bar':e.type==='nightclub'?'Boîte de nuit':'Hôtel'}
+      </span>
+      <div style="font-size:2rem;margin-bottom:.5rem">${e.type==='bar'?'🍸':e.type==='nightclub'?'🌙':'⭐'}</div>
+      <h3>${e.name}</h3>
+      <p style="font-size:.8rem;color:var(--gray-500);margin-top:.2rem">📍 ${e.address}, ${e.city}</p>
+      <div style="display:flex;gap:1.5rem;margin-top:1rem;padding-top:1rem;border-top:1px solid var(--gray-200)">
+        <div><div style="font-size:1.1rem;font-weight:700;color:var(--green-700)">${e.total_objects}</div><div style="font-size:.7rem;color:var(--gray-500)">Trouvés</div></div>
+        <div><div style="font-size:1.1rem;font-weight:700;color:var(--green-700)">${e.recovered_objects}</div><div style="font-size:.7rem;color:var(--gray-500)">Récupérés</div></div>
+        <div><div style="font-size:1.1rem;font-weight:700;color:var(--green-700)">${e.total_objects>0?Math.round(e.recovered_objects/e.total_objects*100):0}%</div><div style="font-size:.7rem;color:var(--gray-500)">Taux</div></div>
+      </div>
+    </div>`).join('')
+}
+
+// ──────────────────────────────────────────────────────────────
+// OBJECT CARD RENDER
+// ──────────────────────────────────────────────────────────────
+const CAT_ICONS = {phone:'📱',bag:'👜',keys:'🔑',clothing:'👗',glasses:'👓',wallet:'💳',jewelry:'💍',electronics:'💻',documents:'📄',other:'📦'}
+const CAT_LABELS = {phone:'Téléphone',bag:'Sac',keys:'Clés',clothing:'Vêtement',glasses:'Lunettes',wallet:'Portefeuille',jewelry:'Bijou',electronics:'Électronique',documents:'Documents',other:'Autre'}
+const STATUS_LABELS = {online:'En ligne',pending:'En attente',recovered:'Récupéré',archived:'Archivé'}
+const CAT_COLORS = {phone:'#E8F5E9',bag:'#FFF3E0',keys:'#E3F2FD',clothing:'#FCE4EC',glasses:'#E8F5E9',wallet:'#FFF3E0',jewelry:'#F3E5F5',electronics:'#E3F2FD',documents:'#FFF8E1',other:'#F5F5F5'}
+
+function renderObjectCard(o) {
+  const ago = timeAgo(o.found_at)
+  const statusClass = `badge-${o.status}`
+  return `<div class="obj-card" onclick="navigate('object','${o.id}')">
+    <div class="obj-img" style="background:${CAT_COLORS[o.category]||'#F5F5F5'}">
+      ${o.primary_image_url ? `<img src="${o.primary_image_url}" alt="${o.title}">` : `<span style="position:relative;z-index:1">${CAT_ICONS[o.category]||'📦'}</span>`}
+      <div style="position:absolute;top:10px;left:10px"><span class="badge ${statusClass}">${STATUS_LABELS[o.status]||o.status}</span></div>
+    </div>
+    <div class="obj-body">
+      <div class="obj-cat">${CAT_ICONS[o.category]} ${CAT_LABELS[o.category]||o.category}</div>
+      <div class="obj-name">${o.title}</div>
+      <div class="obj-place">📍 ${o.establishment?.name||'—'}, ${o.establishment?.city||''}</div>
+    </div>
+    <div class="obj-footer"><span class="obj-date">${ago}</span></div>
+  </div>`
+}
+
+function timeAgo(dateStr) {
+  const diff = Date.now() - new Date(dateStr).getTime()
+  const m = Math.floor(diff/60000), h = Math.floor(diff/3600000), d = Math.floor(diff/86400000)
+  if (m < 60) return `Il y a ${m}min`
+  if (h < 24) return `Il y a ${h}h`
+  if (d < 30) return `Il y a ${d}j`
+  return new Date(dateStr).toLocaleDateString('fr-FR',{day:'numeric',month:'short'})
+}
+
+// ──────────────────────────────────────────────────────────────
+// EXPLORER
+// ──────────────────────────────────────────────────────────────
+function setFilter(el) {
+  document.querySelectorAll('#filter-pills .filter-pill').forEach(p => p.classList.remove('active'))
+  el.classList.add('active')
+  activeCategory = el.dataset.cat
+  loadObjects()
+}
+
+function debounceSearch() {
+  clearTimeout(searchDebounce)
+  searchDebounce = setTimeout(loadObjects, 400)
+}
+
+async function loadObjects() {
+  const grid = document.getElementById('explorer-grid')
+  if (!grid) return
+  grid.innerHTML = '<div class="loader"><div class="spinner"></div></div>'
+  const search = document.getElementById('search-input')?.value || ''
+
+  let query = sb.from('objects').select('*, establishment:establishments(name,city)').eq('status','online').order('created_at',{ascending:false}).limit(40)
+  if (activeCategory !== 'all') query = query.eq('category', activeCategory)
+  if (search.trim()) query = query.ilike('title', `%${search.trim()}%`)
+
+  const { data, error } = await query
+  const count = document.getElementById('explorer-count')
+  if (error) { grid.innerHTML = `<div class="empty-state"><div class="icon">⚠️</div><p>${error.message}</p></div>`; return }
+  if (count) count.textContent = `${data?.length||0} objet${data?.length!==1?'s':''} trouvé${data?.length!==1?'s':''}`
+  if (!data?.length) { grid.innerHTML = '<div class="empty-state" style="grid-column:1/-1"><div class="icon">🔍</div><h3>Aucun objet trouvé</h3><p>Modifiez vos filtres ou déclarez votre objet perdu</p><br><button class="btn btn-primary" onclick="openModal(\'modal-declare\')">Déclarer mon objet</button></div>'; return }
+  grid.innerHTML = data.map(o => renderObjectCard(o)).join('')
+}
+
+// ──────────────────────────────────────────────────────────────
+// OBJECT DETAIL
+// ──────────────────────────────────────────────────────────────
+async function loadObjectDetail(id) {
+  const el = document.getElementById('object-detail-content')
+  el.innerHTML = '<div class="loader"><div class="spinner"></div></div>'
+  const { data: o } = await sb.from('objects').select('*, establishment:establishments(*)').eq('id',id).single()
+  if (!o) { el.innerHTML = '<div class="empty-state"><div class="icon">❓</div><h3>Objet introuvable</h3></div>'; return }
+
+  el.innerHTML = `
+    <div class="obj-detail-grid">
+      <div>
+        <div class="card obj-detail-img" id="main-img" style="background:${CAT_COLORS[o.category]}">
+          ${o.primary_image_url ? `<img src="${o.primary_image_url}" alt="${o.title}" id="main-img-el">` : `<span style="position:relative;z-index:1;font-size:80px">${CAT_ICONS[o.category]||'📦'}</span>`}
+          <div style="position:absolute;top:12px;left:12px"><span class="badge badge-${o.status}">${STATUS_LABELS[o.status]}</span></div>
+        </div>
+        ${o.images?.length > 1 ? `<div class="obj-detail-thumbs">${o.images.map((img,i) => `<div class="obj-detail-thumb" onclick="document.getElementById('main-img-el').src='${img}'"><img src="${img}" style="width:100%;height:100%;object-fit:cover"></div>`).join('')}</div>` : ''}
+        ${o.ai_tags?.length ? `<div class="card" style="padding:1rem;margin-top:.75rem"><div style="font-size:.7rem;font-weight:700;text-transform:uppercase;color:var(--gray-500);letter-spacing:.05em;margin-bottom:.5rem">🤖 Tags IA</div><div class="tags-row">${o.ai_tags.map(t=>`<span class="tag">${t}</span>`).join('')}</div></div>` : ''}
+      </div>
+      <div>
+        <div class="card obj-info-card">
+          <div style="font-size:.7rem;font-weight:700;text-transform:uppercase;color:var(--green-700);letter-spacing:.06em;margin-bottom:.5rem">${CAT_ICONS[o.category]} ${CAT_LABELS[o.category]}</div>
+          <h2 style="font-size:1.4rem;margin-bottom:.75rem">${o.title}</h2>
+          <p style="font-size:.875rem;color:var(--gray-500);line-height:1.7;margin-bottom:1rem">${o.description}</p>
+          <div class="obj-info-row"><span class="obj-info-icon">🏢</span><div><div class="obj-info-label">Établissement</div><div class="obj-info-value">${o.establishment?.name||'—'}</div><div style="font-size:.78rem;color:var(--gray-500)">${o.establishment?.address||''}, ${o.establishment?.city||''}</div></div></div>
+          <div class="obj-info-row"><span class="obj-info-icon">📅</span><div><div class="obj-info-label">Trouvé le</div><div class="obj-info-value">${new Date(o.found_at).toLocaleDateString('fr-FR',{day:'numeric',month:'long',year:'numeric',hour:'2-digit',minute:'2-digit'})}</div></div></div>
+          ${o.found_location_detail ? `<div class="obj-info-row"><span class="obj-info-icon">📍</span><div><div class="obj-info-label">Emplacement</div><div class="obj-info-value">${o.found_location_detail}</div></div></div>` : ''}
+        </div>
+        ${o.status === 'online' ? `
+          <div class="card" style="padding:1.2rem;margin-top:1rem">
+            <h3 style="font-size:.95rem;margin-bottom:.4rem">C'est votre objet ?</h3>
+            <p style="font-size:.78rem;color:var(--gray-500);margin-bottom:.9rem">Soumettez une demande. Notre équipe vérifiera sous 48h.</p>
+            <button class="btn btn-primary btn-full" onclick="openClaimModal('${o.id}','${o.title.replace(/'/g,"\\'")}')">✋ C'est mon objet !</button>
+            <button class="btn btn-secondary btn-full" style="margin-top:.5rem" onclick="shareObject('${o.id}','${o.title.replace(/'/g,"\\'")}')">📤 Partager</button>
+          </div>` :
+          o.status === 'recovered' ? `<div class="card" style="padding:1.5rem;margin-top:1rem;background:var(--green-50);border-color:var(--green-200);text-align:center"><div style="font-size:2.5rem;margin-bottom:.5rem">✅</div><h3 style="color:var(--green-700)">Objet récupéré</h3><p style="font-size:.85rem;color:var(--green-700);margin-top:.3rem">Cet objet a été restitué à son propriétaire.</p></div>` : ''}
+        <div class="card" style="padding:1.2rem;margin-top:1rem">
+          <h3 style="font-size:.9rem;margin-bottom:.4rem">💳 Laisser un pourboire</h3>
+          <p style="font-size:.78rem;color:var(--gray-500);margin-bottom:.7rem">Remerciez l'établissement si votre objet a été récupéré.</p>
+          <div style="display:flex;gap:.4rem;flex-wrap:wrap">
+            ${[2,5,10,20].map(a => `<button class="btn btn-secondary btn-sm" onclick="toast('Pourboire de ${a}€ — fonctionnalité Stripe à connecter','info')">${a}€</button>`).join('')}
+          </div>
+        </div>
+      </div>
+    </div>`
+}
+
+function openClaimModal(id, title) {
+  currentClaimObjectId = id
+  document.getElementById('claim-object-name').textContent = title
+  closeModal(null)
+  openModal('modal-claim')
+}
+
+function shareObject(id, title) {
+  const url = window.location.href.split('?')[0] + `?object=${id}`
+  if (navigator.share) navigator.share({ title, url })
+  else { navigator.clipboard?.writeText(url); toast('Lien copié !') }
+}
+
+// ──────────────────────────────────────────────────────────────
+// DECLARE LOST OBJECT
+// ──────────────────────────────────────────────────────────────
+function selectDeclareCategory(el) {
+  document.querySelectorAll('#declare-cats .filter-pill').forEach(p => p.classList.remove('active'))
+  el.classList.add('active')
+  declarationCategory = el.dataset.cat
+}
+
+async function submitDeclaration(e) {
+  e.preventDefault()
+  const btn = document.getElementById('declare-submit')
+  btn.disabled = true
+  btn.innerHTML = '<div class="btn-spinner"></div> Envoi en cours...'
+
+  try {
+    const payload = {
+      full_name: document.getElementById('d-name').value,
+      email: document.getElementById('d-email').value,
+      title: document.getElementById('d-title').value,
+      description: document.getElementById('d-desc').value,
+      category: declarationCategory,
+      loss_date: document.getElementById('d-date').value,
+      loss_location: document.getElementById('d-location').value,
+      status: 'active',
+      user_id: currentUser?.id || null,
+    }
+
+    const { data, error } = await sb.from('declarations').insert(payload).select().single()
+    if (error) throw error
+
+    // Trigger N8N workflow for AI matching
+    triggerN8N('reperdu-new-declaration', { ...payload, declaration_id: data.id })
+
+    document.getElementById('declare-form-container').innerHTML = `
+      <div class="success-state">
+        <div class="success-icon">🎉</div>
+        <h2 style="margin-bottom:.75rem">Déclaration enregistrée !</h2>
+        <p style="color:var(--gray-500);line-height:1.7;margin-bottom:.5rem">Votre déclaration a bien été reçue. Notre IA va analyser votre description et vous notifier par email dès qu'une correspondance est trouvée.</p>
+        <div style="background:var(--green-100);border-radius:var(--radius-sm);padding:.75rem 1rem;font-size:.82rem;color:var(--green-700);margin:1rem 0;font-weight:600">Référence : #${data.id.substring(0,8).toUpperCase()}</div>
+        <div style="display:flex;gap:.75rem;justify-content:center;flex-wrap:wrap;margin-top:1.5rem">
+          <button class="btn btn-primary" onclick="navigate('explorer')">Explorer les objets trouvés</button>
+          <button class="btn btn-secondary" onclick="navigate('user-dashboard')">Mes déclarations</button>
+        </div>
+      </div>`
+  } catch(err) {
+    toast(err.message || 'Erreur lors de la soumission', 'error')
+    btn.disabled = false
+    btn.textContent = 'Envoyer ma déclaration →'
+  }
+}
+
+async function submitModalDeclaration() {
+  const btn = document.getElementById('md-submit')
+  const name = document.getElementById('md-name').value
+  const email = document.getElementById('md-email').value
+  const title = document.getElementById('md-title').value
+  const desc = document.getElementById('md-desc').value
+  if (!name || !email || !title || !desc) { toast('Remplissez tous les champs obligatoires','error'); return }
+
+  btn.disabled = true
+  btn.innerHTML = '<div class="btn-spinner"></div>'
+  try {
+    const payload = { full_name:name, email, title, description:desc, category:'other', loss_date: document.getElementById('md-date').value || new Date().toISOString().split('T')[0], loss_location: document.getElementById('md-location').value || 'Non précisé', status:'active', user_id: currentUser?.id||null }
+    const { data, error } = await sb.from('declarations').insert(payload).select().single()
+    if (error) throw error
+    triggerN8N('reperdu-new-declaration', { ...payload, declaration_id: data.id })
+    closeModal('modal-declare')
+    toast('Déclaration envoyée ! Vous serez notifié par email si une correspondance est trouvée. 🎉')
+  } catch(err) {
+    toast(err.message,'error')
+  } finally {
+    btn.disabled = false
+    btn.textContent = 'Envoyer →'
+  }
+}
+
+// ──────────────────────────────────────────────────────────────
+// CLAIM
+// ──────────────────────────────────────────────────────────────
+async function submitClaim() {
+  const btn = document.getElementById('cl-submit')
+  const name = document.getElementById('cl-name').value
+  const email = document.getElementById('cl-email').value
+  const desc = document.getElementById('cl-desc').value
+  if (!name || !email || !desc) { toast('Remplissez tous les champs obligatoires','error'); return }
+
+  btn.disabled = true
+  btn.innerHTML = '<div class="btn-spinner"></div> Envoi...'
+  try {
+    const payload = {
+      object_id: currentClaimObjectId,
+      claimant_id: currentUser?.id || null,
+      full_name: name,
+      email,
+      phone: document.getElementById('cl-phone').value || null,
+      description: desc,
+      loss_date: document.getElementById('cl-date').value || null,
+      loss_location: document.getElementById('cl-location').value || null,
+      status: 'pending',
+    }
+    const { data, error } = await sb.from('claims').insert(payload).select().single()
+    if (error) throw error
+
+    // Update object to pending
+    await sb.from('objects').update({ status:'pending' }).eq('id', currentClaimObjectId)
+
+    // Trigger N8N: notify admin + send confirmation email
+    triggerN8N('reperdu-new-claim', { ...payload, claim_id: data.id })
+
+    document.getElementById('modal-claim-inner').innerHTML = `
+      <div class="success-state">
+        <div class="success-icon">✅</div>
+        <h3>Demande envoyée !</h3>
+        <p style="color:var(--gray-500);margin-top:.5rem;line-height:1.7">Notre équipe va vérifier votre demande et vous contacter par email dans les 24 à 48 heures.</p>
+        <button class="btn btn-primary" style="margin-top:1.5rem" onclick="closeModal('modal-claim')">Fermer</button>
+      </div>`
+    toast('Demande envoyée ! Nous vous contacterons rapidement. 🎉')
+  } catch(err) {
+    toast(err.message,'error')
+    btn.disabled = false
+    btn.textContent = 'Envoyer ma demande →'
+  }
+}
+
+// ──────────────────────────────────────────────────────────────
+// USER DASHBOARD
+// ──────────────────────────────────────────────────────────────
+async function loadUserDashboard() {
+  if (!currentUser) { openModal('modal-login'); return }
+
+  document.getElementById('dash-welcome').textContent = `Bonjour, ${currentProfile?.full_name?.split(' ')[0] || 'vous'} 👋`
+  document.getElementById('dash-email').textContent = currentUser.email
+
+  const [{ data: decls }, { data: claims }, { data: notifs }] = await Promise.all([
+    sb.from('declarations').select('*, matched_object:objects(id,title,primary_image_url,status,establishment:establishments(name))').eq('user_id', currentUser.id).order('created_at',{ascending:false}),
+    sb.from('claims').select('*, object:objects(id,title,category,primary_image_url,establishment:establishments(name,city))').eq('claimant_id', currentUser.id).order('created_at',{ascending:false}),
+    sb.from('notifications').select('*').eq('user_id', currentUser.id).order('created_at',{ascending:false}).limit(20),
+  ])
+
+  document.getElementById('kpi-decls').textContent = decls?.length || 0
+  document.getElementById('kpi-claims').textContent = claims?.length || 0
+  document.getElementById('kpi-notifs').textContent = notifs?.filter(n => !n.is_read).length || 0
+
+  // Declarations
+  const dl = document.getElementById('decl-list')
+  if (!decls?.length) {
+    dl.innerHTML = `<div class="empty-state"><div class="icon">📋</div><h3>Aucune déclaration</h3><button class="btn btn-primary" style="margin-top:1rem" onclick="navigate('declarer')">Déclarer un objet</button></div>`
+  } else {
+    dl.innerHTML = decls.map(d => `
+      <div class="decl-item">
+        <div class="decl-icon">${CAT_ICONS[d.category]||'📦'}</div>
+        <div class="decl-info">
+          <div class="decl-name">${d.title}</div>
+          <div class="decl-meta">Perdu le ${new Date(d.loss_date).toLocaleDateString('fr-FR')} — ${d.loss_location}</div>
+          ${d.matched_object ? `<div class="match-found" onclick="navigate('object','${d.matched_object.id}')">🎉 Correspondance : ${d.matched_object.title} — ${d.matched_object.establishment?.name} →</div>` : ''}
+        </div>
+        <span class="badge ${d.status==='matched'?'badge-online':d.status==='closed'?'badge-recovered':'badge-pending'}">${d.status==='matched'?'✅ Correspondance':d.status==='closed'?'Clôturé':'🔍 En cours'}</span>
+      </div>`).join('')
+  }
+
+  // Claims
+  const cl = document.getElementById('claims-list')
+  if (!claims?.length) {
+    cl.innerHTML = `<div class="empty-state"><div class="icon">🙋</div><h3>Aucune demande</h3><button class="btn btn-secondary" style="margin-top:1rem" onclick="navigate('explorer')">Explorer les objets</button></div>`
+  } else {
+    cl.innerHTML = claims.map(c => `
+      <div class="decl-item">
+        <div class="decl-icon">${CAT_ICONS[c.object?.category]||'📦'}</div>
+        <div class="decl-info">
+          <div class="decl-name">${c.object?.title||'—'}</div>
+          <div class="decl-meta">${c.object?.establishment?.name||''} · Envoyé ${timeAgo(c.created_at)}</div>
+          ${c.status==='accepted'&&c.admin_notes?`<div style="font-size:.78rem;background:var(--green-100);border-radius:6px;padding:.4rem .7rem;margin-top:.4rem;color:var(--green-900)">💬 ${c.admin_notes}</div>`:``}
+        </div>
+        <span class="badge ${c.status==='accepted'?'badge-online':c.status==='refused'?'badge-archived':c.status==='recovered'?'badge-recovered':'badge-pending'}">${c.status==='pending'?'⏳ En attente':c.status==='accepted'?'✅ Acceptée':c.status==='recovered'?'🎉 Récupéré':'❌ Refusée'}</span>
+      </div>`).join('')
+  }
+
+  // Notifications
+  const nl = document.getElementById('notif-list')
+  if (!notifs?.length) {
+    nl.innerHTML = `<div class="empty-state"><div class="icon">🔔</div><h3>Aucune notification</h3></div>`
+  } else {
+    nl.innerHTML = notifs.map(n => `
+      <div class="notif-item ${n.is_read?'':'unread'}">
+        <div class="notif-icon">${n.type==='match_found'?'🎉':n.type==='claim_accepted'?'✅':'📬'}</div>
+        <div>
+          <div class="notif-title">${n.title}</div>
+          <div class="notif-msg">${n.message}</div>
+          <div class="notif-time">${timeAgo(n.created_at)}</div>
+        </div>
+        ${n.object_id?`<button class="btn btn-secondary btn-sm" onclick="navigate('object','${n.object_id}')">Voir →</button>`:''}
+      </div>`).join('')
+  }
+}
+
+function switchDashTab(btn, tabId) {
+  document.querySelectorAll('.dashboard .dash-tab').forEach(t => t.classList.remove('active'))
+  btn.classList.add('active')
+  document.getElementById('tab-decls').style.display = 'none'
+  document.getElementById('tab-claims').style.display = 'none'
+  document.getElementById('tab-notifs').style.display = 'none'
+  document.getElementById(tabId).style.display = 'block'
+}
+
+// ──────────────────────────────────────────────────────────────
+// ADMIN
+// ──────────────────────────────────────────────────────────────
+async function checkAdminAccess() {
+  if (!currentUser) { navigate('home'); openModal('modal-login'); return }
+  const role = currentProfile?.role
+  if (role !== 'admin' && role !== 'superadmin') { toast('Accès refusé','error'); navigate('home'); return }
+}
+
+async function loadAdminOverview() {
+  const [{ count:total }, { count:online }, { count:recovered }, { count:pendingClaims }] = await Promise.all([
+    sb.from('objects').select('*',{count:'exact',head:true}),
+    sb.from('objects').select('*',{count:'exact',head:true}).eq('status','online'),
+    sb.from('objects').select('*',{count:'exact',head:true}).eq('status','recovered'),
+    sb.from('claims').select('*',{count:'exact',head:true}).eq('status','pending'),
+  ])
+  const rate = total > 0 ? Math.round((recovered/total)*100) : 0
+  document.getElementById('admin-kpis').innerHTML = [
+    {label:'Objets en ligne', value:online||0, color:'var(--green-700)'},
+    {label:'Demandes en attente', value:pendingClaims||0, color:'#E65100'},
+    {label:'Récupérés', value:recovered||0, color:'#1565C0'},
+    {label:'Taux de récupération', value:rate+'%', color:'var(--green-700)'},
+  ].map(k => `<div class="kpi"><div class="kpi-value" style="color:${k.color}">${k.value}</div><div class="kpi-label">${k.label}</div></div>`).join('')
+
+  // Recent claims
+  const { data:claims } = await sb.from('claims').select('*, object:objects(title,category)').eq('status','pending').order('created_at',{ascending:false}).limit(5)
+  document.getElementById('admin-recent-claims').innerHTML = claims?.length ?
+    `<table class="admin-table">${claims.map(c => `<tr><td><strong>${c.full_name}</strong><br><span style="font-size:.75rem;color:var(--gray-500)">${c.email}</span></td><td>${c.object?.title||'—'}</td><td><span class="badge badge-pending">En attente</span></td><td><button class="btn btn-secondary btn-sm" onclick="switchAdminSection('admin-claims',null)">Examiner</button></td></tr>`).join('')}</table>` :
+    '<div style="padding:1.5rem;text-align:center;color:var(--gray-500);font-size:.875rem">✅ Aucune demande en attente</div>'
+
+  // Recent objects
+  const { data:objs } = await sb.from('objects').select('*, establishment:establishments(name)').order('created_at',{ascending:false}).limit(5)
+  document.getElementById('admin-recent-objects').innerHTML = objs?.length ?
+    `<table class="admin-table">${objs.map(o => `<tr><td><div class="obj-cell"><span>${CAT_ICONS[o.category]}</span><div><strong>${o.title}</strong><br><span style="font-size:.72rem;color:var(--gray-500)">${o.establishment?.name||'—'}</span></div></div></td><td><span class="badge badge-${o.status}">${STATUS_LABELS[o.status]}</span></td><td><button class="btn btn-secondary btn-sm" onclick="navigate('object','${o.id}')">Voir</button></td></tr>`).join('')}</table>` :
+    '<div style="padding:1.5rem;text-align:center;color:var(--gray-500);font-size:.875rem">Aucun objet</div>'
+}
+
+function switchAdminSection(id, btn) {
+  document.querySelectorAll('.admin-inner > div').forEach(d => d.style.display = 'none')
+  const section = document.getElementById(id)
+  if (section) section.style.display = 'block'
+  // Update active sidebar item
+  document.querySelectorAll('#page-admin .sidebar-item').forEach(b => b.classList.remove('active'))
+  if (btn && btn.classList) {
+    btn.classList.add('active')
+  } else {
+    // Find matching sidebar button by section id
+    const match = document.querySelector(`#page-admin .sidebar-item[onclick*="${id}"]`)
+    if (match) match.classList.add('active')
+  }
+  if (id === 'admin-objects') loadAdminObjects()
+  if (id === 'admin-claims') loadAdminClaims()
+  if (id === 'admin-establishments') loadAdminEstablishments()
+  if (id === 'admin-declarations') loadAdminDeclarations()
+  if (id === 'admin-overview') loadAdminOverview()
+}
+
+async function loadAdminObjects() {
+  const { data } = await sb.from('objects').select('*, establishment:establishments(name,city)').order('created_at',{ascending:false}).limit(50)
+  document.getElementById('admin-objects-content').innerHTML = `
+    <div class="card" style="overflow:hidden">
+      <table class="admin-table">
+        <thead><tr><th>Objet</th><th>Établissement</th><th>Statut</th><th>Date</th><th>Actions</th></tr></thead>
+        <tbody>${(data||[]).map(o => `
+          <tr>
+            <td><div class="obj-cell"><span>${CAT_ICONS[o.category]}</span><div><strong>${o.title}</strong><br><span style="font-size:.72rem;color:var(--gray-500)">${CAT_LABELS[o.category]}</span></div></div></td>
+            <td>${o.establishment?.name||'—'}</td>
+            <td><span class="badge badge-${o.status}">${STATUS_LABELS[o.status]}</span></td>
+            <td style="font-size:.78rem;color:var(--gray-500)">${timeAgo(o.created_at)}</td>
+            <td><div class="action-btns">
+              <button class="btn btn-secondary btn-sm" onclick="navigate('object','${o.id}')">Voir</button>
+              <select class="form-input form-select" style="padding:.3rem .5rem;font-size:.75rem;width:auto" onchange="updateObjectStatus('${o.id}',this.value,this)">
+                <option value="">Changer statut</option>
+                <option value="online">En ligne</option>
+                <option value="pending">En attente</option>
+                <option value="recovered">Récupéré</option>
+                <option value="archived">Archivé</option>
+              </select>
+              <button class="btn btn-danger btn-sm" onclick="deleteObject('${o.id}')">🗑</button>
+            </div></td>
+          </tr>`).join('')}
+        </tbody>
+      </table>
+    </div>`
+}
+
+async function updateObjectStatus(id, status, el) {
+  if (!status) return
+  const { error } = await sb.from('objects').update({status}).eq('id',id)
+  if (error) { toast(error.message,'error'); return }
+  toast(`Statut mis à jour : ${STATUS_LABELS[status]}`)
+  el.value = ''
+  loadAdminObjects()
+}
+
+async function deleteObject(id) {
+  if (!confirm('Supprimer cet objet définitivement ?')) return
+  const { error } = await sb.from('objects').delete().eq('id',id)
+  if (error) { toast(error.message,'error'); return }
+  toast('Objet supprimé')
+  loadAdminObjects()
+}
+
+function setClaimFilter(el) {
+  document.querySelectorAll('#claim-status-filters .filter-pill').forEach(p => p.classList.remove('active'))
+  el.classList.add('active')
+  claimStatusFilter = el.dataset.status
+  loadAdminClaims()
+}
+
+async function loadAdminClaims() {
+  const { data } = await sb.from('claims').select('*, object:objects(title,category,primary_image_url)').eq('status', claimStatusFilter).order('created_at',{ascending:false})
+  const el = document.getElementById('admin-claims-content')
+  if (!data?.length) { el.innerHTML = '<div class="empty-state"><div class="icon">✅</div><h3>Aucune demande dans ce statut</h3></div>'; return }
+  el.innerHTML = data.map(c => {
+    const score = c.ai_match_score ? Math.round(c.ai_match_score*100) : null
+    return `
+    <div class="card" style="padding:1.25rem;margin-bottom:.75rem">
+      <div style="display:flex;align-items:start;gap:1rem;flex-wrap:wrap">
+        <div style="width:48px;height:48px;background:var(--green-100);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0">${CAT_ICONS[c.object?.category]||'📦'}</div>
+        <div style="flex:1;min-width:0">
+          <div style="display:flex;justify-content:space-between;flex-wrap:wrap;gap:.5rem">
+            <div><strong>${c.full_name}</strong> <span style="font-size:.8rem;color:var(--gray-500)">${c.email}${c.phone?` · ${c.phone}`:``}</span></div>
+            <div style="display:flex;gap:.4rem;align-items:center">
+              ${score!==null?`<span style="font-size:.75rem;font-weight:700;padding:.2rem .6rem;border-radius:var(--radius-full);background:${score>=80?'var(--green-100)':'#FFF3E0'};color:${score>=80?'var(--green-700)':'#E65100'}">🤖 ${score}%</span>`:''}
+              <span class="badge badge-${c.status==='pending'?'pending':c.status==='accepted'?'online':'archived'}">${c.status==='pending'?'En attente':c.status==='under_review'?'En examen':c.status==='accepted'?'Acceptée':'Refusée'}</span>
+            </div>
+          </div>
+          <div style="font-size:.8rem;color:var(--gray-500);margin-top:.2rem">Objet : ${c.object?.title||'—'}</div>
+          <div style="font-size:.82rem;color:var(--gray-700);margin-top:.5rem;background:var(--gray-100);border-radius:8px;padding:.5rem .8rem">${c.description}</div>
+          ${c.ai_match_reasoning?`<div style="font-size:.78rem;color:#1565C0;background:#E3F2FD;border-radius:8px;padding:.5rem .8rem;margin-top:.4rem">🤖 ${c.ai_match_reasoning}</div>`:''}
+          ${c.status==='pending'||c.status==='under_review'?`
+            <div style="display:flex;gap:.5rem;margin-top:.9rem;flex-wrap:wrap">
+              <button class="btn btn-primary btn-sm" onclick="reviewClaim('${c.id}','accepted')">✅ Accepter</button>
+              <button class="btn btn-danger btn-sm" onclick="reviewClaim('${c.id}','refused')">❌ Refuser</button>
+              <button class="btn btn-secondary btn-sm" onclick="reviewClaim('${c.id}','recovered')">🎉 Marquer récupéré</button>
+            </div>`:''}
+        </div>
+      </div>
+    </div>`}).join('')
+}
+
+async function reviewClaim(id, status) {
+  const notes = status === 'accepted' ? prompt('Note pour le demandeur (optionnel) :\nEx: Présentez-vous au comptoir avec une pièce d\'identité') : null
+  const { data: claim } = await sb.from('claims').select('*, object:objects(*)').eq('id',id).single()
+  const { error } = await sb.from('claims').update({ status, reviewed_by: currentUser.id, reviewed_at: new Date().toISOString(), admin_notes: notes||null }).eq('id',id)
+  if (error) { toast(error.message,'error'); return }
+  if (status === 'recovered') await sb.from('objects').update({ status:'recovered', recovered_at: new Date().toISOString(), recovered_by_claim_id: id }).eq('id', claim.object_id)
+  else if (status === 'refused') await sb.from('objects').update({ status:'online' }).eq('id', claim.object_id)
+
+  // Trigger N8N notification
+  triggerN8N('reperdu-claim-update', {
+    status,
+    claimant_email: claim.email,
+    claimant_name: claim.full_name,
+    object_title: claim.object?.title,
+    admin_notes: notes||null,
+  })
+
+  toast(`Demande ${status === 'accepted' ? 'acceptée' : status === 'refused' ? 'refusée' : 'marquée récupérée'} — ${claim.full_name} a été notifié`)
+  loadAdminClaims()
+}
+
+async function loadAdminEstablishments() {
+  const { data } = await sb.from('establishments').select('*').order('name')
+  document.getElementById('admin-establishments-content').innerHTML = `
+    <div class="card" style="overflow:hidden">
+      <table class="admin-table">
+        <thead><tr><th>Établissement</th><th>Type</th><th>Plan</th><th>Objets</th><th>Taux</th><th>Actions</th></tr></thead>
+        <tbody>${(data||[]).map(e => `
+          <tr style="${!e.is_active?'opacity:.5':''}">
+            <td><strong>${e.name}</strong><br><span style="font-size:.75rem;color:var(--gray-500)">${e.city} · ${e.email}</span></td>
+            <td>${e.type==='bar'?'🍸 Bar':e.type==='nightclub'?'🎵 Boîte':'🏨 Hôtel'}</td>
+            <td><span class="badge badge-online">${e.plan}</span></td>
+            <td><strong>${e.total_objects}</strong> / ${e.recovered_objects} récup.</td>
+            <td><strong style="color:var(--green-700)">${e.total_objects>0?Math.round(e.recovered_objects/e.total_objects*100):0}%</strong></td>
+            <td><div class="action-btns">
+              <button class="btn btn-secondary btn-sm" onclick="window.open('/','_blank')">Voir page</button>
+              <button class="btn btn-${e.is_active?'danger':'primary'} btn-sm" onclick="toggleEstab('${e.id}',${e.is_active})">${e.is_active?'Désactiver':'Activer'}</button>
+            </div></td>
+          </tr>`).join('')}
+        </tbody>
+      </table>
+    </div>`
+}
+
+async function toggleEstab(id, current) {
+  await sb.from('establishments').update({ is_active: !current }).eq('id', id)
+  toast(`Établissement ${current ? 'désactivé' : 'activé'}`)
+  loadAdminEstablishments()
+}
+
+async function loadAdminDeclarations() {
+  const { data } = await sb.from('declarations').select('*, matched_object:objects(title)').order('created_at',{ascending:false}).limit(50)
+  document.getElementById('admin-declarations-content').innerHTML = `
+    <div class="card" style="overflow:hidden">
+      <table class="admin-table">
+        <thead><tr><th>Déclarant</th><th>Objet</th><th>Lieu de perte</th><th>Statut</th><th>Correspondance</th></tr></thead>
+        <tbody>${(data||[]).map(d => `
+          <tr>
+            <td><strong>${d.full_name}</strong><br><span style="font-size:.75rem;color:var(--gray-500)">${d.email}</span></td>
+            <td>${CAT_ICONS[d.category]} ${d.title}</td>
+            <td style="font-size:.82rem;color:var(--gray-500)">${d.loss_location}</td>
+            <td><span class="badge ${d.status==='matched'?'badge-online':d.status==='closed'?'badge-recovered':'badge-pending'}">${d.status==='matched'?'✅ Correspondance':d.status==='closed'?'Clôturé':'En cours'}</span></td>
+            <td>${d.matched_object?`<button class="btn btn-secondary btn-sm" onclick="navigate('object','${d.matched_object_id}')">${d.matched_object.title}</button>`:'—'}</td>
+          </tr>`).join('')}
+        </tbody>
+      </table>
+    </div>`
+}
+
+// ADD OBJECT MODAL
+function selectAddCategory(el) {
+  document.querySelectorAll('#add-obj-cats .filter-pill').forEach(p => p.classList.remove('active'))
+  el.classList.add('active')
+  addObjectCategory = el.dataset.cat
+}
+
+async function loadEstablishmentsSelect() {
+  const { data } = await sb.from('establishments').select('id,name').eq('is_active',true).order('name')
+  const sel = document.getElementById('ao-establishment')
+  if (!sel) return
+  sel.innerHTML = data?.map(e => `<option value="${e.id}">${e.name}</option>`).join('') || ''
+
+  // If establishment user, hide the select and pre-fill
+  if (currentProfile?.role === 'establishment') {
+    document.getElementById('ao-estab-group').style.display = 'none'
+  }
+}
+
+async function submitAddObject() {
+  const btn = document.getElementById('ao-submit')
+  const title = document.getElementById('ao-title').value
+  const desc = document.getElementById('ao-desc').value
+  if (!title || !desc) { toast('Titre et description obligatoires','error'); return }
+
+  const estabId = currentProfile?.role === 'establishment'
+    ? currentProfile.establishment_id
+    : document.getElementById('ao-establishment').value
+
+  if (!estabId) { toast('Sélectionnez un établissement','error'); return }
+
+  btn.disabled = true
+  btn.innerHTML = '<div class="btn-spinner"></div> Ajout en cours...'
+  try {
+    const { data, error } = await sb.from('objects').insert({
+      title,
+      description: desc,
+      category: addObjectCategory,
+      establishment_id: estabId,
+      found_at: new Date().toISOString(),
+      found_location_detail: document.getElementById('ao-location').value || null,
+      storage_location: document.getElementById('ao-storage').value || null,
+      internal_notes: document.getElementById('ao-notes').value || null,
+      status: 'online',
+      added_by: currentUser?.id || null,
+    }).select().single()
+    if (error) throw error
+
+    // Trigger N8N for AI matching
+    triggerN8N('reperdu-new-object', { object_id: data.id, title, description: desc, category: addObjectCategory, establishment_id: estabId })
+
+    closeModal('modal-add-object')
+    toast('Objet ajouté ! L\'IA cherche des correspondances... 🤖')
+    // Refresh current admin section
+    if (currentProfile?.role === 'establishment') {
+      loadEstabObjects()
+    } else {
+      loadAdminObjects()
+    }
+    // Reset form
+    document.getElementById('ao-title').value = ''
+    document.getElementById('ao-desc').value = ''
+  } catch(err) {
+    toast(err.message,'error')
+  } finally {
+    btn.disabled = false
+    btn.textContent = 'Ajouter l\'objet →'
+  }
+}
+
+async function submitAddEstablishment() {
+  const btn = document.getElementById('ae-submit')
+  const name = document.getElementById('ae-name').value
+  const email = document.getElementById('ae-email').value
+  const address = document.getElementById('ae-address').value
+  const city = document.getElementById('ae-city').value
+  if (!name || !email || !address || !city) { toast('Remplissez tous les champs obligatoires','error'); return }
+
+  btn.disabled = true
+  btn.innerHTML = '<div class="btn-spinner"></div>'
+  try {
+    const { error } = await sb.from('establishments').insert({
+      name, email, address, city,
+      type: document.getElementById('ae-type').value,
+      plan: document.getElementById('ae-plan').value,
+      phone: document.getElementById('ae-phone').value || null,
+      postal_code: document.getElementById('ae-postal').value || null,
+    })
+    if (error) throw error
+    closeModal('modal-add-establishment')
+    toast('Établissement créé ! 🎉')
+    loadAdminEstablishments()
+  } catch(err) {
+    toast(err.message,'error')
+  } finally {
+    btn.disabled = false
+    btn.textContent = 'Créer l\'établissement →'
+  }
+}
+
+// EXPORT CSV
+async function exportCSV(type) {
+  const { data } = type === 'objects'
+    ? await sb.from('objects').select('title,category,status,found_at,establishment:establishments(name,city)').order('found_at',{ascending:false})
+    : await sb.from('claims').select('full_name,email,status,ai_match_score,created_at,object:objects(title)').order('created_at',{ascending:false})
+
+  if (!data?.length) { toast('Aucune donnée à exporter','info'); return }
+
+  const headers = type === 'objects' ? ['Titre','Catégorie','Statut','Trouvé le','Établissement','Ville'] : ['Nom','Email','Statut','Score IA','Objet','Date']
+  const rows = data.map(d => type === 'objects'
+    ? [d.title, d.category, d.status, new Date(d.found_at).toLocaleDateString('fr-FR'), d.establishment?.name||'', d.establishment?.city||'']
+    : [d.full_name, d.email, d.status, d.ai_match_score ? Math.round(d.ai_match_score*100)+'%' : '', d.object?.title||'', new Date(d.created_at).toLocaleDateString('fr-FR')]
+  )
+  const csv = [headers, ...rows].map(r => r.map(c => `"${String(c||'').replace(/"/g,'""')}"`).join(',')).join('\n')
+  const blob = new Blob(['\uFEFF' + csv], {type:'text/csv;charset=utf-8'})
+  const a = document.createElement('a')
+  a.href = URL.createObjectURL(blob)
+  a.download = `reperdu-${type}-${new Date().toISOString().split('T')[0]}.csv`
+  a.click()
+  toast('Export CSV téléchargé !')
+}
+
+// ──────────────────────────────────────────────────────────────
+// ETABLISSEMENT DASHBOARD
+// ──────────────────────────────────────────────────────────────
+async function loadEstabDashboard() {
+  if (!currentUser) { openModal('modal-login'); return }
+  if (!currentProfile?.establishment_id) { toast('Aucun établissement lié à votre compte','error'); return }
+
+  const { data: estab } = await sb.from('establishments').select('*').eq('id', currentProfile.establishment_id).single()
+  estabProfile = estab
+  if (!estab) return
+
+  document.getElementById('estab-sidebar-name').textContent = estab.name
+  document.getElementById('estab-name-header').textContent = estab.name
+  document.getElementById('estab-address-header').textContent = `📍 ${estab.address}, ${estab.city}`
+
+  const { count:total } = await sb.from('objects').select('*',{count:'exact',head:true}).eq('establishment_id',estab.id)
+  const { count:online } = await sb.from('objects').select('*',{count:'exact',head:true}).eq('establishment_id',estab.id).eq('status','online')
+  const { count:recovered } = await sb.from('objects').select('*',{count:'exact',head:true}).eq('establishment_id',estab.id).eq('status','recovered')
+
+  document.getElementById('estab-kpis').innerHTML = [
+    {label:'Objets en ligne', value:online||0},
+    {label:'Total trouvés', value:total||0},
+    {label:'Récupérés', value:recovered||0},
+    {label:'Taux', value: total>0?Math.round((recovered/total)*100)+'%':'0%'},
+  ].map(k => `<div class="kpi"><div class="kpi-value" style="color:var(--green-700)">${k.value}</div><div class="kpi-label">${k.label}</div></div>`).join('')
+
+  loadEstabObjects()
+  loadEstablishmentsSelect()
+}
+
+async function loadEstabObjects() {
+  if (!currentProfile?.establishment_id) return
+  const { data } = await sb.from('objects').select('*').eq('establishment_id', currentProfile.establishment_id).order('created_at',{ascending:false}).limit(20)
+  const renderTable = (data) => !data?.length
+    ? '<div style="padding:2rem;text-align:center;color:var(--gray-500)">Aucun objet — ajoutez votre premier objet trouvé !</div>'
+    : `<table class="admin-table">
+        <thead><tr><th>Objet</th><th>Statut</th><th>Date</th><th></th></tr></thead>
+        <tbody>${data.map(o => `<tr>
+          <td><div class="obj-cell"><span>${CAT_ICONS[o.category]}</span><div><strong>${o.title}</strong></div></div></td>
+          <td><span class="badge badge-${o.status}">${STATUS_LABELS[o.status]}</span></td>
+          <td style="font-size:.78rem;color:var(--gray-500)">${timeAgo(o.created_at)}</td>
+          <td><button class="btn btn-secondary btn-sm" onclick="navigate('object','${o.id}')">Voir →</button></td>
+        </tr>`).join('')}</tbody>
+      </table>`
+
+  if (document.getElementById('estab-objects-table')) document.getElementById('estab-objects-table').innerHTML = renderTable(data)
+  if (document.getElementById('estab-all-objects')) document.getElementById('estab-all-objects').innerHTML = renderTable(data)
+}
+
+function switchEstabSection(id, btn) {
+  document.querySelectorAll('.estab-main .admin-inner > div').forEach(d => d.style.display = 'none')
+  const section = document.getElementById(id)
+  if (section) section.style.display = 'block'
+  document.querySelectorAll('#page-etablissement .sidebar-item').forEach(b => b.classList.remove('active'))
+  if (btn && btn.classList) {
+    btn.classList.add('active')
+  } else {
+    const match = document.querySelector(`#page-etablissement .sidebar-item[onclick*="${id}"]`)
+    if (match) match.classList.add('active')
+  }
+  if (id === 'estab-objects') loadEstabObjects()
+  if (id === 'estab-claims') loadEstabClaims()
+}
+
+async function loadEstabClaims() {
+  if (!currentProfile?.establishment_id) return
+  const { data: objIds } = await sb.from('objects').select('id').eq('establishment_id', currentProfile.establishment_id)
+  const ids = (objIds||[]).map(o => o.id)
+  if (!ids.length) { document.getElementById('estab-claims-content').innerHTML = '<div class="empty-state"><div class="icon">✅</div><h3>Aucune demande</h3></div>'; return }
+
+  const { data } = await sb.from('claims').select('*, object:objects(title,category)').in('object_id', ids).order('created_at',{ascending:false})
+  document.getElementById('estab-claims-content').innerHTML = data?.length
+    ? `<div class="card" style="overflow:hidden"><table class="admin-table"><thead><tr><th>Demandeur</th><th>Objet</th><th>Statut</th><th>Actions</th></tr></thead><tbody>${data.map(c => `<tr><td><strong>${c.full_name}</strong><br><span style="font-size:.75rem;color:var(--gray-500)">${c.email}</span></td><td>${CAT_ICONS[c.object?.category]||''} ${c.object?.title||'—'}</td><td><span class="badge badge-${c.status==='pending'?'pending':'online'}">${c.status==='pending'?'En attente':'Traité'}</span></td><td><button class="btn btn-secondary btn-sm" onclick="navigate('object','${c.object_id}')">Voir l'objet</button></td></tr>`).join('')}</tbody></table></div>`
+    : '<div class="empty-state"><div class="icon">✅</div><h3>Aucune demande pour vos objets</h3></div>'
+}
+
+async function generateQR() {
+  if (!estabProfile) return
+  // Generate QR using external service
+  const url = `${window.location.origin}${window.location.pathname}?estab=${estabProfile.qr_code_token}`
+  const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(url)}&color=2E7D32`
+
+  await sb.from('establishments').update({ qr_code_url: qrUrl }).eq('id', estabProfile.id)
+
+  document.getElementById('qr-display').innerHTML = `
+    <img src="${qrUrl}" alt="QR Code" class="qr-code" style="border-radius:12px;border:3px solid var(--green-200)">
+    <p style="font-size:.78rem;color:var(--gray-500);margin:.75rem 0">${url}</p>
+    <div style="display:flex;gap:.5rem;justify-content:center">
+      <a href="${qrUrl}" download="qr-${estabProfile.name}.png" class="btn btn-secondary btn-sm">⬇️ Télécharger</a>
+      <button class="btn btn-primary btn-sm" onclick="navigator.clipboard?.writeText('${url}');toast('Lien copié !')">📋 Copier le lien</button>
+    </div>`
+  toast('QR code généré ! 🎉')
+}
+
+// ──────────────────────────────────────────────────────────────
+// N8N WEBHOOKS
+// ──────────────────────────────────────────────────────────────
+async function triggerN8N(workflow, payload) {
+  try {
+    await fetch(`${CONFIG.N8N_URL}/webhook/${workflow}`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+      mode: 'no-cors', // N8N webhook doesn't need CORS for fire-and-forget
+    })
+  } catch(e) {
+    console.log('[N8N] Webhook error (non-blocking):', e.message)
+  }
+}
+
+// ──────────────────────────────────────────────────────────────
+// MODALS
+// ──────────────────────────────────────────────────────────────
+function openModal(id) {
+  closeModal(null)
+  const el = document.getElementById(id)
+  if (el) { el.classList.add('open'); document.body.style.overflow = 'hidden' }
+  if (id === 'modal-add-object') loadEstablishmentsSelect()
+}
+function closeModal(id) {
+  if (id) {
+    document.getElementById(id)?.classList.remove('open')
+  } else {
+    document.querySelectorAll('.modal-overlay').forEach(m => m.classList.remove('open'))
+  }
+  document.body.style.overflow = ''
+}
+function closeModalOut(e, id) {
+  if (e.target.id === id) closeModal(id)
+}
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(null) })
+
+// ──────────────────────────────────────────────────────────────
+// NAVBAR SCROLL
+// ──────────────────────────────────────────────────────────────
+window.addEventListener('scroll', () => {
+  document.getElementById('navbar').classList.toggle('scrolled', window.scrollY > 10)
+})
+
+// ──────────────────────────────────────────────────────────────
+// URL PARAMS (deep linking)
+// ──────────────────────────────────────────────────────────────
+function handleURLParams() {
+  const params = new URLSearchParams(window.location.search)
+  if (params.get('object')) { navigate('object', params.get('object')); return }
+  if (params.get('estab')) {
+    // Load establishment page (filtered explorer)
+    activeCategory = 'all'
+    navigate('explorer')
+    return
+  }
+  navigate('home')
+}
+
+// ──────────────────────────────────────────────────────────────
+// START
+// ──────────────────────────────────────────────────────────────
+(async () => {
+  await initAuth()
+  handleURLParams()
+})()
+</script>
+</body>
+</html>
