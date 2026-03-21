@@ -990,6 +990,20 @@ function scrollToSection(id) {
 }
 
 // ──────────────────────────────────────────────────────────────
+// CACHE - évite les requêtes répétées
+// ──────────────────────────────────────────────────────────────
+const CACHE = {}
+async function cached(key, ttlMs, fn) {
+  const now = Date.now()
+  if (CACHE[key] && now - CACHE[key].ts < ttlMs) return CACHE[key].data
+  const data = await fn()
+  CACHE[key] = { data, ts: now }
+  return data
+}
+
+function invalidateCache(key) { delete CACHE[key] }
+
+// ──────────────────────────────────────────────────────────────
 // AUTH
 // ──────────────────────────────────────────────────────────────
 async function initAuth() {
@@ -1078,14 +1092,16 @@ async function submitAuth(e) {
 
   try {
     if (authMode === 'login') {
-      const { error } = await sb.auth.signInWithPassword({ email, password })
+      const { data: authData, error } = await sb.auth.signInWithPassword({ email, password })
       if (error) throw error
-      // Wait for profile to load fully
-      await new Promise(r => setTimeout(r, 800))
-      const { data: freshProfile } = await sb.from('profiles').select('role').eq('id', currentUser?.id || (await sb.auth.getUser()).data.user?.id).single()
+      // Load profile immediately after login
+      const { data: freshProfile } = await sb.from('profiles').select('role, full_name, establishment_id').eq('id', authData.user.id).single()
+      currentUser = authData.user
+      currentProfile = freshProfile
+      renderNavActions()
       closeModal('modal-login')
       toast('Connexion réussie ! 🎉')
-      const role = freshProfile?.role || currentProfile?.role
+      const role = freshProfile?.role
       if (role === 'admin' || role === 'superadmin') navigate('admin')
       else if (role === 'establishment') navigate('etablissement')
       else navigate('user-dashboard')
@@ -1136,10 +1152,13 @@ async function loadHomeStats() {
 }
 
 async function loadHomeObjects() {
-  const { data } = await sb.from('objects').select('*, establishment:establishments(name,city)').eq('status','online').order('created_at',{ascending:false}).limit(6)
+  const homeObjs = await cached('home_objects', 30000, async () => {
+    const { data } = await sb.from('objects').select('*, establishment:establishments(name,city)').eq('status','online').order('created_at',{ascending:false}).limit(6)
+    return data
+  })
   const grid = document.getElementById('home-objects-grid')
-  if (!data?.length) { grid.innerHTML = '<div class="empty-state"><div class="icon">📦</div><p>Aucun objet disponible</p></div>'; return }
-  grid.innerHTML = data.map(o => renderObjectCard(o)).join('')
+  if (!homeObjs?.length) { grid.innerHTML = '<div class="empty-state"><div class="icon">📦</div><p>Aucun objet disponible</p></div>'; return }
+  grid.innerHTML = homeObjs.map(o => renderObjectCard(o)).join('')
 }
 
 async function loadHomeEstabs() {
@@ -1801,12 +1820,13 @@ function selectAddCategory(el) {
 }
 
 async function loadEstablishmentsSelect() {
-  const { data } = await sb.from('establishments').select('id,name').eq('is_active',true).order('name')
+  const data = await cached('establishments', 60000, async () => {
+    const { data } = await sb.from('establishments').select('id,name').eq('is_active',true).order('name')
+    return data
+  })
   const sel = document.getElementById('ao-establishment')
   if (!sel) return
   sel.innerHTML = data?.map(e => `<option value="${e.id}">${e.name}</option>`).join('') || ''
-
-  // If establishment user, hide the select and pre-fill
   if (currentProfile?.role === 'establishment') {
     document.getElementById('ao-estab-group').style.display = 'none'
   }
@@ -1977,9 +1997,11 @@ async function loadEstabDashboard() {
   document.getElementById('estab-name-header').textContent = estab.name
   document.getElementById('estab-address-header').textContent = `📍 ${estab.address}, ${estab.city}`
 
-  const { count:total } = await sb.from('objects').select('*',{count:'exact',head:true}).eq('establishment_id',estab.id)
-  const { count:online } = await sb.from('objects').select('*',{count:'exact',head:true}).eq('establishment_id',estab.id).eq('status','online')
-  const { count:recovered } = await sb.from('objects').select('*',{count:'exact',head:true}).eq('establishment_id',estab.id).eq('status','recovered')
+  const [{ count:total }, { count:online }, { count:recovered }] = await Promise.all([
+    sb.from('objects').select('*',{count:'exact',head:true}).eq('establishment_id',estab.id),
+    sb.from('objects').select('*',{count:'exact',head:true}).eq('establishment_id',estab.id).eq('status','online'),
+    sb.from('objects').select('*',{count:'exact',head:true}).eq('establishment_id',estab.id).eq('status','recovered'),
+  ])
 
   document.getElementById('estab-kpis').innerHTML = [
     {label:'Objets en ligne', value:online||0},
@@ -2059,17 +2081,24 @@ async function generateQR() {
 // ──────────────────────────────────────────────────────────────
 // N8N WEBHOOKS
 // ──────────────────────────────────────────────────────────────
-async function triggerN8N(workflow, payload) {
-  try {
-    await fetch(`${CONFIG.N8N_URL}/webhook/${workflow}`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload),
-      mode: 'no-cors', // N8N webhook doesn't need CORS for fire-and-forget
-    })
-  } catch(e) {
-    console.log('[N8N] Webhook error (non-blocking):', e.message)
-  }
+// N8N - fire and forget, NEVER blocks the UI
+function triggerN8N(workflow, payload) {
+  // Completely fire-and-forget - 3s timeout max, never blocks UI
+  const controller = new AbortController()
+  const timeout = setTimeout(() => controller.abort(), 3000)
+  fetch(`${CONFIG.N8N_URL}/webhook/${workflow}`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload),
+    mode: 'no-cors',
+    signal: controller.signal,
+    keepalive: true,
+  }).catch(() => {}).finally(() => clearTimeout(timeout))
+}
+
+// Wake up N8N on load so it's ready when needed
+function wakeN8N() {
+  fetch(`${CONFIG.N8N_URL}/healthz`, { mode: 'no-cors', keepalive: true }).catch(() => {})
 }
 
 // ──────────────────────────────────────────────────────────────
@@ -2120,6 +2149,8 @@ function handleURLParams() {
 // START
 // ──────────────────────────────────────────────────────────────
 (async () => {
+  // Wake N8N in background on load
+  wakeN8N()
   await initAuth()
   handleURLParams()
 })()
