@@ -1861,38 +1861,39 @@ async function submitAddObject() {
     }).select().single()
     if (error) throw error
 
-    // Upload photos if any
-    const photoUrls = await uploadObjectPhotos(data.id)
-    if (photoUrls?.length) {
-      await sb.from('objects').update({
-        images: photoUrls,
-        primary_image_url: photoUrls[0]
-      }).eq('id', data.id)
-      toast('📷 Photos uploadées !')
-    }
-
-    // Run keyword matching
-    await runKeywordMatch(data.id, addObjectCategory, title, desc)
-
-    // Trigger N8N
-    triggerN8N('reperdu-new-object', { object_id: data.id, title, description: desc, category: addObjectCategory, establishment_id: estabId })
-
+    // ✅ Fermer le modal IMMÉDIATEMENT — ne pas attendre les tâches longues
     closeModal('modal-add-object')
-    toast('Objet ajouté ! Recherche de correspondances en cours... 🔍')
-    if (currentProfile?.role === 'establishment') {
-      loadEstabObjects()
-    } else {
-      loadAdminObjects()
-    }
+    toast('Objet ajouté ! 🎉')
+    btn.disabled = false
+    btn.textContent = 'Ajouter l\'objet →'
+
     // Reset form
     document.getElementById('ao-title').value = ''
     document.getElementById('ao-desc').value = ''
     document.getElementById('ao-photo-previews').innerHTML = ''
     document.getElementById('ao-photo-text').textContent = 'Cliquez pour ajouter des photos (max 3)'
     if (document.getElementById('ao-photos')) document.getElementById('ao-photos').value = ''
+
+    // Refresh table
+    if (currentProfile?.role === 'establishment') loadEstabObjects()
+    else loadAdminObjects()
+
+    // 🔁 Tâches en arrière-plan — n'attendent pas
+    const objectId = data.id
+    ;(async () => {
+      // Upload photos
+      const photoUrls = await uploadObjectPhotos(objectId)
+      if (photoUrls?.length) {
+        await sb.from('objects').update({ images: photoUrls, primary_image_url: photoUrls[0] }).eq('id', objectId)
+        toast('📷 Photos sauvegardées !')
+      }
+      // Keyword matching
+      await runKeywordMatch(objectId, addObjectCategory, title, desc)
+      // N8N (fire and forget)
+      triggerN8N('reperdu-new-object', { object_id: objectId, title, description: desc, category: addObjectCategory, establishment_id: estabId })
+    })().catch(console.error)
   } catch(err) {
     toast(err.message,'error')
-  } finally {
     btn.disabled = false
     btn.textContent = 'Ajouter l\'objet →'
   }
