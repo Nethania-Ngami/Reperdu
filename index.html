@@ -583,8 +583,24 @@ const CONFIG = {
           <div class="form-group"><label class="form-label">Date de perte *</label><input class="form-input" type="date" id="d-date" required></div>
           <div class="form-group"><label class="form-label">Lieu approximatif *</label><input class="form-input" id="d-location" placeholder="Ex : Rex Club, Paris 2e" required></div>
         </div>
+
+        <!-- Établissement -->
+        <div class="form-group">
+          <label class="form-label">Établissement (si connu)</label>
+          <div style="position:relative">
+            <input class="form-input" id="d-estab-search" placeholder="🔍 Rechercher un établissement..." oninput="searchEstablishments(this.value)" autocomplete="off">
+            <div id="d-estab-dropdown" style="display:none;position:absolute;top:100%;left:0;right:0;background:#fff;border:1.5px solid var(--green-400);border-top:none;border-radius:0 0 var(--radius-sm) var(--radius-sm);max-height:200px;overflow-y:auto;z-index:50;box-shadow:var(--shadow-hover)"></div>
+          </div>
+          <input type="hidden" id="d-estab-id">
+          <div id="d-estab-selected" style="display:none;margin-top:.5rem;background:var(--green-100);border-radius:var(--radius-sm);padding:.5rem .75rem;font-size:.82rem;color:var(--green-700);display:flex;align-items:center;justify-content:space-between">
+            <span id="d-estab-name"></span>
+            <button type="button" onclick="clearEstabSelection()" style="background:none;border:none;color:var(--green-700);cursor:pointer;font-size:1rem;line-height:1">✕</button>
+          </div>
+          <p style="font-size:.75rem;color:var(--gray-500);margin-top:.35rem">Optionnel — aide à cibler la recherche dans cet établissement spécifique</p>
+        </div>
+
         <div style="background:var(--green-100);border-radius:var(--radius-sm);padding:.9rem 1rem;font-size:.82rem;color:var(--green-900);margin-bottom:1.5rem">
-          🤖 Après soumission, notre IA analyse votre description et la compare à tous les objets trouvés. Vous recevrez un email si une correspondance est détectée.
+          🤖 Après soumission, notre système analyse votre description et la compare à tous les objets trouvés. Vous recevrez un email si une correspondance est détectée.
         </div>
         <button type="submit" class="btn btn-primary btn-full" id="declare-submit">Envoyer ma déclaration →</button>
       </form>
@@ -866,6 +882,15 @@ const CONFIG = {
       <div class="form-group"><label class="form-label">Lieu de stockage</label><input class="form-input" id="ao-storage" placeholder="Coffre, bureau..."></div>
     </div>
     <div class="form-group"><label class="form-label">Note interne</label><input class="form-input" id="ao-notes" placeholder="Note pour l'équipe..."></div>
+    <div class="form-group">
+      <label class="form-label">Photos de l'objet</label>
+      <label id="ao-photo-label" style="display:flex;flex-direction:column;align-items:center;gap:8px;border:2px dashed var(--gray-200);border-radius:var(--radius-sm);padding:1.2rem;cursor:pointer;transition:all var(--transition);background:var(--gray-100)" onmouseenter="this.style.borderColor='var(--green-400)';this.style.background='var(--green-100)'" onmouseleave="this.style.borderColor='var(--gray-200)';this.style.background='var(--gray-100)'">
+        <span style="font-size:2rem">📷</span>
+        <span id="ao-photo-text" style="font-size:.82rem;color:var(--gray-500)">Cliquez pour ajouter des photos (max 3)</span>
+        <input type="file" id="ao-photos" accept="image/*" multiple style="display:none" onchange="previewPhotos(this)">
+      </label>
+      <div id="ao-photo-previews" style="display:flex;gap:.5rem;margin-top:.5rem;flex-wrap:wrap"></div>
+    </div>
     <button class="btn btn-primary btn-full" onclick="submitAddObject()" id="ao-submit">Ajouter l'objet →</button>
   </div>
 </div>
@@ -1273,6 +1298,61 @@ function selectDeclareCategory(el) {
   declarationCategory = el.dataset.cat
 }
 
+// Establishment search for declaration form
+let estabSearchTimeout = null
+async function searchEstablishments(query) {
+  const dropdown = document.getElementById('d-estab-dropdown')
+  if (!query.trim()) { dropdown.style.display = 'none'; return }
+
+  clearTimeout(estabSearchTimeout)
+  estabSearchTimeout = setTimeout(async () => {
+    const { data } = await sb.from('establishments')
+      .select('id, name, city, type')
+      .eq('is_active', true)
+      .ilike('name', `%${query}%`)
+      .limit(6)
+
+    if (!data?.length) {
+      dropdown.style.display = 'none'
+      return
+    }
+
+    dropdown.style.display = 'block'
+    dropdown.innerHTML = data.map(e => `
+      <div onclick="selectEstablishment('${e.id}','${e.name.replace(/'/g,"\\'")}','${e.city}')"
+        style="padding:.7rem 1rem;cursor:pointer;font-size:.875rem;transition:background var(--transition);display:flex;align-items:center;gap:.75rem;border-bottom:1px solid var(--gray-100)"
+        onmouseenter="this.style.background='var(--green-50)'" onmouseleave="this.style.background='#fff'">
+        <span>${e.type === 'bar' ? '🍸' : e.type === 'nightclub' ? '🎵' : '🏨'}</span>
+        <div>
+          <div style="font-weight:600;color:var(--gray-900)">${e.name}</div>
+          <div style="font-size:.75rem;color:var(--gray-500)">📍 ${e.city}</div>
+        </div>
+      </div>`).join('')
+  }, 300)
+}
+
+function selectEstablishment(id, name, city) {
+  document.getElementById('d-estab-id').value = id
+  document.getElementById('d-estab-search').value = ''
+  document.getElementById('d-estab-dropdown').style.display = 'none'
+  document.getElementById('d-estab-name').textContent = `${name} — ${city}`
+  document.getElementById('d-estab-selected').style.display = 'flex'
+}
+
+function clearEstabSelection() {
+  document.getElementById('d-estab-id').value = ''
+  document.getElementById('d-estab-search').value = ''
+  document.getElementById('d-estab-selected').style.display = 'none'
+}
+
+// Close dropdown when clicking outside
+document.addEventListener('click', e => {
+  if (!e.target.closest('#d-estab-search') && !e.target.closest('#d-estab-dropdown')) {
+    const dd = document.getElementById('d-estab-dropdown')
+    if (dd) dd.style.display = 'none'
+  }
+})
+
 async function submitDeclaration(e) {
   e.preventDefault()
   const btn = document.getElementById('declare-submit')
@@ -1288,6 +1368,7 @@ async function submitDeclaration(e) {
       category: declarationCategory,
       loss_date: document.getElementById('d-date').value,
       loss_location: document.getElementById('d-location').value,
+      establishment_id: document.getElementById('d-estab-id').value || null,
       status: 'active',
       user_id: currentUser?.id || null,
     }
@@ -1399,7 +1480,7 @@ async function loadUserDashboard() {
   document.getElementById('dash-email').textContent = currentUser.email
 
   const [{ data: decls }, { data: claims }, { data: notifs }] = await Promise.all([
-    sb.from('declarations').select('*, matched_object:objects(id,title,primary_image_url,status,establishment:establishments(name))').eq('user_id', currentUser.id).order('created_at',{ascending:false}),
+    sb.from('declarations').select('*, establishment:establishments(name,city), matched_object:objects(id,title,primary_image_url,status,establishment:establishments(name))').eq('user_id', currentUser.id).order('created_at',{ascending:false}),
     sb.from('claims').select('*, object:objects(id,title,category,primary_image_url,establishment:establishments(name,city))').eq('claimant_id', currentUser.id).order('created_at',{ascending:false}),
     sb.from('notifications').select('*').eq('user_id', currentUser.id).order('created_at',{ascending:false}).limit(20),
   ])
@@ -1418,7 +1499,10 @@ async function loadUserDashboard() {
         <div class="decl-icon">${CAT_ICONS[d.category]||'📦'}</div>
         <div class="decl-info">
           <div class="decl-name">${d.title}</div>
-          <div class="decl-meta">Perdu le ${new Date(d.loss_date).toLocaleDateString('fr-FR')} — ${d.loss_location}</div>
+          <div class="decl-meta">
+            Perdu le ${new Date(d.loss_date).toLocaleDateString('fr-FR')} — ${d.loss_location}
+            ${d.establishment ? `<span style="background:var(--green-100);color:var(--green-700);border-radius:20px;padding:.1rem .5rem;font-size:.7rem;font-weight:600;margin-left:.4rem">🏢 ${d.establishment.name}</span>` : ''}
+          </div>
           ${d.matched_object ? `<div class="match-found" onclick="navigate('object','${d.matched_object.id}')">🎉 Correspondance : ${d.matched_object.title} — ${d.matched_object.establishment?.name} →</div>` : ''}
         </div>
         <span class="badge ${d.status==='matched'?'badge-online':d.status==='closed'?'badge-recovered':'badge-pending'}">${d.status==='matched'?'✅ Correspondance':d.status==='closed'?'Clôturé':'🔍 En cours'}</span>
@@ -1681,6 +1765,35 @@ async function loadAdminDeclarations() {
 }
 
 // ADD OBJECT MODAL
+function previewPhotos(input) {
+  const files = Array.from(input.files).slice(0, 3)
+  const previews = document.getElementById('ao-photo-previews')
+  const text = document.getElementById('ao-photo-text')
+  previews.innerHTML = ''
+  files.forEach(file => {
+    const url = URL.createObjectURL(file)
+    previews.innerHTML += `<div style="position:relative;width:72px;height:72px;border-radius:8px;overflow:hidden;border:2px solid var(--green-200)"><img src="${url}" style="width:100%;height:100%;object-fit:cover"></div>`
+  })
+  text.textContent = files.length > 0 ? `${files.length} photo(s) sélectionnée(s)` : 'Cliquez pour ajouter des photos (max 3)'
+}
+
+async function uploadObjectPhotos(objectId) {
+  const input = document.getElementById('ao-photos')
+  if (!input?.files?.length) return null
+  const files = Array.from(input.files).slice(0, 3)
+  const urls = []
+  for (const file of files) {
+    const ext = file.name.split('.').pop() || 'jpg'
+    const path = `${objectId}/${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`
+    const { error } = await sb.storage.from('objects').upload(path, file, { contentType: file.type, upsert: true })
+    if (!error) {
+      const { data } = sb.storage.from('objects').getPublicUrl(path)
+      urls.push(data.publicUrl)
+    }
+  }
+  return urls
+}
+
 function selectAddCategory(el) {
   document.querySelectorAll('#add-obj-cats .filter-pill').forEach(p => p.classList.remove('active'))
   el.classList.add('active')
@@ -1728,12 +1841,24 @@ async function submitAddObject() {
     }).select().single()
     if (error) throw error
 
-    // Trigger N8N for AI matching
+    // Upload photos if any
+    const photoUrls = await uploadObjectPhotos(data.id)
+    if (photoUrls?.length) {
+      await sb.from('objects').update({
+        images: photoUrls,
+        primary_image_url: photoUrls[0]
+      }).eq('id', data.id)
+      toast('📷 Photos uploadées !')
+    }
+
+    // Run keyword matching
+    await runKeywordMatch(data.id, addObjectCategory, title, desc)
+
+    // Trigger N8N
     triggerN8N('reperdu-new-object', { object_id: data.id, title, description: desc, category: addObjectCategory, establishment_id: estabId })
 
     closeModal('modal-add-object')
-    toast('Objet ajouté ! L\'IA cherche des correspondances... 🤖')
-    // Refresh current admin section
+    toast('Objet ajouté ! Recherche de correspondances en cours... 🔍')
     if (currentProfile?.role === 'establishment') {
       loadEstabObjects()
     } else {
@@ -1742,11 +1867,46 @@ async function submitAddObject() {
     // Reset form
     document.getElementById('ao-title').value = ''
     document.getElementById('ao-desc').value = ''
+    document.getElementById('ao-photo-previews').innerHTML = ''
+    document.getElementById('ao-photo-text').textContent = 'Cliquez pour ajouter des photos (max 3)'
+    if (document.getElementById('ao-photos')) document.getElementById('ao-photos').value = ''
   } catch(err) {
     toast(err.message,'error')
   } finally {
     btn.disabled = false
     btn.textContent = 'Ajouter l\'objet →'
+  }
+}
+
+async function runKeywordMatch(objectId, category, title, description) {
+  try {
+    // Call Supabase function to find matching declarations
+    const { data: matches } = await sb.rpc('match_declarations_for_object', { p_object_id: objectId })
+    if (!matches?.length) return
+
+    const topMatches = matches.filter(m => m.match_score >= 50)
+    for (const match of topMatches) {
+      // Notify via N8N
+      triggerN8N('reperdu-match-found', {
+        user_email: match.user_email,
+        user_name: match.user_name,
+        object_id: objectId,
+        object_title: title,
+        match_score: match.match_score / 100,
+        declaration_id: match.declaration_id,
+      })
+      // Update declaration as matched
+      await sb.from('declarations').update({
+        matched_object_id: objectId,
+        match_score: match.match_score / 100,
+        status: 'matched'
+      }).eq('id', match.declaration_id)
+    }
+    if (topMatches.length > 0) {
+      toast(`🎉 ${topMatches.length} correspondance(s) trouvée(s) ! Les utilisateurs ont été notifiés.`)
+    }
+  } catch(e) {
+    console.log('Keyword match error:', e.message)
   }
 }
 
