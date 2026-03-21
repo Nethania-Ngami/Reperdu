@@ -969,13 +969,26 @@ function scrollToSection(id) {
 // ──────────────────────────────────────────────────────────────
 async function initAuth() {
   const { data: { session } } = await sb.auth.getSession()
-  if (session) await setUser(session.user)
+  if (session) {
+    await setUser(session.user)
+    renderNavActions()
+    const role = currentProfile?.role
+    if (role === 'admin' || role === 'superadmin') navigate('admin')
+    else if (role === 'establishment') navigate('etablissement')
+  } else {
+    renderNavActions()
+  }
 
   sb.auth.onAuthStateChange(async (event, session) => {
-    if (session) { await setUser(session.user); renderNavActions() }
-    else { currentUser = null; currentProfile = null; renderNavActions() }
+    if (session) {
+      await setUser(session.user)
+      renderNavActions()
+    } else {
+      currentUser = null
+      currentProfile = null
+      renderNavActions()
+    }
   })
-  renderNavActions()
 }
 
 async function setUser(user) {
@@ -1042,10 +1055,12 @@ async function submitAuth(e) {
     if (authMode === 'login') {
       const { error } = await sb.auth.signInWithPassword({ email, password })
       if (error) throw error
+      // Wait for profile to load fully
+      await new Promise(r => setTimeout(r, 800))
+      const { data: freshProfile } = await sb.from('profiles').select('role').eq('id', currentUser?.id || (await sb.auth.getUser()).data.user?.id).single()
       closeModal('modal-login')
       toast('Connexion réussie ! 🎉')
-      await new Promise(r => setTimeout(r, 500))
-      const role = currentProfile?.role
+      const role = freshProfile?.role || currentProfile?.role
       if (role === 'admin' || role === 'superadmin') navigate('admin')
       else if (role === 'establishment') navigate('etablissement')
       else navigate('user-dashboard')
