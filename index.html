@@ -8,9 +8,6 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="https://js.stripe.com/v3/"></script>
 <style>
-/* ============================================================
-   VARIABLES & RESET
-============================================================ */
 :root {
   --green-900: #1B5E20;
   --green-700: #2E7D32;
@@ -39,17 +36,9 @@ body{font-family:'Poppins',sans-serif;color:var(--gray-900);background:var(--whi
 img{max-width:100%;display:block}
 button,input,select,textarea{font-family:inherit}
 a{text-decoration:none;color:inherit}
-
-/* ============================================================
-   TYPOGRAPHY
-============================================================ */
 h1{font-size:clamp(2rem,4vw,3.2rem);font-weight:800;letter-spacing:-0.03em;line-height:1.1}
 h2{font-size:clamp(1.6rem,3vw,2.4rem);font-weight:800;letter-spacing:-0.03em;line-height:1.15}
 h3{font-size:1.1rem;font-weight:700}
-
-/* ============================================================
-   BUTTONS
-============================================================ */
 .btn{display:inline-flex;align-items:center;gap:8px;padding:.7rem 1.5rem;border-radius:var(--radius-full);font-weight:600;font-size:.9rem;cursor:pointer;border:none;transition:all var(--transition)}
 .btn-primary{background:var(--green-700);color:#fff}
 .btn-primary:hover{background:var(--green-900);transform:translateY(-2px);box-shadow:0 6px 20px rgba(46,125,50,0.3)}
@@ -64,10 +53,6 @@ h3{font-size:1.1rem;font-weight:700}
 .btn-sm{padding:.4rem 1rem;font-size:.8rem}
 .btn-full{width:100%;justify-content:center}
 .btn:disabled{opacity:.5;cursor:not-allowed;transform:none!important}
-
-/* ============================================================
-   FORMS
-============================================================ */
 .form-group{margin-bottom:1rem}
 .form-label{display:block;font-size:.82rem;font-weight:600;color:var(--gray-700);margin-bottom:.4rem}
 .form-input{width:100%;padding:.7rem 1rem;border:1.5px solid var(--gray-200);border-radius:var(--radius-sm);font-size:.9rem;color:var(--gray-900);outline:none;transition:border-color var(--transition);background:#fff}
@@ -76,26 +61,14 @@ h3{font-size:1.1rem;font-weight:700}
 .form-row{display:grid;grid-template-columns:1fr 1fr;gap:1rem}
 textarea.form-input{resize:vertical}
 .form-error{color:#ef4444;font-size:.75rem;margin-top:.25rem}
-
-/* ============================================================
-   CARDS
-============================================================ */
 .card{background:#fff;border-radius:var(--radius);border:1px solid var(--gray-200);box-shadow:var(--shadow-card)}
 .card-hover{transition:all var(--transition)}
 .card-hover:hover{transform:translateY(-4px);box-shadow:var(--shadow-hover);border-color:var(--green-200)}
-
-/* ============================================================
-   BADGES
-============================================================ */
 .badge{display:inline-flex;align-items:center;gap:4px;padding:.22rem .65rem;border-radius:var(--radius-full);font-size:.7rem;font-weight:700}
 .badge-online{background:var(--green-100);color:var(--green-700)}
 .badge-pending{background:#FFF3E0;color:#E65100}
 .badge-recovered{background:#E3F2FD;color:#1565C0}
 .badge-archived{background:var(--gray-100);color:var(--gray-500)}
-
-/* ============================================================
-   NAVBAR
-============================================================ */
 #navbar{position:sticky;top:0;z-index:100;background:rgba(255,255,255,0.97);backdrop-filter:blur(12px);border-bottom:1px solid var(--gray-200);padding:0 5vw;display:flex;align-items:center;justify-content:space-between;height:64px;transition:box-shadow var(--transition)}
 #navbar.scrolled{box-shadow:0 2px 12px rgba(0,0,0,0.07)}
 .nav-logo{display:flex;align-items:center;gap:10px;cursor:pointer}
@@ -116,17 +89,9 @@ textarea.form-input{resize:vertical}
 .nav-dropdown a.danger{color:#ef4444}
 .nav-dropdown a.danger:hover{background:#fef2f2}
 .nav-dropdown hr{border:none;border-top:1px solid var(--gray-200);margin:.3rem 0}
-
-/* ============================================================
-   PAGES (router)
-============================================================ */
 .page{display:none;animation:fadeIn .25s ease-out}
 .page.active{display:block}
 @keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
-
-/* ============================================================
-   LANDING PAGE
-============================================================ */
 .hero{max-width:1200px;margin:0 auto;padding:5rem 5vw 4rem;display:grid;grid-template-columns:1fr 1fr;gap:4rem;align-items:center;min-height:calc(100vh - 64px)}
 .hero-eyebrow{display:inline-flex;align-items:center;gap:8px;background:var(--green-100);border:1px solid var(--green-200);border-radius:var(--radius-full);padding:.3rem 1rem;font-size:.75rem;font-weight:700;color:var(--green-700);letter-spacing:.05em;text-transform:uppercase;margin-bottom:1.5rem}
 .hero-dot{width:6px;height:6px;border-radius:50%;background:var(--green-400);animation:pulse 2s infinite}
@@ -148,8 +113,6 @@ textarea.form-input{resize:vertical}
 .hero-card-meta{font-size:.73rem;color:var(--gray-500);margin-top:2px}
 .hero-notif{position:absolute;top:-16px;right:-16px;background:#fff;border:1px solid var(--gray-200);border-radius:var(--radius);padding:.7rem 1rem;box-shadow:var(--shadow-hover);display:flex;align-items:center;gap:8px;font-size:.78rem;font-weight:500;animation:floatY 3s ease-in-out infinite;z-index:2}
 @keyframes floatY{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
-
-/* Steps */
 .steps-section{background:var(--gray-100);padding:5rem 5vw}
 .steps-section .inner{max-width:1100px;margin:0 auto}
 .section-label{font-size:.72rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--green-700);display:flex;align-items:center;gap:8px;margin-bottom:.6rem}
@@ -162,24 +125,16 @@ textarea.form-input{resize:vertical}
 .step-num.side{background:var(--green-100);color:var(--green-700);border:2px solid var(--green-200)}
 .step-icon{font-size:1.6rem;margin-bottom:.6rem}
 .step-desc{font-size:.875rem;color:var(--gray-500);line-height:1.65;margin-top:.4rem}
-
-/* Stats banner */
 .stats-banner{background:linear-gradient(135deg,var(--green-700) 0%,var(--green-600) 50%,var(--green-400) 100%);padding:4rem 5vw}
 .stats-banner .inner{max-width:1000px;margin:0 auto;display:grid;grid-template-columns:repeat(4,1fr);gap:2rem;text-align:center}
 .banner-num{font-size:2.8rem;font-weight:900;color:#fff;letter-spacing:-0.04em;line-height:1}
 .banner-label{font-size:.85rem;color:rgba(255,255,255,.75);font-weight:500;margin-top:.3rem}
-
-/* CTA section */
 .cta-section{padding:6rem 5vw;text-align:center}
 .cta-box{max-width:700px;margin:0 auto;background:linear-gradient(135deg,var(--green-700),var(--green-600));border-radius:24px;padding:4rem 3rem;position:relative;overflow:hidden}
 .cta-box::before{content:'';position:absolute;width:280px;height:280px;background:rgba(255,255,255,.06);border-radius:50%;top:-80px;right:-60px}
 .cta-box h2{color:#fff;margin-bottom:1rem}
 .cta-box p{color:rgba(255,255,255,.8);font-size:1rem;margin-bottom:2rem}
 .cta-actions{display:flex;gap:.75rem;justify-content:center;flex-wrap:wrap}
-
-/* ============================================================
-   EXPLORER
-============================================================ */
 .explorer-header{background:#fff;border-bottom:1px solid var(--gray-200);padding:2.5rem 5vw}
 .explorer-header .inner{max-width:1200px;margin:0 auto}
 .explorer-body{max-width:1200px;margin:0 auto;padding:2rem 5vw}
@@ -204,10 +159,6 @@ textarea.form-input{resize:vertical}
 .empty-state{text-align:center;padding:5rem 2rem;color:var(--gray-500)}
 .empty-state .icon{font-size:4rem;margin-bottom:1rem}
 .empty-state h3{font-size:1.2rem;font-weight:700;color:var(--gray-700);margin-bottom:.5rem}
-
-/* ============================================================
-   OBJECT DETAIL
-============================================================ */
 .object-detail{max-width:900px;margin:0 auto;padding:2rem 5vw}
 .obj-detail-grid{display:grid;grid-template-columns:1.6fr 1fr;gap:2rem;align-items:start}
 .obj-detail-img{border-radius:var(--radius);overflow:hidden;background:var(--green-50);height:320px;display:flex;align-items:center;justify-content:center;font-size:100px;position:relative}
@@ -222,10 +173,6 @@ textarea.form-input{resize:vertical}
 .obj-info-value{font-size:.9rem;font-weight:600}
 .tags-row{display:flex;flex-wrap:wrap;gap:.4rem;margin-top:.5rem}
 .tag{background:var(--green-100);color:var(--green-700);border-radius:var(--radius-full);padding:.2rem .65rem;font-size:.72rem;font-weight:600;border:1px solid var(--green-200)}
-
-/* ============================================================
-   USER DASHBOARD
-============================================================ */
 .dashboard{max-width:960px;margin:0 auto;padding:2rem 5vw}
 .dash-header{display:flex;justify-content:space-between;align-items:start;margin-bottom:2rem;flex-wrap:wrap;gap:1rem}
 .dash-tabs{display:flex;gap:.3rem;background:var(--gray-100);border-radius:var(--radius-full);padding:4px;margin-bottom:1.5rem}
@@ -251,10 +198,6 @@ textarea.form-input{resize:vertical}
 .notif-title{font-size:.85rem;font-weight:600}
 .notif-msg{font-size:.78rem;color:var(--gray-500);margin-top:2px}
 .notif-time{font-size:.7rem;color:var(--gray-500);margin-top:4px}
-
-/* ============================================================
-   ADMIN DASHBOARD
-============================================================ */
 .admin-layout{display:flex;min-height:100vh}
 .admin-sidebar{width:220px;background:#fff;border-right:1px solid var(--gray-200);display:flex;flex-direction:column;position:fixed;height:100%;z-index:50}
 .sidebar-logo{padding:1.2rem 1rem;border-bottom:1px solid var(--gray-200)}
@@ -277,18 +220,10 @@ textarea.form-input{resize:vertical}
 .score-bar-fill.high{background:var(--green-700)}
 .score-bar-fill.low{background:#f59e0b}
 .action-btns{display:flex;gap:.4rem}
-
-/* ============================================================
-   ETABLISSEMENT DASHBOARD
-============================================================ */
 .estab-layout{display:flex;min-height:100vh}
 .estab-main{margin-left:220px;flex:1;padding:2rem}
 .qr-box{background:var(--green-50);border:2px dashed var(--green-200);border-radius:var(--radius);padding:1.5rem;text-align:center}
 .qr-code{margin:1rem auto;max-width:180px}
-
-/* ============================================================
-   MODALS
-============================================================ */
 .modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:200;align-items:center;justify-content:center;padding:1rem}
 .modal-overlay.open{display:flex}
 .modal{background:#fff;border-radius:20px;padding:2rem;max-width:540px;width:100%;max-height:90vh;overflow-y:auto;box-shadow:var(--shadow-modal);animation:slideUp .28s cubic-bezier(0.4,0,.2,1)}
@@ -300,10 +235,6 @@ textarea.form-input{resize:vertical}
 .modal-close:hover{background:var(--gray-200)}
 .success-state{text-align:center;padding:2rem 0}
 .success-icon{font-size:4rem;margin-bottom:1rem}
-
-/* ============================================================
-   TOAST
-============================================================ */
 #toast-container{position:fixed;bottom:1.5rem;right:1.5rem;z-index:999;display:flex;flex-direction:column;gap:.5rem}
 .toast{display:flex;align-items:center;gap:.7rem;padding:.85rem 1.25rem;border-radius:12px;box-shadow:0 8px 30px rgba(0,0,0,.15);font-size:.875rem;font-weight:500;max-width:320px;animation:toastIn .3s cubic-bezier(0.4,0,.2,1);color:#fff}
 @keyframes toastIn{from{opacity:0;transform:translateX(20px)}to{opacity:1;transform:none}}
@@ -311,18 +242,10 @@ textarea.form-input{resize:vertical}
 .toast.error{background:#C62828}
 .toast.info{background:#1565C0}
 .toast-icon{font-size:16px}
-
-/* ============================================================
-   LOADER
-============================================================ */
 .loader{display:flex;align-items:center;justify-content:center;padding:3rem}
 .spinner{width:36px;height:36px;border:3px solid var(--green-200);border-top-color:var(--green-700);border-radius:50%;animation:spin .7s linear infinite}
 @keyframes spin{to{transform:rotate(360deg)}}
 .btn-spinner{width:16px;height:16px;border:2px solid rgba(255,255,255,.4);border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite;flex-shrink:0}
-
-/* ============================================================
-   FOOTER
-============================================================ */
 footer{background:var(--gray-900);color:rgba(255,255,255,.6);padding:4rem 5vw 2rem}
 .footer-inner{max-width:1200px;margin:0 auto}
 .footer-grid{display:grid;grid-template-columns:1.5fr 1fr 1fr 1fr;gap:3rem;margin-bottom:3rem}
@@ -336,10 +259,6 @@ footer{background:var(--gray-900);color:rgba(255,255,255,.6);padding:4rem 5vw 2r
 .footer-bottom-links{display:flex;gap:1.5rem}
 .footer-bottom-links a{cursor:pointer;transition:color var(--transition)}
 .footer-bottom-links a:hover{color:var(--green-200)}
-
-/* ============================================================
-   RESPONSIVE
-============================================================ */
 @media(max-width:1024px){
   .admin-sidebar,.admin-layout .admin-sidebar,.estab-layout .admin-sidebar{display:none}
   .admin-main,.estab-main{margin-left:0}
@@ -366,9 +285,6 @@ footer{background:var(--gray-900);color:rgba(255,255,255,.6);padding:4rem 5vw 2r
 </head>
 <body>
 
-<!-- ============================================================
-     CONFIG — Remplace si besoin
-============================================================ -->
 <script>
 const CONFIG = {
   SUPABASE_URL: 'https://oilrcdzdchmjzhlahaex.supabase.co',
@@ -378,10 +294,8 @@ const CONFIG = {
 }
 </script>
 
-<!-- TOAST -->
 <div id="toast-container"></div>
 
-<!-- NAVBAR -->
 <nav id="navbar">
   <div class="nav-logo" onclick="navigate('home')">
     <div class="nav-logo-mark">R</div>
@@ -393,16 +307,11 @@ const CONFIG = {
     <a onclick="navigate('home'); scrollToSection('#comment')" id="nav-comment">Comment ça marche</a>
     <a onclick="navigate('home'); scrollToSection('#etablissements')" id="nav-estab">Établissements</a>
   </div>
-  <div class="nav-actions" id="nav-actions">
-    <!-- filled by JS -->
-  </div>
+  <div class="nav-actions" id="nav-actions"></div>
 </nav>
 
-<!-- ============================================================
-     PAGE: HOME
-============================================================ -->
+<!-- PAGE: HOME -->
 <div id="page-home" class="page">
-  <!-- HERO -->
   <section class="hero">
     <div>
       <div class="hero-eyebrow"><div class="hero-dot"></div>Plateforme objets trouvés N°1</div>
@@ -429,7 +338,6 @@ const CONFIG = {
     </div>
   </section>
 
-  <!-- HOW IT WORKS -->
   <section class="steps-section" id="comment">
     <div class="inner">
       <div class="section-label">Processus simple</div>
@@ -442,20 +350,16 @@ const CONFIG = {
     </div>
   </section>
 
-  <!-- RECENT OBJECTS -->
   <section style="padding:5rem 5vw">
     <div style="max-width:1200px;margin:0 auto">
       <div style="display:flex;align-items:end;justify-content:space-between;margin-bottom:2rem;flex-wrap:wrap;gap:1rem">
         <div><div class="section-label">Objets trouvés</div><h2 style="margin-top:.3rem">Derniers objets disponibles</h2></div>
         <button class="btn btn-secondary" onclick="navigate('explorer')">Voir tout →</button>
       </div>
-      <div class="objects-grid" id="home-objects-grid">
-        <div class="loader"><div class="spinner"></div></div>
-      </div>
+      <div class="objects-grid" id="home-objects-grid"><div class="loader"><div class="spinner"></div></div></div>
     </div>
   </section>
 
-  <!-- STATS BANNER -->
   <div class="stats-banner">
     <div class="inner">
       <div><div class="banner-num" id="banner-total">—</div><div class="banner-label">Objets répertoriés</div></div>
@@ -465,7 +369,6 @@ const CONFIG = {
     </div>
   </div>
 
-  <!-- ESTABLISHMENTS -->
   <section style="padding:5rem 5vw;background:var(--gray-100)" id="etablissements">
     <div style="max-width:1200px;margin:0 auto">
       <div style="text-align:center;margin-bottom:3rem"><div class="section-label" style="justify-content:center">Réseau partenaire</div><h2>Établissements partenaires</h2><p style="color:var(--gray-500);margin-top:.5rem">Bars, boîtes de nuit et hôtels qui font confiance à Reperdu</p></div>
@@ -473,7 +376,6 @@ const CONFIG = {
     </div>
   </section>
 
-  <!-- CTA -->
   <section class="cta-section">
     <div class="cta-box">
       <h2>Votre établissement perd des objets chaque soir ?</h2>
@@ -504,9 +406,7 @@ const CONFIG = {
   </footer>
 </div>
 
-<!-- ============================================================
-     PAGE: EXPLORER
-============================================================ -->
+<!-- PAGE: EXPLORER -->
 <div id="page-explorer" class="page">
   <div class="explorer-header">
     <div class="inner">
@@ -535,15 +435,11 @@ const CONFIG = {
       </div>
     </div>
     <div id="explorer-count" style="font-size:.85rem;color:var(--gray-500);margin-bottom:1rem"></div>
-    <div class="objects-grid" id="explorer-grid">
-      <div class="loader"><div class="spinner"></div></div>
-    </div>
+    <div class="objects-grid" id="explorer-grid"><div class="loader"><div class="spinner"></div></div></div>
   </div>
 </div>
 
-<!-- ============================================================
-     PAGE: OBJECT DETAIL
-============================================================ -->
+<!-- PAGE: OBJECT DETAIL -->
 <div id="page-object" class="page">
   <div class="object-detail">
     <button class="btn btn-secondary btn-sm" onclick="history.back(); navigate('explorer')" style="margin-bottom:1.5rem">← Retour</button>
@@ -551,9 +447,7 @@ const CONFIG = {
   </div>
 </div>
 
-<!-- ============================================================
-     PAGE: DÉCLARER
-============================================================ -->
+<!-- PAGE: DÉCLARER -->
 <div id="page-declarer" class="page">
   <div style="max-width:680px;margin:0 auto;padding:2.5rem 5vw">
     <button class="btn btn-secondary btn-sm" onclick="navigate('home')" style="margin-bottom:1.5rem">← Retour</button>
@@ -583,22 +477,20 @@ const CONFIG = {
           <div class="form-group"><label class="form-label">Date de perte *</label><input class="form-input" type="date" id="d-date" required></div>
           <div class="form-group"><label class="form-label">Lieu approximatif *</label><input class="form-input" id="d-location" placeholder="Ex : Rex Club, Paris 2e" required></div>
         </div>
-
-        <!-- Établissement -->
+        <!-- Établissement OBLIGATOIRE page déclarer -->
         <div class="form-group">
-          <label class="form-label">Établissement (si connu)</label>
+          <label class="form-label">Établissement *</label>
           <div style="position:relative">
-            <input class="form-input" id="d-estab-search" placeholder="🔍 Rechercher un établissement..." oninput="searchEstablishments(this.value)" autocomplete="off">
+            <input class="form-input" id="d-estab-search" placeholder="🔍 Rechercher un établissement..." oninput="searchEstablishments(this.value,'d')" autocomplete="off" required>
             <div id="d-estab-dropdown" style="display:none;position:absolute;top:100%;left:0;right:0;background:#fff;border:1.5px solid var(--green-400);border-top:none;border-radius:0 0 var(--radius-sm) var(--radius-sm);max-height:200px;overflow-y:auto;z-index:50;box-shadow:var(--shadow-hover)"></div>
           </div>
           <input type="hidden" id="d-estab-id">
-          <div id="d-estab-selected" style="display:none;margin-top:.5rem;background:var(--green-100);border-radius:var(--radius-sm);padding:.5rem .75rem;font-size:.82rem;color:var(--green-700);display:flex;align-items:center;justify-content:space-between">
+          <div id="d-estab-selected" style="display:none;margin-top:.5rem;background:var(--green-100);border-radius:var(--radius-sm);padding:.5rem .75rem;font-size:.82rem;color:var(--green-700);align-items:center;justify-content:space-between">
             <span id="d-estab-name"></span>
-            <button type="button" onclick="clearEstabSelection()" style="background:none;border:none;color:var(--green-700);cursor:pointer;font-size:1rem;line-height:1">✕</button>
+            <button type="button" onclick="clearEstabSelection('d')" style="background:none;border:none;color:var(--green-700);cursor:pointer;font-size:1rem;line-height:1">✕</button>
           </div>
-          <p style="font-size:.75rem;color:var(--gray-500);margin-top:.35rem">Optionnel — aide à cibler la recherche dans cet établissement spécifique</p>
+          <p style="font-size:.75rem;color:var(--gray-500);margin-top:.35rem">Sélectionnez l'établissement où vous pensez avoir perdu votre objet</p>
         </div>
-
         <div style="background:var(--green-100);border-radius:var(--radius-sm);padding:.9rem 1rem;font-size:.82rem;color:var(--green-900);margin-bottom:1.5rem">
           🤖 Après soumission, notre système analyse votre description et la compare à tous les objets trouvés. Vous recevrez un email si une correspondance est détectée.
         </div>
@@ -608,9 +500,7 @@ const CONFIG = {
   </div>
 </div>
 
-<!-- ============================================================
-     PAGE: USER DASHBOARD
-============================================================ -->
+<!-- PAGE: USER DASHBOARD -->
 <div id="page-user-dashboard" class="page">
   <div class="dashboard">
     <div class="dash-header">
@@ -633,9 +523,7 @@ const CONFIG = {
   </div>
 </div>
 
-<!-- ============================================================
-     PAGE: ADMIN DASHBOARD
-============================================================ -->
+<!-- PAGE: ADMIN -->
 <div id="page-admin" class="page">
   <div class="admin-layout">
     <aside class="admin-sidebar">
@@ -656,7 +544,6 @@ const CONFIG = {
     </aside>
     <main class="admin-main">
       <div class="admin-inner">
-        <!-- Overview -->
         <div id="admin-overview">
           <h2 style="margin-bottom:.5rem">Dashboard</h2>
           <p style="color:var(--gray-500);font-size:.875rem;margin-bottom:1.5rem">Vue d'ensemble de la plateforme</p>
@@ -666,7 +553,6 @@ const CONFIG = {
             <div class="card"><div style="padding:1.2rem 1.2rem .8rem;border-bottom:1px solid var(--gray-200);display:flex;justify-content:space-between;align-items:center"><h3 style="font-size:1rem">Objets récents</h3><button class="btn btn-secondary btn-sm" onclick="switchAdminSection('admin-objects',null)">Voir tout</button></div><div id="admin-recent-objects"><div class="loader"><div class="spinner"></div></div></div></div>
           </div>
         </div>
-        <!-- Objects -->
         <div id="admin-objects" style="display:none">
           <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1.5rem;flex-wrap:wrap;gap:1rem">
             <h2>Gestion des objets</h2>
@@ -677,7 +563,6 @@ const CONFIG = {
           </div>
           <div id="admin-objects-content"><div class="loader"><div class="spinner"></div></div></div>
         </div>
-        <!-- Claims -->
         <div id="admin-claims" style="display:none">
           <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem;flex-wrap:wrap;gap:.75rem">
             <h2>Demandes "C'est à moi"</h2>
@@ -691,7 +576,6 @@ const CONFIG = {
           </div>
           <div id="admin-claims-content"><div class="loader"><div class="spinner"></div></div></div>
         </div>
-        <!-- Establishments -->
         <div id="admin-establishments" style="display:none">
           <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1.5rem">
             <h2>Établissements partenaires</h2>
@@ -699,7 +583,6 @@ const CONFIG = {
           </div>
           <div id="admin-establishments-content"><div class="loader"><div class="spinner"></div></div></div>
         </div>
-        <!-- Declarations -->
         <div id="admin-declarations" style="display:none">
           <h2 style="margin-bottom:1.5rem">Déclarations de perte</h2>
           <div id="admin-declarations-content"><div class="loader"><div class="spinner"></div></div></div>
@@ -709,9 +592,7 @@ const CONFIG = {
   </div>
 </div>
 
-<!-- ============================================================
-     PAGE: ETABLISSEMENT
-============================================================ -->
+<!-- PAGE: ETABLISSEMENT -->
 <div id="page-etablissement" class="page">
   <div class="admin-layout">
     <aside class="admin-sidebar">
@@ -762,15 +643,6 @@ const CONFIG = {
               <p style="font-size:.9rem;color:var(--gray-500);margin-bottom:1rem">Votre QR code donne accès à votre page publique</p>
               <button class="btn btn-primary btn-sm" onclick="generateQR()">Générer le QR Code</button>
             </div>
-            <div style="margin-top:1.5rem;font-size:.82rem;color:var(--gray-500)">
-              <p style="font-weight:600;color:var(--gray-700);margin-bottom:.4rem">À quoi ça sert ?</p>
-              <p>Affichez ce QR code dans votre établissement. Vos clients peuvent le scanner pour :</p>
-              <ul style="padding-left:1.2rem;margin-top:.4rem;line-height:1.8">
-                <li>Voir tous les objets trouvés chez vous</li>
-                <li>Déclarer un objet perdu directement</li>
-                <li>Réclamer un objet qui leur appartient</li>
-              </ul>
-            </div>
           </div>
         </div>
       </div>
@@ -778,9 +650,7 @@ const CONFIG = {
   </div>
 </div>
 
-<!-- ============================================================
-     MODALS
-============================================================ -->
+<!-- MODALS -->
 
 <!-- LOGIN -->
 <div id="modal-login" class="modal-overlay" onclick="closeModalOut(event,'modal-login')">
@@ -803,30 +673,64 @@ const CONFIG = {
   </div>
 </div>
 
-<!-- DECLARE LOST (from modal) -->
+<!-- =====================================================
+     MODAL DECLARE — avec établissement OBLIGATOIRE
+===================================================== -->
 <div id="modal-declare" class="modal-overlay" onclick="closeModalOut(event,'modal-declare')">
-  <div class="modal">
+  <div class="modal" style="max-width:600px">
     <div class="modal-header">
       <div><div class="modal-title">✍️ Déclarer un objet perdu</div><div class="modal-sub">Notre IA cherchera une correspondance automatiquement</div></div>
       <button class="modal-close" onclick="closeModal('modal-declare')">✕</button>
     </div>
     <div id="modal-declare-inner">
       <div class="form-row">
-        <div class="form-group"><label class="form-label">Nom complet *</label><input class="form-input" id="md-name" placeholder="Marie Dupont" required></div>
-        <div class="form-group"><label class="form-label">Email *</label><input class="form-input" id="md-email" type="email" placeholder="marie@email.com" required></div>
+        <div class="form-group"><label class="form-label">Nom complet *</label><input class="form-input" id="md-name" placeholder="Marie Dupont"></div>
+        <div class="form-group"><label class="form-label">Email *</label><input class="form-input" id="md-email" type="email" placeholder="marie@email.com"></div>
       </div>
+
+      <!-- Catégorie -->
+      <div class="form-group">
+        <label class="form-label">Catégorie *</label>
+        <div class="filter-pills" id="modal-declare-cats" style="margin-top:.4rem">
+          <span class="filter-pill active" data-cat="phone" onclick="selectModalDeclareCategory(this)">📱 Téléphone</span>
+          <span class="filter-pill" data-cat="bag" onclick="selectModalDeclareCategory(this)">👜 Sac</span>
+          <span class="filter-pill" data-cat="keys" onclick="selectModalDeclareCategory(this)">🔑 Clés</span>
+          <span class="filter-pill" data-cat="clothing" onclick="selectModalDeclareCategory(this)">👗 Vêtement</span>
+          <span class="filter-pill" data-cat="glasses" onclick="selectModalDeclareCategory(this)">👓 Lunettes</span>
+          <span class="filter-pill" data-cat="wallet" onclick="selectModalDeclareCategory(this)">💳 Portefeuille</span>
+          <span class="filter-pill" data-cat="jewelry" onclick="selectModalDeclareCategory(this)">💍 Bijou</span>
+          <span class="filter-pill" data-cat="other" onclick="selectModalDeclareCategory(this)">📦 Autre</span>
+        </div>
+      </div>
+
       <div class="form-group"><label class="form-label">Titre *</label><input class="form-input" id="md-title" placeholder="Ex : iPhone 14 Pro noir..."></div>
       <div class="form-group"><label class="form-label">Description *</label><textarea class="form-input" id="md-desc" rows="3" placeholder="Couleur, marque, contenu, signes distinctifs..."></textarea></div>
       <div class="form-row">
         <div class="form-group"><label class="form-label">Date de perte</label><input class="form-input" type="date" id="md-date"></div>
-        <div class="form-group"><label class="form-label">Lieu</label><input class="form-input" id="md-location" placeholder="Rex Club, Paris..."></div>
+        <div class="form-group"><label class="form-label">Lieu approximatif</label><input class="form-input" id="md-location" placeholder="Rex Club, Paris..."></div>
       </div>
+
+      <!-- Établissement OBLIGATOIRE -->
+      <div class="form-group">
+        <label class="form-label">Établissement *</label>
+        <div style="position:relative">
+          <input class="form-input" id="md-estab-search" placeholder="🔍 Rechercher un établissement..." oninput="searchEstablishments(this.value,'md')" autocomplete="off">
+          <div id="md-estab-dropdown" style="display:none;position:absolute;top:100%;left:0;right:0;background:#fff;border:1.5px solid var(--green-400);border-top:none;border-radius:0 0 var(--radius-sm) var(--radius-sm);max-height:200px;overflow-y:auto;z-index:50;box-shadow:var(--shadow-hover)"></div>
+        </div>
+        <input type="hidden" id="md-estab-id">
+        <div id="md-estab-selected" style="display:none;margin-top:.5rem;background:var(--green-100);border-radius:var(--radius-sm);padding:.5rem .75rem;font-size:.82rem;color:var(--green-700);align-items:center;justify-content:space-between">
+          <span id="md-estab-name"></span>
+          <button type="button" onclick="clearEstabSelection('md')" style="background:none;border:none;color:var(--green-700);cursor:pointer;font-size:1rem;line-height:1">✕</button>
+        </div>
+        <p style="font-size:.75rem;color:var(--gray-500);margin-top:.35rem">Sélectionnez l'établissement où vous pensez avoir perdu votre objet</p>
+      </div>
+
       <button class="btn btn-primary btn-full" onclick="submitModalDeclaration()" id="md-submit">Envoyer →</button>
     </div>
   </div>
 </div>
 
-<!-- CLAIM (C'est à moi) -->
+<!-- CLAIM -->
 <div id="modal-claim" class="modal-overlay" onclick="closeModalOut(event,'modal-claim')">
   <div class="modal">
     <div class="modal-header">
@@ -852,7 +756,7 @@ const CONFIG = {
   </div>
 </div>
 
-<!-- ADD OBJECT (admin/estab) -->
+<!-- ADD OBJECT -->
 <div id="modal-add-object" class="modal-overlay" onclick="closeModalOut(event,'modal-add-object')">
   <div class="modal" style="max-width:580px">
     <div class="modal-header">
@@ -928,13 +832,22 @@ const CONFIG = {
   </div>
 </div>
 
-<!-- ============================================================
-     JAVASCRIPT
-============================================================ -->
+<!-- MODAL CONFIRM DELETE -->
+<div id="modal-confirm-delete" class="modal-overlay" onclick="closeModalOut(event,'modal-confirm-delete')">
+  <div class="modal" style="max-width:420px">
+    <div class="modal-header">
+      <div><div class="modal-title">🗑️ Supprimer la déclaration</div><div class="modal-sub">Cette action est irréversible</div></div>
+      <button class="modal-close" onclick="closeModal('modal-confirm-delete')">✕</button>
+    </div>
+    <p style="color:var(--gray-500);font-size:.9rem;margin-bottom:1.5rem">Êtes-vous sûr de vouloir supprimer cette déclaration ? Toutes les correspondances associées seront perdues.</p>
+    <div style="display:flex;gap:.75rem">
+      <button class="btn btn-secondary btn-full" onclick="closeModal('modal-confirm-delete')">Annuler</button>
+      <button class="btn btn-danger btn-full" id="confirm-delete-btn" onclick="confirmDeleteDeclaration()">Supprimer</button>
+    </div>
+  </div>
+</div>
+
 <script>
-// ──────────────────────────────────────────────────────────────
-// INIT SUPABASE
-// ──────────────────────────────────────────────────────────────
 const { createClient } = supabase
 const sb = createClient(CONFIG.SUPABASE_URL, CONFIG.SUPABASE_ANON_KEY)
 
@@ -943,16 +856,16 @@ let currentProfile = null
 let currentPage = 'home'
 let activeCategory = 'all'
 let declarationCategory = 'phone'
+let modalDeclarationCategory = 'phone' // ← catégorie pour le modal
 let addObjectCategory = 'phone'
 let currentObjectId = null
 let currentClaimObjectId = null
 let searchDebounce = null
 let claimStatusFilter = 'pending'
 let estabProfile = null
+let pendingDeleteDeclId = null // ← id déclaration à supprimer
 
-// ──────────────────────────────────────────────────────────────
-// TOAST
-// ──────────────────────────────────────────────────────────────
+// ── TOAST ──────────────────────────────────────────────────────
 function toast(msg, type='success', duration=4000) {
   const icons = {success:'✅', error:'❌', info:'ℹ️'}
   const t = document.createElement('div')
@@ -962,17 +875,13 @@ function toast(msg, type='success', duration=4000) {
   setTimeout(() => t.remove(), duration)
 }
 
-// ──────────────────────────────────────────────────────────────
-// ROUTER
-// ──────────────────────────────────────────────────────────────
+// ── ROUTER ─────────────────────────────────────────────────────
 function navigate(page, data=null) {
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'))
   currentPage = page
   const el = document.getElementById(`page-${page}`)
   if (el) el.classList.add('active')
   window.scrollTo(0, 0)
-
-  // Load page data
   if (page === 'home') { loadHomeStats(); loadHomeObjects(); loadHomeEstabs() }
   if (page === 'explorer') loadObjects()
   if (page === 'object' && data) { currentObjectId = data; loadObjectDetail(data) }
@@ -983,15 +892,10 @@ function navigate(page, data=null) {
 }
 
 function scrollToSection(id) {
-  setTimeout(() => {
-    const el = document.querySelector(id)
-    if (el) el.scrollIntoView({ behavior:'smooth' })
-  }, 100)
+  setTimeout(() => { const el = document.querySelector(id); if (el) el.scrollIntoView({ behavior:'smooth' }) }, 100)
 }
 
-// ──────────────────────────────────────────────────────────────
-// CACHE - évite les requêtes répétées
-// ──────────────────────────────────────────────────────────────
+// ── CACHE ──────────────────────────────────────────────────────
 const CACHE = {}
 async function cached(key, ttlMs, fn) {
   const now = Date.now()
@@ -1000,12 +904,9 @@ async function cached(key, ttlMs, fn) {
   CACHE[key] = { data, ts: now }
   return data
 }
-
 function invalidateCache(key) { delete CACHE[key] }
 
-// ──────────────────────────────────────────────────────────────
-// AUTH
-// ──────────────────────────────────────────────────────────────
+// ── AUTH ───────────────────────────────────────────────────────
 async function initAuth() {
   const { data: { session } } = await sb.auth.getSession()
   if (session) {
@@ -1017,16 +918,9 @@ async function initAuth() {
   } else {
     renderNavActions()
   }
-
   sb.auth.onAuthStateChange(async (event, session) => {
-    if (session) {
-      await setUser(session.user)
-      renderNavActions()
-    } else {
-      currentUser = null
-      currentProfile = null
-      renderNavActions()
-    }
+    if (session) { await setUser(session.user); renderNavActions() }
+    else { currentUser = null; currentProfile = null; renderNavActions() }
   })
 }
 
@@ -1061,15 +955,9 @@ function renderNavActions() {
   }
 }
 
-function toggleDropdown() {
-  document.getElementById('nav-dd')?.classList.toggle('open')
-}
-function closeDropdown() {
-  document.getElementById('nav-dd')?.classList.remove('open')
-}
-document.addEventListener('click', e => {
-  if (!e.target.closest('.nav-user')) closeDropdown()
-})
+function toggleDropdown() { document.getElementById('nav-dd')?.classList.toggle('open') }
+function closeDropdown() { document.getElementById('nav-dd')?.classList.remove('open') }
+document.addEventListener('click', e => { if (!e.target.closest('.nav-user')) closeDropdown() })
 
 let authMode = 'login'
 function setAuthMode(mode, btn) {
@@ -1089,12 +977,10 @@ async function submitAuth(e) {
   const btn = document.getElementById('auth-submit')
   btn.disabled = true
   btn.innerHTML = '<div class="btn-spinner"></div> Chargement...'
-
   try {
     if (authMode === 'login') {
       const { data: authData, error } = await sb.auth.signInWithPassword({ email, password })
       if (error) throw error
-      // Load profile immediately after login
       const { data: freshProfile } = await sb.from('profiles').select('role, full_name, establishment_id').eq('id', authData.user.id).single()
       currentUser = authData.user
       currentProfile = freshProfile
@@ -1128,14 +1014,10 @@ async function submitAuth(e) {
 async function signOut() {
   await sb.auth.signOut()
   currentUser = null; currentProfile = null
-  renderNavActions()
-  navigate('home')
-  toast('Déconnecté')
+  renderNavActions(); navigate('home'); toast('Déconnecté')
 }
 
-// ──────────────────────────────────────────────────────────────
-// HOME PAGE
-// ──────────────────────────────────────────────────────────────
+// ── HOME ───────────────────────────────────────────────────────
 async function loadHomeStats() {
   const [{ count: total }, { count: recovered }, { count: estabs }] = await Promise.all([
     sb.from('objects').select('*', { count:'exact', head:true }),
@@ -1181,9 +1063,7 @@ async function loadHomeEstabs() {
     </div>`).join('')
 }
 
-// ──────────────────────────────────────────────────────────────
-// OBJECT CARD RENDER
-// ──────────────────────────────────────────────────────────────
+// ── OBJECT CARD ────────────────────────────────────────────────
 const CAT_ICONS = {phone:'📱',bag:'👜',keys:'🔑',clothing:'👗',glasses:'👓',wallet:'💳',jewelry:'💍',electronics:'💻',documents:'📄',other:'📦'}
 const CAT_LABELS = {phone:'Téléphone',bag:'Sac',keys:'Clés',clothing:'Vêtement',glasses:'Lunettes',wallet:'Portefeuille',jewelry:'Bijou',electronics:'Électronique',documents:'Documents',other:'Autre'}
 const STATUS_LABELS = {online:'En ligne',pending:'En attente',recovered:'Récupéré',archived:'Archivé'}
@@ -1191,11 +1071,10 @@ const CAT_COLORS = {phone:'#E8F5E9',bag:'#FFF3E0',keys:'#E3F2FD',clothing:'#FCE4
 
 function renderObjectCard(o) {
   const ago = timeAgo(o.found_at)
-  const statusClass = `badge-${o.status}`
   return `<div class="obj-card" onclick="navigate('object','${o.id}')">
     <div class="obj-img" style="background:${CAT_COLORS[o.category]||'#F5F5F5'}">
       ${o.primary_image_url ? `<img src="${o.primary_image_url}" alt="${o.title}">` : `<span style="position:relative;z-index:1">${CAT_ICONS[o.category]||'📦'}</span>`}
-      <div style="position:absolute;top:10px;left:10px"><span class="badge ${statusClass}">${STATUS_LABELS[o.status]||o.status}</span></div>
+      <div style="position:absolute;top:10px;left:10px"><span class="badge badge-${o.status}">${STATUS_LABELS[o.status]||o.status}</span></div>
     </div>
     <div class="obj-body">
       <div class="obj-cat">${CAT_ICONS[o.category]} ${CAT_LABELS[o.category]||o.category}</div>
@@ -1215,9 +1094,7 @@ function timeAgo(dateStr) {
   return new Date(dateStr).toLocaleDateString('fr-FR',{day:'numeric',month:'short'})
 }
 
-// ──────────────────────────────────────────────────────────────
-// EXPLORER
-// ──────────────────────────────────────────────────────────────
+// ── EXPLORER ───────────────────────────────────────────────────
 function setFilter(el) {
   document.querySelectorAll('#filter-pills .filter-pill').forEach(p => p.classList.remove('active'))
   el.classList.add('active')
@@ -1235,11 +1112,9 @@ async function loadObjects() {
   if (!grid) return
   grid.innerHTML = '<div class="loader"><div class="spinner"></div></div>'
   const search = document.getElementById('search-input')?.value || ''
-
   let query = sb.from('objects').select('*, establishment:establishments(name,city)').eq('status','online').order('created_at',{ascending:false}).limit(40)
   if (activeCategory !== 'all') query = query.eq('category', activeCategory)
   if (search.trim()) query = query.ilike('title', `%${search.trim()}%`)
-
   const { data, error } = await query
   const count = document.getElementById('explorer-count')
   if (error) { grid.innerHTML = `<div class="empty-state"><div class="icon">⚠️</div><p>${error.message}</p></div>`; return }
@@ -1248,15 +1123,12 @@ async function loadObjects() {
   grid.innerHTML = data.map(o => renderObjectCard(o)).join('')
 }
 
-// ──────────────────────────────────────────────────────────────
-// OBJECT DETAIL
-// ──────────────────────────────────────────────────────────────
+// ── OBJECT DETAIL ──────────────────────────────────────────────
 async function loadObjectDetail(id) {
   const el = document.getElementById('object-detail-content')
   el.innerHTML = '<div class="loader"><div class="spinner"></div></div>'
   const { data: o } = await sb.from('objects').select('*, establishment:establishments(*)').eq('id',id).single()
   if (!o) { el.innerHTML = '<div class="empty-state"><div class="icon">❓</div><h3>Objet introuvable</h3></div>'; return }
-
   el.innerHTML = `
     <div class="obj-detail-grid">
       <div>
@@ -1264,7 +1136,7 @@ async function loadObjectDetail(id) {
           ${o.primary_image_url ? `<img src="${o.primary_image_url}" alt="${o.title}" id="main-img-el">` : `<span style="position:relative;z-index:1;font-size:80px">${CAT_ICONS[o.category]||'📦'}</span>`}
           <div style="position:absolute;top:12px;left:12px"><span class="badge badge-${o.status}">${STATUS_LABELS[o.status]}</span></div>
         </div>
-        ${o.images?.length > 1 ? `<div class="obj-detail-thumbs">${o.images.map((img,i) => `<div class="obj-detail-thumb" onclick="document.getElementById('main-img-el').src='${img}'"><img src="${img}" style="width:100%;height:100%;object-fit:cover"></div>`).join('')}</div>` : ''}
+        ${o.images?.length > 1 ? `<div class="obj-detail-thumbs">${o.images.map(img => `<div class="obj-detail-thumb" onclick="document.getElementById('main-img-el').src='${img}'"><img src="${img}" style="width:100%;height:100%;object-fit:cover"></div>`).join('')}</div>` : ''}
         ${o.ai_tags?.length ? `<div class="card" style="padding:1rem;margin-top:.75rem"><div style="font-size:.7rem;font-weight:700;text-transform:uppercase;color:var(--gray-500);letter-spacing:.05em;margin-bottom:.5rem">🤖 Tags IA</div><div class="tags-row">${o.ai_tags.map(t=>`<span class="tag">${t}</span>`).join('')}</div></div>` : ''}
       </div>
       <div>
@@ -1273,7 +1145,7 @@ async function loadObjectDetail(id) {
           <h2 style="font-size:1.4rem;margin-bottom:.75rem">${o.title}</h2>
           <p style="font-size:.875rem;color:var(--gray-500);line-height:1.7;margin-bottom:1rem">${o.description}</p>
           <div class="obj-info-row"><span class="obj-info-icon">🏢</span><div><div class="obj-info-label">Établissement</div><div class="obj-info-value">${o.establishment?.name||'—'}</div><div style="font-size:.78rem;color:var(--gray-500)">${o.establishment?.address||''}, ${o.establishment?.city||''}</div></div></div>
-          <div class="obj-info-row"><span class="obj-info-icon">📅</span><div><div class="obj-info-label">Trouvé le</div><div class="obj-info-value">${new Date(o.found_at).toLocaleDateString('fr-FR',{day:'numeric',month:'long',year:'numeric',hour:'2-digit',minute:'2-digit'})}</div></div></div>
+          <div class="obj-info-row"><span class="obj-info-icon">📅</span><div><div class="obj-info-label">Trouvé le</div><div class="obj-info-value">${new Date(o.found_at).toLocaleDateString('fr-FR',{day:'numeric',month:'long',year:'numeric'})}</div></div></div>
           ${o.found_location_detail ? `<div class="obj-info-row"><span class="obj-info-icon">📍</span><div><div class="obj-info-label">Emplacement</div><div class="obj-info-value">${o.found_location_detail}</div></div></div>` : ''}
         </div>
         ${o.status === 'online' ? `
@@ -1283,7 +1155,7 @@ async function loadObjectDetail(id) {
             <button class="btn btn-primary btn-full" onclick="openClaimModal('${o.id}','${o.title.replace(/'/g,"\\'")}')">✋ C'est mon objet !</button>
             <button class="btn btn-secondary btn-full" style="margin-top:.5rem" onclick="shareObject('${o.id}','${o.title.replace(/'/g,"\\'")}')">📤 Partager</button>
           </div>` :
-          o.status === 'recovered' ? `<div class="card" style="padding:1.5rem;margin-top:1rem;background:var(--green-50);border-color:var(--green-200);text-align:center"><div style="font-size:2.5rem;margin-bottom:.5rem">✅</div><h3 style="color:var(--green-700)">Objet récupéré</h3><p style="font-size:.85rem;color:var(--green-700);margin-top:.3rem">Cet objet a été restitué à son propriétaire.</p></div>` : ''}
+          o.status === 'recovered' ? `<div class="card" style="padding:1.5rem;margin-top:1rem;background:var(--green-50);border-color:var(--green-200);text-align:center"><div style="font-size:2.5rem;margin-bottom:.5rem">✅</div><h3 style="color:var(--green-700)">Objet récupéré</h3></div>` : ''}
         <div class="card" style="padding:1.2rem;margin-top:1rem">
           <h3 style="font-size:.9rem;margin-bottom:.4rem">💳 Laisser un pourboire</h3>
           <p style="font-size:.78rem;color:var(--gray-500);margin-bottom:.7rem">Remerciez l'établissement si votre objet a été récupéré.</p>
@@ -1308,76 +1180,73 @@ function shareObject(id, title) {
   else { navigator.clipboard?.writeText(url); toast('Lien copié !') }
 }
 
-// ──────────────────────────────────────────────────────────────
-// DECLARE LOST OBJECT
-// ──────────────────────────────────────────────────────────────
+// ── DECLARE (page) ─────────────────────────────────────────────
 function selectDeclareCategory(el) {
   document.querySelectorAll('#declare-cats .filter-pill').forEach(p => p.classList.remove('active'))
   el.classList.add('active')
   declarationCategory = el.dataset.cat
 }
 
-// Establishment search for declaration form
-let estabSearchTimeout = null
-async function searchEstablishments(query) {
-  const dropdown = document.getElementById('d-estab-dropdown')
+// ── DECLARE (modal) ────────────────────────────────────────────
+function selectModalDeclareCategory(el) {
+  document.querySelectorAll('#modal-declare-cats .filter-pill').forEach(p => p.classList.remove('active'))
+  el.classList.add('active')
+  modalDeclarationCategory = el.dataset.cat
+}
+
+// ── ESTABLISHMENT SEARCH (réutilisable par préfixe: 'd' ou 'md') ──
+let estabSearchTimeouts = {}
+async function searchEstablishments(query, prefix) {
+  const dropdown = document.getElementById(`${prefix}-estab-dropdown`)
   if (!query.trim()) { dropdown.style.display = 'none'; return }
-
-  clearTimeout(estabSearchTimeout)
-  estabSearchTimeout = setTimeout(async () => {
-    const { data } = await sb.from('establishments')
-      .select('id, name, city, type')
-      .eq('is_active', true)
-      .ilike('name', `%${query}%`)
-      .limit(6)
-
-    if (!data?.length) {
-      dropdown.style.display = 'none'
-      return
-    }
-
+  clearTimeout(estabSearchTimeouts[prefix])
+  estabSearchTimeouts[prefix] = setTimeout(async () => {
+    const { data } = await sb.from('establishments').select('id, name, city, type').eq('is_active', true).ilike('name', `%${query}%`).limit(6)
+    if (!data?.length) { dropdown.style.display = 'none'; return }
     dropdown.style.display = 'block'
     dropdown.innerHTML = data.map(e => `
-      <div onclick="selectEstablishment('${e.id}','${e.name.replace(/'/g,"\\'")}','${e.city}')"
+      <div onclick="selectEstablishment('${prefix}','${e.id}','${e.name.replace(/'/g,"\\'")}','${e.city}')"
         style="padding:.7rem 1rem;cursor:pointer;font-size:.875rem;transition:background var(--transition);display:flex;align-items:center;gap:.75rem;border-bottom:1px solid var(--gray-100)"
         onmouseenter="this.style.background='var(--green-50)'" onmouseleave="this.style.background='#fff'">
         <span>${e.type === 'bar' ? '🍸' : e.type === 'nightclub' ? '🎵' : '🏨'}</span>
-        <div>
-          <div style="font-weight:600;color:var(--gray-900)">${e.name}</div>
-          <div style="font-size:.75rem;color:var(--gray-500)">📍 ${e.city}</div>
-        </div>
+        <div><div style="font-weight:600;color:var(--gray-900)">${e.name}</div><div style="font-size:.75rem;color:var(--gray-500)">📍 ${e.city}</div></div>
       </div>`).join('')
   }, 300)
 }
 
-function selectEstablishment(id, name, city) {
-  document.getElementById('d-estab-id').value = id
-  document.getElementById('d-estab-search').value = ''
-  document.getElementById('d-estab-dropdown').style.display = 'none'
-  document.getElementById('d-estab-name').textContent = `${name} — ${city}`
-  document.getElementById('d-estab-selected').style.display = 'flex'
+function selectEstablishment(prefix, id, name, city) {
+  document.getElementById(`${prefix}-estab-id`).value = id
+  document.getElementById(`${prefix}-estab-search`).value = ''
+  document.getElementById(`${prefix}-estab-dropdown`).style.display = 'none'
+  document.getElementById(`${prefix}-estab-name`).textContent = `${name} — ${city}`
+  const sel = document.getElementById(`${prefix}-estab-selected`)
+  sel.style.display = 'flex'
 }
 
-function clearEstabSelection() {
-  document.getElementById('d-estab-id').value = ''
-  document.getElementById('d-estab-search').value = ''
-  document.getElementById('d-estab-selected').style.display = 'none'
+function clearEstabSelection(prefix) {
+  document.getElementById(`${prefix}-estab-id`).value = ''
+  document.getElementById(`${prefix}-estab-search`).value = ''
+  document.getElementById(`${prefix}-estab-selected`).style.display = 'none'
 }
 
-// Close dropdown when clicking outside
 document.addEventListener('click', e => {
-  if (!e.target.closest('#d-estab-search') && !e.target.closest('#d-estab-dropdown')) {
-    const dd = document.getElementById('d-estab-dropdown')
-    if (dd) dd.style.display = 'none'
-  }
+  ['d','md'].forEach(prefix => {
+    if (!e.target.closest(`#${prefix}-estab-search`) && !e.target.closest(`#${prefix}-estab-dropdown`)) {
+      const dd = document.getElementById(`${prefix}-estab-dropdown`)
+      if (dd) dd.style.display = 'none'
+    }
+  })
 })
 
+// ── DECLARATION (page complète) ────────────────────────────────
 async function submitDeclaration(e) {
   e.preventDefault()
+  const estabId = document.getElementById('d-estab-id').value
+  if (!estabId) { toast('Veuillez sélectionner un établissement', 'error'); return }
+
   const btn = document.getElementById('declare-submit')
   btn.disabled = true
   btn.innerHTML = '<div class="btn-spinner"></div> Envoi en cours...'
-
   try {
     const payload = {
       full_name: document.getElementById('d-name').value,
@@ -1387,15 +1256,14 @@ async function submitDeclaration(e) {
       category: declarationCategory,
       loss_date: document.getElementById('d-date').value,
       loss_location: document.getElementById('d-location').value,
-      establishment_id: document.getElementById('d-estab-id').value || null,
+      establishment_id: estabId,
       status: 'active',
       user_id: currentUser?.id || null,
     }
-
     const { data, error } = await sb.from('declarations').insert(payload).select().single()
     if (error) throw error
 
-    // Trigger N8N workflow for AI matching
+    // ✅ FIX: Content-Type application/json pour que n8n reçoive un body parsé
     triggerN8N('reperdu-new-declaration', { ...payload, declaration_id: data.id })
 
     document.getElementById('declare-form-container').innerHTML = `
@@ -1416,23 +1284,52 @@ async function submitDeclaration(e) {
   }
 }
 
+// ── DECLARATION (modal) ────────────────────────────────────────
 async function submitModalDeclaration() {
   const btn = document.getElementById('md-submit')
   const name = document.getElementById('md-name').value
   const email = document.getElementById('md-email').value
   const title = document.getElementById('md-title').value
   const desc = document.getElementById('md-desc').value
+  const estabId = document.getElementById('md-estab-id').value
+
   if (!name || !email || !title || !desc) { toast('Remplissez tous les champs obligatoires','error'); return }
+  if (!estabId) { toast('Veuillez sélectionner un établissement', 'error'); return }
 
   btn.disabled = true
   btn.innerHTML = '<div class="btn-spinner"></div>'
   try {
-    const payload = { full_name:name, email, title, description:desc, category:'other', loss_date: document.getElementById('md-date').value || new Date().toISOString().split('T')[0], loss_location: document.getElementById('md-location').value || 'Non précisé', status:'active', user_id: currentUser?.id||null }
+    const payload = {
+      full_name: name,
+      email,
+      title,
+      description: desc,
+      category: modalDeclarationCategory,
+      loss_date: document.getElementById('md-date').value || new Date().toISOString().split('T')[0],
+      loss_location: document.getElementById('md-location').value || 'Non précisé',
+      establishment_id: estabId,
+      status: 'active',
+      user_id: currentUser?.id || null,
+    }
     const { data, error } = await sb.from('declarations').insert(payload).select().single()
     if (error) throw error
+
+    // ✅ FIX: Content-Type application/json
     triggerN8N('reperdu-new-declaration', { ...payload, declaration_id: data.id })
+
     closeModal('modal-declare')
     toast('Déclaration envoyée ! Vous serez notifié par email si une correspondance est trouvée. 🎉')
+
+    // Reset modal
+    document.getElementById('md-name').value = ''
+    document.getElementById('md-email').value = ''
+    document.getElementById('md-title').value = ''
+    document.getElementById('md-desc').value = ''
+    document.getElementById('md-date').value = ''
+    document.getElementById('md-location').value = ''
+    clearEstabSelection('md')
+    document.querySelectorAll('#modal-declare-cats .filter-pill').forEach((p,i) => p.classList.toggle('active', i===0))
+    modalDeclarationCategory = 'phone'
   } catch(err) {
     toast(err.message,'error')
   } finally {
@@ -1441,24 +1338,20 @@ async function submitModalDeclaration() {
   }
 }
 
-// ──────────────────────────────────────────────────────────────
-// CLAIM
-// ──────────────────────────────────────────────────────────────
+// ── CLAIM ──────────────────────────────────────────────────────
 async function submitClaim() {
   const btn = document.getElementById('cl-submit')
   const name = document.getElementById('cl-name').value
   const email = document.getElementById('cl-email').value
   const desc = document.getElementById('cl-desc').value
   if (!name || !email || !desc) { toast('Remplissez tous les champs obligatoires','error'); return }
-
   btn.disabled = true
   btn.innerHTML = '<div class="btn-spinner"></div> Envoi...'
   try {
     const payload = {
       object_id: currentClaimObjectId,
       claimant_id: currentUser?.id || null,
-      full_name: name,
-      email,
+      full_name: name, email,
       phone: document.getElementById('cl-phone').value || null,
       description: desc,
       loss_date: document.getElementById('cl-date').value || null,
@@ -1467,13 +1360,8 @@ async function submitClaim() {
     }
     const { data, error } = await sb.from('claims').insert(payload).select().single()
     if (error) throw error
-
-    // Update object to pending
     await sb.from('objects').update({ status:'pending' }).eq('id', currentClaimObjectId)
-
-    // Trigger N8N: notify admin + send confirmation email
     triggerN8N('reperdu-new-claim', { ...payload, claim_id: data.id })
-
     document.getElementById('modal-claim-inner').innerHTML = `
       <div class="success-state">
         <div class="success-icon">✅</div>
@@ -1489,12 +1377,9 @@ async function submitClaim() {
   }
 }
 
-// ──────────────────────────────────────────────────────────────
-// USER DASHBOARD
-// ──────────────────────────────────────────────────────────────
+// ── USER DASHBOARD ─────────────────────────────────────────────
 async function loadUserDashboard() {
   if (!currentUser) { openModal('modal-login'); return }
-
   document.getElementById('dash-welcome').textContent = `Bonjour, ${currentProfile?.full_name?.split(' ')[0] || 'vous'} 👋`
   document.getElementById('dash-email').textContent = currentUser.email
 
@@ -1508,7 +1393,7 @@ async function loadUserDashboard() {
   document.getElementById('kpi-claims').textContent = claims?.length || 0
   document.getElementById('kpi-notifs').textContent = notifs?.filter(n => !n.is_read).length || 0
 
-  // Declarations
+  // ── Déclarations avec bouton supprimer ──
   const dl = document.getElementById('decl-list')
   if (!decls?.length) {
     dl.innerHTML = `<div class="empty-state"><div class="icon">📋</div><h3>Aucune déclaration</h3><button class="btn btn-primary" style="margin-top:1rem" onclick="navigate('declarer')">Déclarer un objet</button></div>`
@@ -1524,11 +1409,14 @@ async function loadUserDashboard() {
           </div>
           ${d.matched_object ? `<div class="match-found" onclick="navigate('object','${d.matched_object.id}')">🎉 Correspondance : ${d.matched_object.title} — ${d.matched_object.establishment?.name} →</div>` : ''}
         </div>
-        <span class="badge ${d.status==='matched'?'badge-online':d.status==='closed'?'badge-recovered':'badge-pending'}">${d.status==='matched'?'✅ Correspondance':d.status==='closed'?'Clôturé':'🔍 En cours'}</span>
+        <div style="display:flex;flex-direction:column;align-items:flex-end;gap:.4rem;flex-shrink:0">
+          <span class="badge ${d.status==='matched'?'badge-online':d.status==='closed'?'badge-recovered':'badge-pending'}">${d.status==='matched'?'✅ Correspondance':d.status==='closed'?'Clôturé':'🔍 En cours'}</span>
+          <button class="btn btn-danger btn-sm" onclick="askDeleteDeclaration('${d.id}')" style="font-size:.72rem;padding:.25rem .6rem">🗑 Supprimer</button>
+        </div>
       </div>`).join('')
   }
 
-  // Claims
+  // ── Claims ──
   const cl = document.getElementById('claims-list')
   if (!claims?.length) {
     cl.innerHTML = `<div class="empty-state"><div class="icon">🙋</div><h3>Aucune demande</h3><button class="btn btn-secondary" style="margin-top:1rem" onclick="navigate('explorer')">Explorer les objets</button></div>`
@@ -1545,7 +1433,7 @@ async function loadUserDashboard() {
       </div>`).join('')
   }
 
-  // Notifications
+  // ── Notifications ──
   const nl = document.getElementById('notif-list')
   if (!notifs?.length) {
     nl.innerHTML = `<div class="empty-state"><div class="icon">🔔</div><h3>Aucune notification</h3></div>`
@@ -1563,6 +1451,31 @@ async function loadUserDashboard() {
   }
 }
 
+// ── SUPPRIMER DÉCLARATION ──────────────────────────────────────
+function askDeleteDeclaration(id) {
+  pendingDeleteDeclId = id
+  openModal('modal-confirm-delete')
+}
+
+async function confirmDeleteDeclaration() {
+  if (!pendingDeleteDeclId) return
+  const btn = document.getElementById('confirm-delete-btn')
+  btn.disabled = true
+  btn.innerHTML = '<div class="btn-spinner"></div>'
+  try {
+    const { error } = await sb.from('declarations').delete().eq('id', pendingDeleteDeclId).eq('user_id', currentUser.id)
+    if (error) throw error
+    closeModal('modal-confirm-delete')
+    toast('Déclaration supprimée')
+    pendingDeleteDeclId = null
+    loadUserDashboard()
+  } catch(err) {
+    toast(err.message, 'error')
+    btn.disabled = false
+    btn.textContent = 'Supprimer'
+  }
+}
+
 function switchDashTab(btn, tabId) {
   document.querySelectorAll('.dashboard .dash-tab').forEach(t => t.classList.remove('active'))
   btn.classList.add('active')
@@ -1572,9 +1485,7 @@ function switchDashTab(btn, tabId) {
   document.getElementById(tabId).style.display = 'block'
 }
 
-// ──────────────────────────────────────────────────────────────
-// ADMIN
-// ──────────────────────────────────────────────────────────────
+// ── ADMIN ──────────────────────────────────────────────────────
 async function checkAdminAccess() {
   if (!currentUser) { navigate('home'); openModal('modal-login'); return }
   const role = currentProfile?.role
@@ -1596,13 +1507,11 @@ async function loadAdminOverview() {
     {label:'Taux de récupération', value:rate+'%', color:'var(--green-700)'},
   ].map(k => `<div class="kpi"><div class="kpi-value" style="color:${k.color}">${k.value}</div><div class="kpi-label">${k.label}</div></div>`).join('')
 
-  // Recent claims
   const { data:claims } = await sb.from('claims').select('*, object:objects(title,category)').eq('status','pending').order('created_at',{ascending:false}).limit(5)
   document.getElementById('admin-recent-claims').innerHTML = claims?.length ?
     `<table class="admin-table">${claims.map(c => `<tr><td><strong>${c.full_name}</strong><br><span style="font-size:.75rem;color:var(--gray-500)">${c.email}</span></td><td>${c.object?.title||'—'}</td><td><span class="badge badge-pending">En attente</span></td><td><button class="btn btn-secondary btn-sm" onclick="switchAdminSection('admin-claims',null)">Examiner</button></td></tr>`).join('')}</table>` :
     '<div style="padding:1.5rem;text-align:center;color:var(--gray-500);font-size:.875rem">✅ Aucune demande en attente</div>'
 
-  // Recent objects
   const { data:objs } = await sb.from('objects').select('*, establishment:establishments(name)').order('created_at',{ascending:false}).limit(5)
   document.getElementById('admin-recent-objects').innerHTML = objs?.length ?
     `<table class="admin-table">${objs.map(o => `<tr><td><div class="obj-cell"><span>${CAT_ICONS[o.category]}</span><div><strong>${o.title}</strong><br><span style="font-size:.72rem;color:var(--gray-500)">${o.establishment?.name||'—'}</span></div></div></td><td><span class="badge badge-${o.status}">${STATUS_LABELS[o.status]}</span></td><td><button class="btn btn-secondary btn-sm" onclick="navigate('object','${o.id}')">Voir</button></td></tr>`).join('')}</table>` :
@@ -1613,15 +1522,9 @@ function switchAdminSection(id, btn) {
   document.querySelectorAll('.admin-inner > div').forEach(d => d.style.display = 'none')
   const section = document.getElementById(id)
   if (section) section.style.display = 'block'
-  // Update active sidebar item
   document.querySelectorAll('#page-admin .sidebar-item').forEach(b => b.classList.remove('active'))
-  if (btn && btn.classList) {
-    btn.classList.add('active')
-  } else {
-    // Find matching sidebar button by section id
-    const match = document.querySelector(`#page-admin .sidebar-item[onclick*="${id}"]`)
-    if (match) match.classList.add('active')
-  }
+  if (btn && btn.classList) btn.classList.add('active')
+  else { const match = document.querySelector(`#page-admin .sidebar-item[onclick*="${id}"]`); if (match) match.classList.add('active') }
   if (id === 'admin-objects') loadAdminObjects()
   if (id === 'admin-claims') loadAdminClaims()
   if (id === 'admin-establishments') loadAdminEstablishments()
@@ -1715,23 +1618,14 @@ async function loadAdminClaims() {
 }
 
 async function reviewClaim(id, status) {
-  const notes = status === 'accepted' ? prompt('Note pour le demandeur (optionnel) :\nEx: Présentez-vous au comptoir avec une pièce d\'identité') : null
+  const notes = status === 'accepted' ? prompt('Note pour le demandeur (optionnel) :') : null
   const { data: claim } = await sb.from('claims').select('*, object:objects(*)').eq('id',id).single()
   const { error } = await sb.from('claims').update({ status, reviewed_by: currentUser.id, reviewed_at: new Date().toISOString(), admin_notes: notes||null }).eq('id',id)
   if (error) { toast(error.message,'error'); return }
   if (status === 'recovered') await sb.from('objects').update({ status:'recovered', recovered_at: new Date().toISOString(), recovered_by_claim_id: id }).eq('id', claim.object_id)
   else if (status === 'refused') await sb.from('objects').update({ status:'online' }).eq('id', claim.object_id)
-
-  // Trigger N8N notification
-  triggerN8N('reperdu-claim-update', {
-    status,
-    claimant_email: claim.email,
-    claimant_name: claim.full_name,
-    object_title: claim.object?.title,
-    admin_notes: notes||null,
-  })
-
-  toast(`Demande ${status === 'accepted' ? 'acceptée' : status === 'refused' ? 'refusée' : 'marquée récupérée'} — ${claim.full_name} a été notifié`)
+  triggerN8N('reperdu-claim-update', { status, claimant_email: claim.email, claimant_name: claim.full_name, object_title: claim.object?.title, admin_notes: notes||null })
+  toast(`Demande ${status === 'accepted' ? 'acceptée' : status === 'refused' ? 'refusée' : 'marquée récupérée'} — ${claim.full_name} notifié`)
   loadAdminClaims()
 }
 
@@ -1749,7 +1643,6 @@ async function loadAdminEstablishments() {
             <td><strong>${e.total_objects}</strong> / ${e.recovered_objects} récup.</td>
             <td><strong style="color:var(--green-700)">${e.total_objects>0?Math.round(e.recovered_objects/e.total_objects*100):0}%</strong></td>
             <td><div class="action-btns">
-              <button class="btn btn-secondary btn-sm" onclick="window.open('/','_blank')">Voir page</button>
               <button class="btn btn-${e.is_active?'danger':'primary'} btn-sm" onclick="toggleEstab('${e.id}',${e.is_active})">${e.is_active?'Désactiver':'Activer'}</button>
             </div></td>
           </tr>`).join('')}
@@ -1783,7 +1676,7 @@ async function loadAdminDeclarations() {
     </div>`
 }
 
-// ADD OBJECT MODAL
+// ── ADD OBJECT ─────────────────────────────────────────────────
 function previewPhotos(input) {
   const files = Array.from(input.files).slice(0, 3)
   const previews = document.getElementById('ao-photo-previews')
@@ -1827,9 +1720,7 @@ async function loadEstablishmentsSelect() {
   const sel = document.getElementById('ao-establishment')
   if (!sel) return
   sel.innerHTML = data?.map(e => `<option value="${e.id}">${e.name}</option>`).join('') || ''
-  if (currentProfile?.role === 'establishment') {
-    document.getElementById('ao-estab-group').style.display = 'none'
-  }
+  if (currentProfile?.role === 'establishment') document.getElementById('ao-estab-group').style.display = 'none'
 }
 
 async function submitAddObject() {
@@ -1837,21 +1728,13 @@ async function submitAddObject() {
   const title = document.getElementById('ao-title').value
   const desc = document.getElementById('ao-desc').value
   if (!title || !desc) { toast('Titre et description obligatoires','error'); return }
-
-  const estabId = currentProfile?.role === 'establishment'
-    ? currentProfile.establishment_id
-    : document.getElementById('ao-establishment').value
-
+  const estabId = currentProfile?.role === 'establishment' ? currentProfile.establishment_id : document.getElementById('ao-establishment').value
   if (!estabId) { toast('Sélectionnez un établissement','error'); return }
-
   btn.disabled = true
   btn.innerHTML = '<div class="btn-spinner"></div> Ajout en cours...'
   try {
     const { data, error } = await sb.from('objects').insert({
-      title,
-      description: desc,
-      category: addObjectCategory,
-      establishment_id: estabId,
+      title, description: desc, category: addObjectCategory, establishment_id: estabId,
       found_at: new Date().toISOString(),
       found_location_detail: document.getElementById('ao-location').value || null,
       storage_location: document.getElementById('ao-storage').value || null,
@@ -1860,75 +1743,45 @@ async function submitAddObject() {
       added_by: currentUser?.id || null,
     }).select().single()
     if (error) throw error
-
-    // ✅ Fermer le modal IMMÉDIATEMENT — ne pas attendre les tâches longues
     closeModal('modal-add-object')
     toast('Objet ajouté ! 🎉')
     btn.disabled = false
-    btn.textContent = 'Ajouter l\'objet →'
-
-    // Reset form
+    btn.textContent = "Ajouter l'objet →"
     document.getElementById('ao-title').value = ''
     document.getElementById('ao-desc').value = ''
     document.getElementById('ao-photo-previews').innerHTML = ''
     document.getElementById('ao-photo-text').textContent = 'Cliquez pour ajouter des photos (max 3)'
     if (document.getElementById('ao-photos')) document.getElementById('ao-photos').value = ''
-
-    // Refresh table
     if (currentProfile?.role === 'establishment') loadEstabObjects()
     else loadAdminObjects()
-
-    // 🔁 Tâches en arrière-plan — n'attendent pas
     const objectId = data.id
     ;(async () => {
-      // Upload photos
       const photoUrls = await uploadObjectPhotos(objectId)
       if (photoUrls?.length) {
         await sb.from('objects').update({ images: photoUrls, primary_image_url: photoUrls[0] }).eq('id', objectId)
         toast('📷 Photos sauvegardées !')
       }
-      // Keyword matching
       await runKeywordMatch(objectId, addObjectCategory, title, desc)
-      // N8N (fire and forget)
       triggerN8N('reperdu-new-object', { object_id: objectId, title, description: desc, category: addObjectCategory, establishment_id: estabId })
     })().catch(console.error)
   } catch(err) {
     toast(err.message,'error')
     btn.disabled = false
-    btn.textContent = 'Ajouter l\'objet →'
+    btn.textContent = "Ajouter l'objet →"
   }
 }
 
 async function runKeywordMatch(objectId, category, title, description) {
   try {
-    // Call Supabase function to find matching declarations
     const { data: matches } = await sb.rpc('match_declarations_for_object', { p_object_id: objectId })
     if (!matches?.length) return
-
     const topMatches = matches.filter(m => m.match_score >= 50)
     for (const match of topMatches) {
-      // Notify via N8N
-      triggerN8N('reperdu-match-found', {
-        user_email: match.user_email,
-        user_name: match.user_name,
-        object_id: objectId,
-        object_title: title,
-        match_score: match.match_score / 100,
-        declaration_id: match.declaration_id,
-      })
-      // Update declaration as matched
-      await sb.from('declarations').update({
-        matched_object_id: objectId,
-        match_score: match.match_score / 100,
-        status: 'matched'
-      }).eq('id', match.declaration_id)
+      triggerN8N('reperdu-match-found', { user_email: match.user_email, user_name: match.user_name, object_id: objectId, object_title: title, match_score: match.match_score / 100, declaration_id: match.declaration_id })
+      await sb.from('declarations').update({ matched_object_id: objectId, match_score: match.match_score / 100, status: 'matched' }).eq('id', match.declaration_id)
     }
-    if (topMatches.length > 0) {
-      toast(`🎉 ${topMatches.length} correspondance(s) trouvée(s) ! Les utilisateurs ont été notifiés.`)
-    }
-  } catch(e) {
-    console.log('Keyword match error:', e.message)
-  }
+    if (topMatches.length > 0) toast(`🎉 ${topMatches.length} correspondance(s) trouvée(s) !`)
+  } catch(e) { console.log('Keyword match error:', e.message) }
 }
 
 async function submitAddEstablishment() {
@@ -1938,37 +1791,22 @@ async function submitAddEstablishment() {
   const address = document.getElementById('ae-address').value
   const city = document.getElementById('ae-city').value
   if (!name || !email || !address || !city) { toast('Remplissez tous les champs obligatoires','error'); return }
-
   btn.disabled = true
   btn.innerHTML = '<div class="btn-spinner"></div>'
   try {
-    const { error } = await sb.from('establishments').insert({
-      name, email, address, city,
-      type: document.getElementById('ae-type').value,
-      plan: document.getElementById('ae-plan').value,
-      phone: document.getElementById('ae-phone').value || null,
-      postal_code: document.getElementById('ae-postal').value || null,
-    })
+    const { error } = await sb.from('establishments').insert({ name, email, address, city, type: document.getElementById('ae-type').value, plan: document.getElementById('ae-plan').value, phone: document.getElementById('ae-phone').value || null, postal_code: document.getElementById('ae-postal').value || null })
     if (error) throw error
     closeModal('modal-add-establishment')
     toast('Établissement créé ! 🎉')
     loadAdminEstablishments()
-  } catch(err) {
-    toast(err.message,'error')
-  } finally {
-    btn.disabled = false
-    btn.textContent = 'Créer l\'établissement →'
-  }
+  } catch(err) { toast(err.message,'error') } finally { btn.disabled = false; btn.textContent = "Créer l'établissement →" }
 }
 
-// EXPORT CSV
 async function exportCSV(type) {
   const { data } = type === 'objects'
     ? await sb.from('objects').select('title,category,status,found_at,establishment:establishments(name,city)').order('found_at',{ascending:false})
     : await sb.from('claims').select('full_name,email,status,ai_match_score,created_at,object:objects(title)').order('created_at',{ascending:false})
-
   if (!data?.length) { toast('Aucune donnée à exporter','info'); return }
-
   const headers = type === 'objects' ? ['Titre','Catégorie','Statut','Trouvé le','Établissement','Ville'] : ['Nom','Email','Statut','Score IA','Objet','Date']
   const rows = data.map(d => type === 'objects'
     ? [d.title, d.category, d.status, new Date(d.found_at).toLocaleDateString('fr-FR'), d.establishment?.name||'', d.establishment?.city||'']
@@ -1983,34 +1821,27 @@ async function exportCSV(type) {
   toast('Export CSV téléchargé !')
 }
 
-// ──────────────────────────────────────────────────────────────
-// ETABLISSEMENT DASHBOARD
-// ──────────────────────────────────────────────────────────────
+// ── ETABLISSEMENT ──────────────────────────────────────────────
 async function loadEstabDashboard() {
   if (!currentUser) { openModal('modal-login'); return }
   if (!currentProfile?.establishment_id) { toast('Aucun établissement lié à votre compte','error'); return }
-
   const { data: estab } = await sb.from('establishments').select('*').eq('id', currentProfile.establishment_id).single()
   estabProfile = estab
   if (!estab) return
-
   document.getElementById('estab-sidebar-name').textContent = estab.name
   document.getElementById('estab-name-header').textContent = estab.name
   document.getElementById('estab-address-header').textContent = `📍 ${estab.address}, ${estab.city}`
-
   const [{ count:total }, { count:online }, { count:recovered }] = await Promise.all([
     sb.from('objects').select('*',{count:'exact',head:true}).eq('establishment_id',estab.id),
     sb.from('objects').select('*',{count:'exact',head:true}).eq('establishment_id',estab.id).eq('status','online'),
     sb.from('objects').select('*',{count:'exact',head:true}).eq('establishment_id',estab.id).eq('status','recovered'),
   ])
-
   document.getElementById('estab-kpis').innerHTML = [
     {label:'Objets en ligne', value:online||0},
     {label:'Total trouvés', value:total||0},
     {label:'Récupérés', value:recovered||0},
     {label:'Taux', value: total>0?Math.round((recovered/total)*100)+'%':'0%'},
   ].map(k => `<div class="kpi"><div class="kpi-value" style="color:var(--green-700)">${k.value}</div><div class="kpi-label">${k.label}</div></div>`).join('')
-
   loadEstabObjects()
   loadEstablishmentsSelect()
 }
@@ -2020,16 +1851,7 @@ async function loadEstabObjects() {
   const { data } = await sb.from('objects').select('*').eq('establishment_id', currentProfile.establishment_id).order('created_at',{ascending:false}).limit(20)
   const renderTable = (data) => !data?.length
     ? '<div style="padding:2rem;text-align:center;color:var(--gray-500)">Aucun objet — ajoutez votre premier objet trouvé !</div>'
-    : `<table class="admin-table">
-        <thead><tr><th>Objet</th><th>Statut</th><th>Date</th><th></th></tr></thead>
-        <tbody>${data.map(o => `<tr>
-          <td><div class="obj-cell"><span>${CAT_ICONS[o.category]}</span><div><strong>${o.title}</strong></div></div></td>
-          <td><span class="badge badge-${o.status}">${STATUS_LABELS[o.status]}</span></td>
-          <td style="font-size:.78rem;color:var(--gray-500)">${timeAgo(o.created_at)}</td>
-          <td><button class="btn btn-secondary btn-sm" onclick="navigate('object','${o.id}')">Voir →</button></td>
-        </tr>`).join('')}</tbody>
-      </table>`
-
+    : `<table class="admin-table"><thead><tr><th>Objet</th><th>Statut</th><th>Date</th><th></th></tr></thead><tbody>${data.map(o => `<tr><td><div class="obj-cell"><span>${CAT_ICONS[o.category]}</span><div><strong>${o.title}</strong></div></div></td><td><span class="badge badge-${o.status}">${STATUS_LABELS[o.status]}</span></td><td style="font-size:.78rem;color:var(--gray-500)">${timeAgo(o.created_at)}</td><td><button class="btn btn-secondary btn-sm" onclick="navigate('object','${o.id}')">Voir →</button></td></tr>`).join('')}</tbody></table>`
   if (document.getElementById('estab-objects-table')) document.getElementById('estab-objects-table').innerHTML = renderTable(data)
   if (document.getElementById('estab-all-objects')) document.getElementById('estab-all-objects').innerHTML = renderTable(data)
 }
@@ -2039,12 +1861,7 @@ function switchEstabSection(id, btn) {
   const section = document.getElementById(id)
   if (section) section.style.display = 'block'
   document.querySelectorAll('#page-etablissement .sidebar-item').forEach(b => b.classList.remove('active'))
-  if (btn && btn.classList) {
-    btn.classList.add('active')
-  } else {
-    const match = document.querySelector(`#page-etablissement .sidebar-item[onclick*="${id}"]`)
-    if (match) match.classList.add('active')
-  }
+  if (btn && btn.classList) btn.classList.add('active')
   if (id === 'estab-objects') loadEstabObjects()
   if (id === 'estab-claims') loadEstabClaims()
 }
@@ -2054,7 +1871,6 @@ async function loadEstabClaims() {
   const { data: objIds } = await sb.from('objects').select('id').eq('establishment_id', currentProfile.establishment_id)
   const ids = (objIds||[]).map(o => o.id)
   if (!ids.length) { document.getElementById('estab-claims-content').innerHTML = '<div class="empty-state"><div class="icon">✅</div><h3>Aucune demande</h3></div>'; return }
-
   const { data } = await sb.from('claims').select('*, object:objects(title,category)').in('object_id', ids).order('created_at',{ascending:false})
   document.getElementById('estab-claims-content').innerHTML = data?.length
     ? `<div class="card" style="overflow:hidden"><table class="admin-table"><thead><tr><th>Demandeur</th><th>Objet</th><th>Statut</th><th>Actions</th></tr></thead><tbody>${data.map(c => `<tr><td><strong>${c.full_name}</strong><br><span style="font-size:.75rem;color:var(--gray-500)">${c.email}</span></td><td>${CAT_ICONS[c.object?.category]||''} ${c.object?.title||'—'}</td><td><span class="badge badge-${c.status==='pending'?'pending':'online'}">${c.status==='pending'?'En attente':'Traité'}</span></td><td><button class="btn btn-secondary btn-sm" onclick="navigate('object','${c.object_id}')">Voir l'objet</button></td></tr>`).join('')}</tbody></table></div>`
@@ -2063,12 +1879,9 @@ async function loadEstabClaims() {
 
 async function generateQR() {
   if (!estabProfile) return
-  // Generate QR using external service
   const url = `${window.location.origin}${window.location.pathname}?estab=${estabProfile.qr_code_token}`
   const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(url)}&color=2E7D32`
-
   await sb.from('establishments').update({ qr_code_url: qrUrl }).eq('id', estabProfile.id)
-
   document.getElementById('qr-display').innerHTML = `
     <img src="${qrUrl}" alt="QR Code" class="qr-code" style="border-radius:12px;border:3px solid var(--green-200)">
     <p style="font-size:.78rem;color:var(--gray-500);margin:.75rem 0">${url}</p>
@@ -2079,32 +1892,24 @@ async function generateQR() {
   toast('QR code généré ! 🎉')
 }
 
-// ──────────────────────────────────────────────────────────────
-// N8N WEBHOOKS
-// ──────────────────────────────────────────────────────────────
-// N8N - fire and forget, NEVER blocks the UI
+// ── N8N — ✅ FIX PRINCIPAL : Content-Type application/json ─────
 function triggerN8N(workflow, payload) {
-  // Completely fire-and-forget - 3s timeout max, never blocks UI
   const controller = new AbortController()
   const timeout = setTimeout(() => controller.abort(), 3000)
   fetch(`${CONFIG.N8N_URL}/webhook/${workflow}`, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    headers: { 'Content-Type': 'application/json' }, // ✅ CORRIGÉ
     body: JSON.stringify(payload),
-    mode: 'no-cors',
     signal: controller.signal,
     keepalive: true,
   }).catch(() => {}).finally(() => clearTimeout(timeout))
 }
 
-// Wake up N8N on load so it's ready when needed
 function wakeN8N() {
   fetch(`${CONFIG.N8N_URL}/healthz`, { mode: 'no-cors', keepalive: true }).catch(() => {})
 }
 
-// ──────────────────────────────────────────────────────────────
-// MODALS
-// ──────────────────────────────────────────────────────────────
+// ── MODALS ─────────────────────────────────────────────────────
 function openModal(id) {
   closeModal(null)
   const el = document.getElementById(id)
@@ -2112,45 +1917,25 @@ function openModal(id) {
   if (id === 'modal-add-object') loadEstablishmentsSelect()
 }
 function closeModal(id) {
-  if (id) {
-    document.getElementById(id)?.classList.remove('open')
-  } else {
-    document.querySelectorAll('.modal-overlay').forEach(m => m.classList.remove('open'))
-  }
+  if (id) { document.getElementById(id)?.classList.remove('open') }
+  else { document.querySelectorAll('.modal-overlay').forEach(m => m.classList.remove('open')) }
   document.body.style.overflow = ''
 }
-function closeModalOut(e, id) {
-  if (e.target.id === id) closeModal(id)
-}
+function closeModalOut(e, id) { if (e.target.id === id) closeModal(id) }
 document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(null) })
 
-// ──────────────────────────────────────────────────────────────
-// NAVBAR SCROLL
-// ──────────────────────────────────────────────────────────────
 window.addEventListener('scroll', () => {
   document.getElementById('navbar').classList.toggle('scrolled', window.scrollY > 10)
 })
 
-// ──────────────────────────────────────────────────────────────
-// URL PARAMS (deep linking)
-// ──────────────────────────────────────────────────────────────
 function handleURLParams() {
   const params = new URLSearchParams(window.location.search)
   if (params.get('object')) { navigate('object', params.get('object')); return }
-  if (params.get('estab')) {
-    // Load establishment page (filtered explorer)
-    activeCategory = 'all'
-    navigate('explorer')
-    return
-  }
+  if (params.get('estab')) { activeCategory = 'all'; navigate('explorer'); return }
   navigate('home')
 }
 
-// ──────────────────────────────────────────────────────────────
-// START
-// ──────────────────────────────────────────────────────────────
 (async () => {
-  // Wake N8N in background on load
   wakeN8N()
   await initAuth()
   handleURLParams()
