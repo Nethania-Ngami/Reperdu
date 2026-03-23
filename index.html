@@ -276,6 +276,8 @@ footer{background:var(--gray-900);color:rgba(255,255,255,.6);padding:4rem 5vw 2r
   .footer-grid{grid-template-columns:1fr}
   .stats-banner .inner{grid-template-columns:1fr 1fr}
   .hero-stats{grid-template-columns:1fr 1fr 1fr}
+  .testimonials-grid{grid-template-columns:1fr!important}
+  .trust-banner-items{flex-direction:column;gap:.75rem!important}
 }
 @media(max-width:480px){
   .dash-kpis,.admin-kpis,.hero-stats{grid-template-columns:1fr 1fr}
@@ -315,11 +317,20 @@ const CONFIG = {
   <section class="hero">
     <div>
       <div class="hero-eyebrow"><div class="hero-dot"></div>Plateforme objets trouvés N°1</div>
-      <h1>Retrouvez vos objets perdus dans les <span class="accent">bars, boîtes</span> et <span class="accent">hôtels</span> partenaires</h1>
-      <p class="hero-sub">Reperdu connecte les clients avec les établissements grâce à un matching intelligent. Déclarez votre perte, notre IA cherche pour vous.</p>
+      <h1>On a tous perdu<br>quelque chose un soir.<br><span class="accent">On vous aide à le retrouver.</span></h1>
+      <p class="hero-sub">Reperdu connecte les clients avec les établissements grâce à un matching intelligent. Déclarez votre perte, notre IA cherche pour vous — gratuitement.</p>
       <div class="hero-cta">
         <button class="btn btn-primary" onclick="navigate('explorer')">🔍 Voir les objets trouvés</button>
-        <button class="btn btn-secondary" onclick="openModal('modal-declare')">✍️ Déclarer un objet perdu</button>
+        <button class="btn btn-secondary" onclick="currentUser ? navigate('declarer') : openModal('modal-login')" id="hero-declare-btn">✍️ Déclarer un objet perdu</button>
+      </div>
+      <div style="display:flex;align-items:center;gap:.75rem;margin-bottom:2rem">
+        <div style="display:flex">
+          <img src="https://i.pravatar.cc/32?img=1" style="width:32px;height:32px;border-radius:50%;border:2px solid #fff;margin-right:-8px" alt="">
+          <img src="https://i.pravatar.cc/32?img=5" style="width:32px;height:32px;border-radius:50%;border:2px solid #fff;margin-right:-8px" alt="">
+          <img src="https://i.pravatar.cc/32?img=9" style="width:32px;height:32px;border-radius:50%;border:2px solid #fff;margin-right:-8px" alt="">
+          <img src="https://i.pravatar.cc/32?img=12" style="width:32px;height:32px;border-radius:50%;border:2px solid #fff" alt="">
+        </div>
+        <span style="font-size:.82rem;color:var(--gray-500)"><strong style="color:var(--gray-700)">+2 400 personnes</strong> ont retrouvé leur objet</span>
       </div>
       <div class="hero-stats">
         <div><div class="hero-stat-num" id="stat-total">—</div><div class="hero-stat-label">Objets trouvés</div></div>
@@ -329,23 +340,94 @@ const CONFIG = {
     </div>
     <div class="hero-visual">
       <div class="hero-notif">🔔 <strong>Correspondance trouvée !</strong>&nbsp;Votre iPhone 14</div>
+      <div style="border-radius:20px;overflow:hidden;margin-bottom:.75rem;position:relative">
+        <img src="https://images.unsplash.com/photo-1566737236500-c8ac43014a67?w=600&q=80" alt="Soirée en bar" style="width:100%;height:260px;object-fit:cover;display:block">
+        <div style="position:absolute;inset:0;background:linear-gradient(to top,rgba(27,94,32,.5),transparent)"></div>
+        <div style="position:absolute;bottom:12px;left:14px;color:#fff;font-size:.82rem;font-weight:600">📍 Social Club, Paris — objet trouvé hier</div>
+      </div>
       <div class="hero-cards" id="hero-cards">
         <div class="hero-card"><div class="hero-card-icon" style="background:#E8F5E9">📱</div><div class="hero-card-info"><div class="hero-card-name">iPhone 14 Pro – Noir sidéral</div><div class="hero-card-meta">📍 Le Comptoir, Paris · Il y a 2h</div></div><span class="badge badge-online">Nouveau</span></div>
         <div class="hero-card"><div class="hero-card-icon" style="background:#FFF3E0">👜</div><div class="hero-card-info"><div class="hero-card-name">Sac à main cuir marron</div><div class="hero-card-meta">📍 Rex Club, Paris · Hier soir</div></div><span class="badge badge-online">En ligne</span></div>
         <div class="hero-card"><div class="hero-card-icon" style="background:#E3F2FD">🔑</div><div class="hero-card-info"><div class="hero-card-name">Trousseau de clés + porte-clé</div><div class="hero-card-meta">📍 Hôtel Acanthe, Lyon · 23 mars</div></div><span class="badge badge-recovered">Récupéré</span></div>
-        <div class="hero-card"><div class="hero-card-icon" style="background:#E8F5E9">👓</div><div class="hero-card-info"><div class="hero-card-name">Lunettes Ray-Ban Tortoise</div><div class="hero-card-meta">📍 Social Club, Paris · 22 mars</div></div><span class="badge badge-online">En ligne</span></div>
       </div>
     </div>
   </section>
+
+  <div style="background:var(--gray-100);border-top:1px solid var(--gray-200);border-bottom:1px solid var(--gray-200);padding:1.25rem 5vw">
+    <div style="max-width:1100px;margin:0 auto;display:flex;align-items:center;justify-content:center;gap:2rem;flex-wrap:wrap">
+      <span style="font-size:.75rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--gray-500)">Ils nous font confiance</span>
+      <span style="color:var(--gray-700);font-weight:600;font-size:.88rem">🎵 Rex Club</span>
+      <span style="color:var(--gray-700);font-weight:600;font-size:.88rem">🏨 Hôtel du Nord</span>
+      <span style="color:var(--gray-700);font-weight:600;font-size:.88rem">🍸 Le Comptoir</span>
+      <span style="color:var(--gray-700);font-weight:600;font-size:.88rem">🎵 Social Club</span>
+      <span style="color:var(--gray-700);font-weight:600;font-size:.88rem">🏨 Hôtel Acanthe</span>
+      <span style="color:var(--gray-500);font-size:.82rem">+ <span id="trust-count">—</span> établissements</span>
+    </div>
+  </div>
 
   <section class="steps-section" id="comment">
     <div class="inner">
       <div class="section-label">Processus simple</div>
       <h2>Comment ça marche ?</h2>
+      <p style="color:var(--gray-500);margin-top:.5rem;margin-bottom:2.5rem;max-width:560px">En moins de 2 minutes, votre déclaration est en ligne et notre IA commence à chercher pour vous.</p>
       <div class="steps-grid">
-        <div class="step-card"><div class="step-num side">01</div><div class="step-icon">✍️</div><h3>Déclarez votre objet</h3><p class="step-desc">Remplissez un formulaire rapide : description, date, lieu approximatif. Ajoutez une photo si possible.</p></div>
-        <div class="step-card"><div class="step-num main">02</div><div class="step-icon">🤖</div><h3>Notre IA cherche pour vous</h3><p class="step-desc">Le système compare automatiquement votre description avec les objets collectés dans tous nos établissements partenaires.</p></div>
-        <div class="step-card"><div class="step-num side">03</div><div class="step-icon">🔔</div><h3>Notification instantanée</h3><p class="step-desc">Dès une correspondance, vous êtes alerté par email. Convenez d'un retrait sur place ou d'une livraison.</p></div>
+        <div class="step-card">
+          <img src="https://images.unsplash.com/photo-1512486130939-2c4f79935e4f?w=400&q=80" alt="Formulaire" style="width:100%;height:140px;object-fit:cover;border-radius:10px;margin-bottom:1.2rem">
+          <div class="step-num side">01</div>
+          <div class="step-icon">✍️</div>
+          <h3>Déclarez votre objet</h3>
+          <p class="step-desc">Remplissez un formulaire rapide : description, date, lieu. Plus c'est précis, plus l'IA est efficace.</p>
+        </div>
+        <div class="step-card">
+          <img src="https://images.unsplash.com/photo-1677442135703-1787eea5ce01?w=400&q=80" alt="IA" style="width:100%;height:140px;object-fit:cover;border-radius:10px;margin-bottom:1.2rem">
+          <div class="step-num main">02</div>
+          <div class="step-icon">🤖</div>
+          <h3>Notre IA cherche pour vous</h3>
+          <p class="step-desc">Le système compare automatiquement votre description avec les objets collectés dans tous nos établissements partenaires.</p>
+        </div>
+        <div class="step-card">
+          <img src="https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?w=400&q=80" alt="Notification" style="width:100%;height:140px;object-fit:cover;border-radius:10px;margin-bottom:1.2rem">
+          <div class="step-num side">03</div>
+          <div class="step-icon">🔔</div>
+          <h3>Notification instantanée</h3>
+          <p class="step-desc">Dès une correspondance, vous êtes alerté par email. Convenez d'un retrait sur place — c'est aussi simple que ça.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- TÉMOIGNAGES -->
+  <section style="padding:5rem 5vw;background:#fff">
+    <div style="max-width:1100px;margin:0 auto">
+      <div style="text-align:center;margin-bottom:3rem">
+        <div class="section-label" style="justify-content:center">Ils ont retrouvé leur objet</div>
+        <h2>Ce qu'ils en disent</h2>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:1.5rem">
+        <div class="card" style="padding:1.75rem">
+          <div style="display:flex;gap:.6rem;margin-bottom:.75rem">⭐⭐⭐⭐⭐</div>
+          <p style="font-size:.9rem;line-height:1.7;color:var(--gray-700);margin-bottom:1.2rem">"J'avais perdu mon portefeuille au Rex Club un vendredi soir. J'y croyais plus du tout... et deux jours après, Reperdu m'a envoyé un email avec une correspondance. Bluffant !"</p>
+          <div style="display:flex;align-items:center;gap:.75rem">
+            <img src="https://i.pravatar.cc/40?img=3" style="width:40px;height:40px;border-radius:50%" alt="">
+            <div><div style="font-size:.85rem;font-weight:700">Lucas M.</div><div style="font-size:.73rem;color:var(--gray-500)">Paris · Portefeuille retrouvé</div></div>
+          </div>
+        </div>
+        <div class="card" style="padding:1.75rem;border-color:var(--green-200);background:var(--green-50)">
+          <div style="display:flex;gap:.6rem;margin-bottom:.75rem">⭐⭐⭐⭐⭐</div>
+          <p style="font-size:.9rem;line-height:1.7;color:var(--gray-700);margin-bottom:1.2rem">"Mon téléphone était à l'hôtel depuis 3 jours sans que personne ne le signale. Grâce à Reperdu, j'ai pu le récupérer en 10 minutes. Service incroyable."</p>
+          <div style="display:flex;align-items:center;gap:.75rem">
+            <img src="https://i.pravatar.cc/40?img=7" style="width:40px;height:40px;border-radius:50%" alt="">
+            <div><div style="font-size:.85rem;font-weight:700">Sarah K.</div><div style="font-size:.73rem;color:var(--gray-500)">Lyon · iPhone retrouvé</div></div>
+          </div>
+        </div>
+        <div class="card" style="padding:1.75rem">
+          <div style="display:flex;gap:.6rem;margin-bottom:.75rem">⭐⭐⭐⭐⭐</div>
+          <p style="font-size:.9rem;line-height:1.7;color:var(--gray-700);margin-bottom:1.2rem">"En tant que gérant de bar, Reperdu nous a changé la vie. On dépose les objets en 30 secondes et les clients sont prévenus automatiquement. Zéro friction."</p>
+          <div style="display:flex;align-items:center;gap:.75rem">
+            <img src="https://i.pravatar.cc/40?img=11" style="width:40px;height:40px;border-radius:50%" alt="">
+            <div><div style="font-size:.85rem;font-weight:700">Antoine R.</div><div style="font-size:.73rem;color:var(--gray-500)">Gérant · Le Comptoir, Paris</div></div>
+          </div>
+        </div>
       </div>
     </div>
   </section>
@@ -378,10 +460,11 @@ const CONFIG = {
 
   <section class="cta-section">
     <div class="cta-box">
+      <div style="font-size:3rem;margin-bottom:1rem">🏢</div>
       <h2>Votre établissement perd des objets chaque soir ?</h2>
-      <p>Rejoignez le réseau Reperdu. QR code, dashboard, notifications automatiques, matching IA — tout est inclus.</p>
+      <p>Rejoignez le réseau Reperdu. QR code, dashboard, notifications automatiques, matching IA — tout est inclus. Vos clients vous remercieront.</p>
       <div class="cta-actions">
-        <button class="btn btn-white" onclick="openModal('modal-login')">🏢 Devenir partenaire</button>
+        <button class="btn btn-white" onclick="openModal('modal-login')">Devenir partenaire →</button>
         <button class="btn btn-outline-white" onclick="navigate('explorer')">🔍 Chercher un objet</button>
       </div>
     </div>
@@ -449,6 +532,13 @@ const CONFIG = {
 
 <!-- PAGE: DÉCLARER -->
 <div id="page-declarer" class="page">
+  <div style="background:linear-gradient(135deg,var(--green-700),var(--green-600));padding:2.5rem 5vw;text-align:center">
+    <div style="max-width:600px;margin:0 auto">
+      <div style="font-size:2.5rem;margin-bottom:.5rem">🔍</div>
+      <h2 style="color:#fff;margin-bottom:.4rem">Déclarer un objet perdu</h2>
+      <p style="color:rgba(255,255,255,.8);font-size:.9rem">Décrivez votre objet avec précision. Notre IA cherche dans tous nos établissements partenaires et vous notifie par email dès qu'une correspondance est trouvée.</p>
+    </div>
+  </div>
   <div style="max-width:680px;margin:0 auto;padding:2.5rem 5vw">
     <button class="btn btn-secondary btn-sm" onclick="navigate('home')" style="margin-bottom:1.5rem">← Retour</button>
     <div class="card" style="padding:2.5rem" id="declare-form-container">
@@ -475,21 +565,14 @@ const CONFIG = {
         <div class="form-group"><label class="form-label">Description détaillée *</label><textarea class="form-input" id="d-desc" rows="4" placeholder="Couleur, marque, contenu, signes distinctifs... Plus c'est précis, mieux l'IA peut trouver." required></textarea></div>
         <div class="form-row">
           <div class="form-group"><label class="form-label">Date de perte *</label><input class="form-input" type="date" id="d-date" required></div>
-          <div class="form-group"><label class="form-label">Lieu approximatif *</label><input class="form-input" id="d-location" placeholder="Ex : Rex Club, Paris 2e" required></div>
-        </div>
-        <!-- Établissement OBLIGATOIRE page déclarer -->
-        <div class="form-group">
-          <label class="form-label">Établissement *</label>
-          <div style="position:relative">
-            <input class="form-input" id="d-estab-search" placeholder="🔍 Rechercher un établissement..." oninput="searchEstablishments(this.value,'d')" autocomplete="off" required>
-            <div id="d-estab-dropdown" style="display:none;position:absolute;top:100%;left:0;right:0;background:#fff;border:1.5px solid var(--green-400);border-top:none;border-radius:0 0 var(--radius-sm) var(--radius-sm);max-height:200px;overflow-y:auto;z-index:50;box-shadow:var(--shadow-hover)"></div>
+          <div class="form-group">
+            <label class="form-label">Lieu *</label>
+            <select class="form-input form-select" id="d-location" required onchange="onDeclareLocationChange(this)">
+              <option value="">Choisir l'établissement...</option>
+            </select>
+            <input type="hidden" id="d-estab-id">
+            <p style="font-size:.75rem;color:var(--gray-500);margin-top:.35rem">Sélectionnez l'établissement membre où vous avez perdu votre objet</p>
           </div>
-          <input type="hidden" id="d-estab-id">
-          <div id="d-estab-selected" style="display:none;margin-top:.5rem;background:var(--green-100);border-radius:var(--radius-sm);padding:.5rem .75rem;font-size:.82rem;color:var(--green-700);align-items:center;justify-content:space-between">
-            <span id="d-estab-name"></span>
-            <button type="button" onclick="clearEstabSelection('d')" style="background:none;border:none;color:var(--green-700);cursor:pointer;font-size:1rem;line-height:1">✕</button>
-          </div>
-          <p style="font-size:.75rem;color:var(--gray-500);margin-top:.35rem">Sélectionnez l'établissement où vous pensez avoir perdu votre objet</p>
         </div>
         <div style="background:var(--green-100);border-radius:var(--radius-sm);padding:.9rem 1rem;font-size:.82rem;color:var(--green-900);margin-bottom:1.5rem">
           🤖 Après soumission, notre système analyse votre description et la compare à tous les objets trouvés. Vous recevrez un email si une correspondance est détectée.
@@ -497,6 +580,7 @@ const CONFIG = {
         <button type="submit" class="btn btn-primary btn-full" id="declare-submit">Envoyer ma déclaration →</button>
       </form>
     </div>
+  </div>
   </div>
 </div>
 
@@ -707,11 +791,17 @@ const CONFIG = {
       <div class="form-group"><label class="form-label">Description *</label><textarea class="form-input" id="md-desc" rows="3" placeholder="Couleur, marque, contenu, signes distinctifs..."></textarea></div>
       <div class="form-row">
         <div class="form-group"><label class="form-label">Date de perte</label><input class="form-input" type="date" id="md-date"></div>
-        <div class="form-group"><label class="form-label">Lieu approximatif</label><input class="form-input" id="md-location" placeholder="Rex Club, Paris..."></div>
+        <div class="form-group">
+          <label class="form-label">Lieu</label>
+          <select class="form-input form-select" id="md-location" onchange="onModalLocationChange(this)">
+            <option value="">Choisir l'établissement...</option>
+          </select>
+          <input type="hidden" id="md-estab-id">
+        </div>
       </div>
 
       <!-- Établissement OBLIGATOIRE -->
-      <div class="form-group">
+      <div class="form-group" style="display:none" id="md-estab-extra-group">
         <label class="form-label">Établissement *</label>
         <div style="position:relative">
           <input class="form-input" id="md-estab-search" placeholder="🔍 Rechercher un établissement..." oninput="searchEstablishments(this.value,'md')" autocomplete="off">
@@ -888,7 +978,7 @@ function navigate(page, data=null) {
   if (page === 'user-dashboard') loadUserDashboard()
   if (page === 'admin') { checkAdminAccess(); loadAdminOverview() }
   if (page === 'etablissement') loadEstabDashboard()
-  if (page === 'declarer') { document.getElementById('d-date').max = new Date().toISOString().split('T')[0] }
+  if (page === 'declarer') { document.getElementById('d-date').max = new Date().toISOString().split('T')[0]; loadEstabsIntoSelect('d-location') }
 }
 
 function scrollToSection(id) {
@@ -1031,6 +1121,8 @@ async function loadHomeStats() {
   document.getElementById('banner-total').textContent = (total||0).toLocaleString('fr-FR')
   document.getElementById('banner-rate').textContent = rate + '%'
   document.getElementById('banner-estabs').textContent = (estabs||0)
+  const trustEl = document.getElementById('trust-count')
+  if (trustEl) trustEl.textContent = (estabs||0)
 }
 
 async function loadHomeObjects() {
@@ -1238,7 +1330,36 @@ document.addEventListener('click', e => {
   })
 })
 
-// ── DECLARATION (page complète) ────────────────────────────────
+// ── LOAD ESTABLISSEMENTS INTO SELECT ──────────────────────────
+async function loadEstabsIntoSelect(selectId) {
+  const sel = document.getElementById(selectId)
+  if (!sel) return
+  const { data } = await sb.from('establishments').select('id, name, city, type').eq('is_active', true).order('name')
+  if (!data?.length) return
+  sel.innerHTML = '<option value="">Choisir l\'établissement...</option>' +
+    data.map(e => {
+      const icon = e.type === 'bar' ? '🍸' : e.type === 'nightclub' ? '🎵' : e.type === 'hotel' ? '🏨' : '🏢'
+      return `<option value="${e.id}" data-name="${e.name}" data-city="${e.city}">${icon} ${e.name} — ${e.city}</option>`
+    }).join('')
+}
+
+function onDeclareLocationChange(sel) {
+  const opt = sel.options[sel.selectedIndex]
+  document.getElementById('d-estab-id').value = opt.value || ''
+}
+
+function onModalLocationChange(sel) {
+  const opt = sel.options[sel.selectedIndex]
+  document.getElementById('md-estab-id').value = opt.value || ''
+}
+
+// ── ESTABLISH LOADER FOR MODAL DECLARE ────────────────────────
+function openModalDeclare() {
+  openModal('modal-declare')
+  loadEstabsIntoSelect('md-location')
+}
+
+
 async function submitDeclaration(e) {
   e.preventDefault()
   const estabId = document.getElementById('d-estab-id').value
@@ -1255,7 +1376,7 @@ async function submitDeclaration(e) {
       description: document.getElementById('d-desc').value,
       category: declarationCategory,
       loss_date: document.getElementById('d-date').value,
-      loss_location: document.getElementById('d-location').value,
+      loss_location: document.getElementById('d-location').options[document.getElementById('d-location').selectedIndex]?.text || '',
       establishment_id: estabId,
       status: 'active',
       user_id: currentUser?.id || null,
@@ -1306,8 +1427,8 @@ async function submitModalDeclaration() {
       description: desc,
       category: modalDeclarationCategory,
       loss_date: document.getElementById('md-date').value || new Date().toISOString().split('T')[0],
-      loss_location: document.getElementById('md-location').value || 'Non précisé',
-      establishment_id: estabId,
+      loss_location: document.getElementById('md-location').options[document.getElementById('md-location').selectedIndex]?.text || 'Non précisé',
+      establishment_id: document.getElementById('md-estab-id').value || estabId,
       status: 'active',
       user_id: currentUser?.id || null,
     }
