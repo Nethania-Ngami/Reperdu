@@ -318,7 +318,7 @@ const CONFIG = {
     <div>
       <div class="hero-eyebrow"><div class="hero-dot"></div>Plateforme objets trouvés N°1</div>
       <h1>On a tous perdu<br>quelque chose un soir.<br><span class="accent">On vous aide à le retrouver.</span></h1>
-      <p class="hero-sub">Reperdu connecte les clients avec les établissements grâce à un matching intelligent. Déclarez votre perte, notre IA cherche pour vous — gratuitement.</p>
+      <p class="hero-sub">Reperdu connecte les clients avec les établissements. Déclarez votre perte, nos équipes cherchent pour vous — gratuitement.</p>
       <div class="hero-cta">
         <button class="btn btn-primary" onclick="navigate('explorer')">🔍 Voir les objets trouvés</button>
         <button class="btn btn-secondary" onclick="currentUser ? navigate('declarer') : openModal('modal-login')" id="hero-declare-btn">✍️ Déclarer un objet perdu</button>
@@ -369,21 +369,21 @@ const CONFIG = {
     <div class="inner">
       <div class="section-label">Processus simple</div>
       <h2>Comment ça marche ?</h2>
-      <p style="color:var(--gray-500);margin-top:.5rem;margin-bottom:2.5rem;max-width:560px">En moins de 2 minutes, votre déclaration est en ligne et notre IA commence à chercher pour vous.</p>
+      <p style="color:var(--gray-500);margin-top:.5rem;margin-bottom:2.5rem;max-width:560px">En moins de 2 minutes, votre déclaration est transmise à nos équipes qui commencent les recherches.</p>
       <div class="steps-grid">
         <div class="step-card">
           <img src="https://images.unsplash.com/photo-1512486130939-2c4f79935e4f?w=400&q=80" alt="Formulaire" style="width:100%;height:140px;object-fit:cover;border-radius:10px;margin-bottom:1.2rem">
           <div class="step-num side">01</div>
           <div class="step-icon">✍️</div>
           <h3>Déclarez votre objet</h3>
-          <p class="step-desc">Remplissez un formulaire rapide : description, date, lieu. Plus c'est précis, plus l'IA est efficace.</p>
+          <p class="step-desc">Remplissez un formulaire rapide : description, date, lieu. Plus votre description est précise, plus nos équipes peuvent chercher efficacement.</p>
         </div>
         <div class="step-card">
-          <img src="https://images.unsplash.com/photo-1677442135703-1787eea5ce01?w=400&q=80" alt="IA" style="width:100%;height:140px;object-fit:cover;border-radius:10px;margin-bottom:1.2rem">
+          <img src="https://images.unsplash.com/photo-1677442135703-1787eea5ce01?w=400&q=80" alt="Équipe" style="width:100%;height:140px;object-fit:cover;border-radius:10px;margin-bottom:1.2rem">
           <div class="step-num main">02</div>
-          <div class="step-icon">🤖</div>
-          <h3>Notre IA cherche pour vous</h3>
-          <p class="step-desc">Le système compare automatiquement votre description avec les objets collectés dans tous nos établissements partenaires.</p>
+          <div class="step-icon">🔎</div>
+          <h3>Nos équipes cherchent pour vous</h3>
+          <p class="step-desc">Nos équipes consultent l'ensemble des objets collectés dans tous nos établissements partenaires et vérifient chaque correspondance possible.</p>
         </div>
         <div class="step-card">
           <img src="https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?w=400&q=80" alt="Notification" style="width:100%;height:140px;object-fit:cover;border-radius:10px;margin-bottom:1.2rem">
@@ -462,7 +462,7 @@ const CONFIG = {
     <div class="cta-box">
       <div style="font-size:3rem;margin-bottom:1rem">🏢</div>
       <h2>Votre établissement perd des objets chaque soir ?</h2>
-      <p>Rejoignez le réseau Reperdu. QR code, dashboard, notifications automatiques, matching IA — tout est inclus. Vos clients vous remercieront.</p>
+      <p>Rejoignez le réseau Reperdu. QR code, dashboard, notifications automatiques, matching humain — tout est inclus. Vos clients vous remercieront.</p>
       <div class="cta-actions">
         <button class="btn btn-white" onclick="openModal('modal-login')">Devenir partenaire →</button>
         <button class="btn btn-outline-white" onclick="navigate('explorer')">🔍 Chercher un objet</button>
@@ -477,7 +477,7 @@ const CONFIG = {
           <div style="display:flex;align-items:center;gap:8px;margin-bottom:.75rem"><div class="nav-logo-mark">R</div><span class="footer-logo-text">Re<span>perdu</span></span></div>
           <p class="footer-desc">La plateforme intelligente pour retrouver vos objets perdus dans les établissements partenaires.</p>
         </div>
-        <div class="footer-col"><h4>Plateforme</h4><a onclick="navigate('explorer')">Explorer les objets</a><a onclick="openModal('modal-declare')">Déclarer un objet</a><a onclick="navigate('home');scrollToSection('#comment')">Comment ça marche</a><a onclick="navigate('user-dashboard')">Mon espace</a></div>
+        <div class="footer-col"><h4>Plateforme</h4><a onclick="navigate('explorer')">Explorer les objets</a><a onclick="currentUser ? navigate('declarer') : openModal('modal-login')">Déclarer un objet</a><a onclick="navigate('home');scrollToSection('#comment')">Comment ça marche</a><a onclick="navigate('user-dashboard')">Mon espace</a></div>
         <div class="footer-col"><h4>Établissements</h4><a onclick="openModal('modal-login')">Devenir partenaire</a><a onclick="navigate('admin')">Dashboard admin</a><a onclick="navigate('home');scrollToSection('#etablissements')">Partenaires actuels</a></div>
         <div class="footer-col"><h4>Entreprise</h4><a>À propos</a><a>FAQ</a><a>Contact</a><a>Mentions légales</a></div>
       </div>
@@ -536,14 +536,14 @@ const CONFIG = {
     <div style="max-width:600px;margin:0 auto">
       <div style="font-size:2.5rem;margin-bottom:.5rem">🔍</div>
       <h2 style="color:#fff;margin-bottom:.4rem">Déclarer un objet perdu</h2>
-      <p style="color:rgba(255,255,255,.8);font-size:.9rem">Décrivez votre objet avec précision. Notre IA cherche dans tous nos établissements partenaires et vous notifie par email dès qu'une correspondance est trouvée.</p>
+      <p style="color:rgba(255,255,255,.8);font-size:.9rem">Décrivez votre objet avec précision. Nos équipes consultent tous nos établissements partenaires et vous notifient par email dès qu'une correspondance est trouvée.</p>
     </div>
   </div>
   <div style="max-width:680px;margin:0 auto;padding:2.5rem 5vw">
     <button class="btn btn-secondary btn-sm" onclick="navigate('home')" style="margin-bottom:1.5rem">← Retour</button>
     <div class="card" style="padding:2.5rem" id="declare-form-container">
       <h2 style="margin-bottom:.5rem">✍️ Déclarer un objet perdu</h2>
-      <p style="color:var(--gray-500);font-size:.9rem;margin-bottom:2rem">Notre IA cherchera automatiquement dans tous nos établissements partenaires.</p>
+      <p style="color:var(--gray-500);font-size:.9rem;margin-bottom:2rem">Nos équipes effectueront les recherches dans tous nos établissements partenaires.</p>
       <form id="declare-form" onsubmit="submitDeclaration(event)">
         <div class="form-row">
           <div class="form-group"><label class="form-label">Prénom et nom *</label><input class="form-input" id="d-name" placeholder="Marie Dupont" required></div>
@@ -562,7 +562,7 @@ const CONFIG = {
           </div>
         </div>
         <div class="form-group"><label class="form-label">Titre de l'objet *</label><input class="form-input" id="d-title" placeholder="Ex : iPhone 14 Pro noir, Sac Vuitton marron..." required></div>
-        <div class="form-group"><label class="form-label">Description détaillée *</label><textarea class="form-input" id="d-desc" rows="4" placeholder="Couleur, marque, contenu, signes distinctifs... Plus c'est précis, mieux l'IA peut trouver." required></textarea></div>
+        <div class="form-group"><label class="form-label">Description détaillée *</label><textarea class="form-input" id="d-desc" rows="4" placeholder="Couleur, marque, contenu, signes distinctifs... Plus c'est précis, mieux nos équipes peuvent identifier votre objet." required></textarea></div>
         <div class="form-row">
           <div class="form-group"><label class="form-label">Date de perte *</label><input class="form-input" type="date" id="d-date" required></div>
           <div class="form-group">
@@ -575,7 +575,7 @@ const CONFIG = {
           </div>
         </div>
         <div style="background:var(--green-100);border-radius:var(--radius-sm);padding:.9rem 1rem;font-size:.82rem;color:var(--green-900);margin-bottom:1.5rem">
-          🤖 Après soumission, notre système analyse votre description et la compare à tous les objets trouvés. Vous recevrez un email si une correspondance est détectée.
+          ✅ Après soumission, nos équipes prennent en charge votre déclaration et consultent tous les objets trouvés. Vous recevrez un email dès qu'une correspondance est identifiée.
         </div>
         <button type="submit" class="btn btn-primary btn-full" id="declare-submit">Envoyer ma déclaration →</button>
       </form>
@@ -621,6 +621,7 @@ const CONFIG = {
         <button class="sidebar-item" onclick="switchAdminSection('admin-claims',this)"><span class="icon">✋</span> Demandes</button>
         <button class="sidebar-item" onclick="switchAdminSection('admin-establishments',this)"><span class="icon">🏢</span> Établissements</button>
         <button class="sidebar-item" onclick="switchAdminSection('admin-declarations',this)"><span class="icon">📋</span> Déclarations</button>
+        <button class="sidebar-item" onclick="switchAdminSection('admin-photos',this)"><span class="icon">🖼️</span> Photos accueil</button>
       </nav>
       <div class="sidebar-footer">
         <button class="sidebar-item" onclick="signOut()" style="color:#ef4444"><span class="icon">🚪</span> Déconnexion</button>
@@ -666,10 +667,77 @@ const CONFIG = {
             <button class="btn btn-primary btn-sm" onclick="openModal('modal-add-establishment')">+ Ajouter</button>
           </div>
           <div id="admin-establishments-content"><div class="loader"><div class="spinner"></div></div></div>
+          <!-- Panneau upload photo établissement -->
+          <div id="estab-photo-panel" style="display:none;margin-top:1.5rem" class="card">
+            <div style="padding:1.2rem 1.5rem;border-bottom:1px solid var(--gray-200);display:flex;justify-content:space-between;align-items:center">
+              <div>
+                <h3 style="font-size:1rem" id="estab-photo-panel-name">Photo de l'établissement</h3>
+                <p style="font-size:.78rem;color:var(--gray-500);margin-top:2px">Cette photo apparaît sur la carte de l'établissement en page d'accueil.</p>
+              </div>
+              <button class="btn btn-secondary btn-sm" onclick="document.getElementById('estab-photo-panel').style.display='none'">✕ Fermer</button>
+            </div>
+            <div style="padding:1.5rem">
+              <div id="estab-photo-current" style="margin-bottom:1rem"></div>
+              <label style="display:flex;flex-direction:column;align-items:center;gap:10px;border:2px dashed var(--gray-200);border-radius:var(--radius);padding:1.5rem;cursor:pointer;transition:all var(--transition);background:var(--gray-100)" onmouseenter="this.style.borderColor='var(--green-400)';this.style.background='var(--green-100)'" onmouseleave="this.style.borderColor='var(--gray-200)';this.style.background='var(--gray-100)'">
+                <span style="font-size:2rem">📷</span>
+                <span style="font-weight:600;font-size:.9rem;color:var(--gray-700)">Choisir une photo</span>
+                <span style="font-size:.75rem;color:var(--gray-500)">JPG, PNG, WEBP — max 5 Mo</span>
+                <input type="file" id="estab-photo-file" accept="image/*" style="display:none" onchange="previewEstabPhoto(this)">
+              </label>
+              <div id="estab-photo-preview" style="display:none;margin-top:1rem;border-radius:var(--radius);overflow:hidden;height:180px;position:relative">
+                <img id="estab-photo-preview-img" style="width:100%;height:100%;object-fit:cover" alt="">
+                <button onclick="clearEstabPhotoPreview()" style="position:absolute;top:8px;right:8px;background:rgba(0,0,0,.6);color:#fff;border:none;border-radius:50%;width:28px;height:28px;cursor:pointer;font-size:14px">✕</button>
+              </div>
+              <input type="hidden" id="estab-photo-target-id">
+              <button class="btn btn-primary btn-full" style="margin-top:1rem" onclick="uploadEstabPhoto()" id="estab-photo-submit">Enregistrer la photo</button>
+            </div>
+          </div>
         </div>
         <div id="admin-declarations" style="display:none">
           <h2 style="margin-bottom:1.5rem">Déclarations de perte</h2>
           <div id="admin-declarations-content"><div class="loader"><div class="spinner"></div></div></div>
+        </div>
+
+        <!-- SECTION PHOTOS D'ACCUEIL -->
+        <div id="admin-photos" style="display:none">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:.5rem">
+            <h2>Photos de la page d'accueil</h2>
+          </div>
+          <p style="color:var(--gray-500);font-size:.875rem;margin-bottom:1.5rem">Ces photos apparaissent dans le hero de la page d'accueil. Ajoutez jusqu'à 6 photos.</p>
+
+          <!-- Upload zone -->
+          <div class="card" style="padding:1.5rem;margin-bottom:1.5rem">
+            <h3 style="font-size:1rem;margin-bottom:1rem">Ajouter une photo</h3>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1rem">
+              <div class="form-group">
+                <label class="form-label">Titre (optionnel)</label>
+                <input class="form-input" id="hp-title" placeholder="Ex : Soirée au Rex Club">
+              </div>
+              <div class="form-group">
+                <label class="form-label">Sous-titre (optionnel)</label>
+                <input class="form-input" id="hp-subtitle" placeholder="Ex : Paris · Objets trouvés chaque soir">
+              </div>
+            </div>
+            <label id="hp-upload-label" style="display:flex;flex-direction:column;align-items:center;gap:10px;border:2px dashed var(--gray-200);border-radius:var(--radius);padding:2rem;cursor:pointer;transition:all var(--transition);background:var(--gray-100)" onmouseenter="this.style.borderColor='var(--green-400)';this.style.background='var(--green-100)'" onmouseleave="this.style.borderColor='var(--gray-200)';this.style.background='var(--gray-100)'">
+              <span style="font-size:2.5rem">🖼️</span>
+              <span style="font-weight:600;color:var(--gray-700)">Cliquez pour choisir une photo</span>
+              <span style="font-size:.78rem;color:var(--gray-500)">JPG, PNG, WEBP — max 5 Mo</span>
+              <input type="file" id="hp-file" accept="image/*" style="display:none" onchange="previewHomepagePhoto(this)">
+            </label>
+            <div id="hp-preview" style="display:none;margin-top:1rem;position:relative;border-radius:var(--radius);overflow:hidden;height:200px">
+              <img id="hp-preview-img" style="width:100%;height:100%;object-fit:cover" alt="">
+              <button onclick="clearHomepagePhotoPreview()" style="position:absolute;top:8px;right:8px;background:rgba(0,0,0,.6);color:#fff;border:none;border-radius:50%;width:28px;height:28px;cursor:pointer;font-size:14px">✕</button>
+            </div>
+            <button class="btn btn-primary" style="margin-top:1rem" onclick="uploadHomepagePhoto()" id="hp-submit">Ajouter cette photo</button>
+          </div>
+
+          <!-- Photos existantes -->
+          <div class="card" style="padding:1.5rem">
+            <h3 style="font-size:1rem;margin-bottom:1rem">Photos actuelles</h3>
+            <div id="hp-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:1rem">
+              <div class="loader"><div class="spinner"></div></div>
+            </div>
+          </div>
         </div>
       </div>
     </main>
@@ -763,7 +831,7 @@ const CONFIG = {
 <div id="modal-declare" class="modal-overlay" onclick="closeModalOut(event,'modal-declare')">
   <div class="modal" style="max-width:600px">
     <div class="modal-header">
-      <div><div class="modal-title">✍️ Déclarer un objet perdu</div><div class="modal-sub">Notre IA cherchera une correspondance automatiquement</div></div>
+      <div><div class="modal-title">✍️ Déclarer un objet perdu</div><div class="modal-sub">Nos équipes prendront en charge votre recherche</div></div>
       <button class="modal-close" onclick="closeModal('modal-declare')">✕</button>
     </div>
     <div id="modal-declare-inner">
@@ -850,7 +918,7 @@ const CONFIG = {
 <div id="modal-add-object" class="modal-overlay" onclick="closeModalOut(event,'modal-add-object')">
   <div class="modal" style="max-width:580px">
     <div class="modal-header">
-      <div><div class="modal-title">📦 Ajouter un objet trouvé</div><div class="modal-sub">L'IA analysera et cherchera une correspondance</div></div>
+      <div><div class="modal-title">📦 Ajouter un objet trouvé</div><div class="modal-sub">Nos équipes vérifieront les correspondances</div></div>
       <button class="modal-close" onclick="closeModal('modal-add-object')">✕</button>
     </div>
     <div class="form-group"><label class="form-label">Catégorie *</label>
@@ -1140,17 +1208,23 @@ async function loadHomeEstabs() {
   const grid = document.getElementById('home-estabs-grid')
   if (!data?.length) { grid.innerHTML = '<div class="empty-state"><p>Aucun établissement partenaire</p></div>'; return }
   grid.innerHTML = data.map(e => `
-    <div class="card card-hover" style="padding:1.5rem;cursor:pointer" onclick="navigate('explorer')">
-      <span style="display:inline-flex;align-items:center;gap:5px;background:var(--green-100);color:var(--green-700);font-size:.68rem;font-weight:700;text-transform:uppercase;letter-spacing:.05em;padding:.2rem .6rem;border-radius:var(--radius-full);margin-bottom:.75rem">
-        ${e.type==='bar'?'🍸':e.type==='nightclub'?'🎵':'🏨'} ${e.type==='bar'?'Bar':e.type==='nightclub'?'Boîte de nuit':'Hôtel'}
-      </span>
-      <div style="font-size:2rem;margin-bottom:.5rem">${e.type==='bar'?'🍸':e.type==='nightclub'?'🌙':'⭐'}</div>
-      <h3>${e.name}</h3>
-      <p style="font-size:.8rem;color:var(--gray-500);margin-top:.2rem">📍 ${e.address}, ${e.city}</p>
-      <div style="display:flex;gap:1.5rem;margin-top:1rem;padding-top:1rem;border-top:1px solid var(--gray-200)">
-        <div><div style="font-size:1.1rem;font-weight:700;color:var(--green-700)">${e.total_objects}</div><div style="font-size:.7rem;color:var(--gray-500)">Trouvés</div></div>
-        <div><div style="font-size:1.1rem;font-weight:700;color:var(--green-700)">${e.recovered_objects}</div><div style="font-size:.7rem;color:var(--gray-500)">Récupérés</div></div>
-        <div><div style="font-size:1.1rem;font-weight:700;color:var(--green-700)">${e.total_objects>0?Math.round(e.recovered_objects/e.total_objects*100):0}%</div><div style="font-size:.7rem;color:var(--gray-500)">Taux</div></div>
+    <div class="card card-hover" style="padding:0;cursor:pointer;overflow:hidden" onclick="navigate('explorer')">
+      <div style="height:130px;background:var(--green-50);display:flex;align-items:center;justify-content:center;font-size:3rem;position:relative;overflow:hidden">
+        ${e.photo_url ? `<img src="${e.photo_url}" alt="${e.name}" style="width:100%;height:100%;object-fit:cover;position:absolute;inset:0">` : (e.type==='bar'?'🍸':e.type==='nightclub'?'🌙':'⭐')}
+        <div style="position:absolute;top:10px;left:10px">
+          <span style="display:inline-flex;align-items:center;gap:5px;background:rgba(255,255,255,.92);color:var(--green-700);font-size:.68rem;font-weight:700;text-transform:uppercase;letter-spacing:.05em;padding:.2rem .6rem;border-radius:var(--radius-full)">
+            ${e.type==='bar'?'🍸 Bar':e.type==='nightclub'?'🎵 Boîte de nuit':'🏨 Hôtel'}
+          </span>
+        </div>
+      </div>
+      <div style="padding:1.1rem 1.25rem">
+        <h3>${e.name}</h3>
+        <p style="font-size:.8rem;color:var(--gray-500);margin-top:.2rem">📍 ${e.address}, ${e.city}</p>
+        <div style="display:flex;gap:1.5rem;margin-top:1rem;padding-top:1rem;border-top:1px solid var(--gray-200)">
+          <div><div style="font-size:1.1rem;font-weight:700;color:var(--green-700)">${e.total_objects}</div><div style="font-size:.7rem;color:var(--gray-500)">Trouvés</div></div>
+          <div><div style="font-size:1.1rem;font-weight:700;color:var(--green-700)">${e.recovered_objects}</div><div style="font-size:.7rem;color:var(--gray-500)">Récupérés</div></div>
+          <div><div style="font-size:1.1rem;font-weight:700;color:var(--green-700)">${e.total_objects>0?Math.round(e.recovered_objects/e.total_objects*100):0}%</div><div style="font-size:.7rem;color:var(--gray-500)">Taux</div></div>
+        </div>
       </div>
     </div>`).join('')
 }
@@ -1229,7 +1303,7 @@ async function loadObjectDetail(id) {
           <div style="position:absolute;top:12px;left:12px"><span class="badge badge-${o.status}">${STATUS_LABELS[o.status]}</span></div>
         </div>
         ${o.images?.length > 1 ? `<div class="obj-detail-thumbs">${o.images.map(img => `<div class="obj-detail-thumb" onclick="document.getElementById('main-img-el').src='${img}'"><img src="${img}" style="width:100%;height:100%;object-fit:cover"></div>`).join('')}</div>` : ''}
-        ${o.ai_tags?.length ? `<div class="card" style="padding:1rem;margin-top:.75rem"><div style="font-size:.7rem;font-weight:700;text-transform:uppercase;color:var(--gray-500);letter-spacing:.05em;margin-bottom:.5rem">🤖 Tags IA</div><div class="tags-row">${o.ai_tags.map(t=>`<span class="tag">${t}</span>`).join('')}</div></div>` : ''}
+        ${o.ai_tags?.length ? `<div class="card" style="padding:1rem;margin-top:.75rem"><div style="font-size:.7rem;font-weight:700;text-transform:uppercase;color:var(--gray-500);letter-spacing:.05em;margin-bottom:.5rem">🏷️ Tags</div><div class="tags-row">${o.ai_tags.map(t=>`<span class="tag">${t}</span>`).join('')}</div></div>` : ''}
       </div>
       <div>
         <div class="card obj-info-card">
@@ -1391,7 +1465,7 @@ async function submitDeclaration(e) {
       <div class="success-state">
         <div class="success-icon">🎉</div>
         <h2 style="margin-bottom:.75rem">Déclaration enregistrée !</h2>
-        <p style="color:var(--gray-500);line-height:1.7;margin-bottom:.5rem">Votre déclaration a bien été reçue. Notre IA va analyser votre description et vous notifier par email dès qu'une correspondance est trouvée.</p>
+        <p style="color:var(--gray-500);line-height:1.7;margin-bottom:.5rem">Votre déclaration a bien été reçue. Nos équipes vont examiner votre description et vous notifier par email dès qu'une correspondance est trouvée.</p>
         <div style="background:var(--green-100);border-radius:var(--radius-sm);padding:.75rem 1rem;font-size:.82rem;color:var(--green-700);margin:1rem 0;font-weight:600">Référence : #${data.id.substring(0,8).toUpperCase()}</div>
         <div style="display:flex;gap:.75rem;justify-content:center;flex-wrap:wrap;margin-top:1.5rem">
           <button class="btn btn-primary" onclick="navigate('explorer')">Explorer les objets trouvés</button>
@@ -1651,6 +1725,7 @@ function switchAdminSection(id, btn) {
   if (id === 'admin-establishments') loadAdminEstablishments()
   if (id === 'admin-declarations') loadAdminDeclarations()
   if (id === 'admin-overview') loadAdminOverview()
+  if (id === 'admin-photos') loadHomepagePhotosAdmin()
 }
 
 async function loadAdminObjects() {
@@ -1720,13 +1795,13 @@ async function loadAdminClaims() {
           <div style="display:flex;justify-content:space-between;flex-wrap:wrap;gap:.5rem">
             <div><strong>${c.full_name}</strong> <span style="font-size:.8rem;color:var(--gray-500)">${c.email}${c.phone?` · ${c.phone}`:``}</span></div>
             <div style="display:flex;gap:.4rem;align-items:center">
-              ${score!==null?`<span style="font-size:.75rem;font-weight:700;padding:.2rem .6rem;border-radius:var(--radius-full);background:${score>=80?'var(--green-100)':'#FFF3E0'};color:${score>=80?'var(--green-700)':'#E65100'}">🤖 ${score}%</span>`:''}
+              ${score!==null?`<span style="font-size:.75rem;font-weight:700;padding:.2rem .6rem;border-radius:var(--radius-full);background:${score>=80?'var(--green-100)':'#FFF3E0'};color:${score>=80?'var(--green-700)':'#E65100'}">${score}%</span>`:''}
               <span class="badge badge-${c.status==='pending'?'pending':c.status==='accepted'?'online':'archived'}">${c.status==='pending'?'En attente':c.status==='under_review'?'En examen':c.status==='accepted'?'Acceptée':'Refusée'}</span>
             </div>
           </div>
           <div style="font-size:.8rem;color:var(--gray-500);margin-top:.2rem">Objet : ${c.object?.title||'—'}</div>
           <div style="font-size:.82rem;color:var(--gray-700);margin-top:.5rem;background:var(--gray-100);border-radius:8px;padding:.5rem .8rem">${c.description}</div>
-          ${c.ai_match_reasoning?`<div style="font-size:.78rem;color:#1565C0;background:#E3F2FD;border-radius:8px;padding:.5rem .8rem;margin-top:.4rem">🤖 ${c.ai_match_reasoning}</div>`:''}
+          ${c.ai_match_reasoning?`<div style="font-size:.78rem;color:#1565C0;background:#E3F2FD;border-radius:8px;padding:.5rem .8rem;margin-top:.4rem">${c.ai_match_reasoning}</div>`:''}
           ${c.status==='pending'||c.status==='under_review'?`
             <div style="display:flex;gap:.5rem;margin-top:.9rem;flex-wrap:wrap">
               <button class="btn btn-primary btn-sm" onclick="reviewClaim('${c.id}','accepted')">✅ Accepter</button>
@@ -1764,6 +1839,7 @@ async function loadAdminEstablishments() {
             <td><strong>${e.total_objects}</strong> / ${e.recovered_objects} récup.</td>
             <td><strong style="color:var(--green-700)">${e.total_objects>0?Math.round(e.recovered_objects/e.total_objects*100):0}%</strong></td>
             <td><div class="action-btns">
+              <button class="btn btn-secondary btn-sm" onclick="openEstabPhotoPanel('${e.id}','${e.name.replace(/'/g,"\\'")}','${e.photo_url||''}')">🖼️ Photo</button>
               <button class="btn btn-${e.is_active?'danger':'primary'} btn-sm" onclick="toggleEstab('${e.id}',${e.is_active})">${e.is_active?'Désactiver':'Activer'}</button>
             </div></td>
           </tr>`).join('')}
@@ -1777,6 +1853,156 @@ async function toggleEstab(id, current) {
   toast(`Établissement ${current ? 'désactivé' : 'activé'}`)
   loadAdminEstablishments()
 }
+
+// ── PHOTOS PAGE D'ACCUEIL ──────────────────────────────────────
+function previewHomepagePhoto(input) {
+  if (!input.files?.length) return
+  const url = URL.createObjectURL(input.files[0])
+  document.getElementById('hp-preview-img').src = url
+  document.getElementById('hp-preview').style.display = 'block'
+}
+
+function clearHomepagePhotoPreview() {
+  document.getElementById('hp-file').value = ''
+  document.getElementById('hp-preview').style.display = 'none'
+}
+
+async function uploadHomepagePhoto() {
+  const file = document.getElementById('hp-file').files?.[0]
+  if (!file) { toast('Sélectionnez une photo', 'error'); return }
+  const btn = document.getElementById('hp-submit')
+  btn.disabled = true
+  btn.innerHTML = '<div class="btn-spinner"></div> Envoi...'
+  try {
+    const ext = file.name.split('.').pop() || 'jpg'
+    const path = `homepage/${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`
+    const { error: upErr } = await sb.storage.from('homepage-photos').upload(path, file, { contentType: file.type, upsert: true })
+    if (upErr) throw upErr
+    const { data: urlData } = sb.storage.from('homepage-photos').getPublicUrl(path)
+    const { error: dbErr } = await sb.from('homepage_photos').insert({
+      url: urlData.publicUrl,
+      storage_path: path,
+      title: document.getElementById('hp-title').value || null,
+      subtitle: document.getElementById('hp-subtitle').value || null,
+      created_by: currentUser.id,
+      is_active: true,
+      sort_order: 0,
+    })
+    if (dbErr) throw dbErr
+    toast('Photo ajoutée ! 🎉')
+    clearHomepagePhotoPreview()
+    document.getElementById('hp-title').value = ''
+    document.getElementById('hp-subtitle').value = ''
+    loadHomepagePhotosAdmin()
+  } catch(e) {
+    toast(e.message || 'Erreur lors de l\'upload', 'error')
+  } finally {
+    btn.disabled = false
+    btn.textContent = 'Ajouter cette photo'
+  }
+}
+
+async function loadHomepagePhotosAdmin() {
+  const grid = document.getElementById('hp-grid')
+  if (!grid) return
+  const { data, error } = await sb.from('homepage_photos').select('*').order('sort_order').order('created_at', { ascending: false })
+  if (!data?.length) {
+    grid.innerHTML = '<div style="color:var(--gray-500);font-size:.875rem;padding:1rem">Aucune photo pour l\'instant. Ajoutez votre première photo ci-dessus.</div>'
+    return
+  }
+  grid.innerHTML = data.map(p => `
+    <div style="border-radius:var(--radius);overflow:hidden;border:1px solid var(--gray-200);position:relative;background:var(--gray-100)">
+      <div style="height:150px;position:relative;overflow:hidden">
+        <img src="${p.url}" alt="${p.title||''}" style="width:100%;height:100%;object-fit:cover">
+        <div style="position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,.4),transparent)"></div>
+        <div style="position:absolute;top:8px;right:8px;display:flex;gap:4px">
+          <button onclick="toggleHomepagePhoto('${p.id}',${p.is_active})" style="background:${p.is_active?'var(--green-700)':'rgba(0,0,0,.5)'};color:#fff;border:none;border-radius:6px;padding:.2rem .55rem;font-size:.7rem;font-weight:700;cursor:pointer">${p.is_active?'✓ Visible':'Masqué'}</button>
+          <button onclick="deleteHomepagePhoto('${p.id}','${p.storage_path}')" style="background:rgba(220,38,38,.85);color:#fff;border:none;border-radius:6px;padding:.2rem .5rem;font-size:.75rem;cursor:pointer">🗑</button>
+        </div>
+      </div>
+      <div style="padding:.75rem">
+        ${p.title ? `<div style="font-size:.83rem;font-weight:600">${p.title}</div>` : ''}
+        ${p.subtitle ? `<div style="font-size:.75rem;color:var(--gray-500)">${p.subtitle}</div>` : ''}
+        <div style="font-size:.7rem;color:var(--gray-400);margin-top:.3rem">${new Date(p.created_at).toLocaleDateString('fr-FR')}</div>
+      </div>
+    </div>`).join('')
+}
+
+async function toggleHomepagePhoto(id, current) {
+  await sb.from('homepage_photos').update({ is_active: !current }).eq('id', id)
+  toast(current ? 'Photo masquée' : 'Photo visible')
+  loadHomepagePhotosAdmin()
+}
+
+async function deleteHomepagePhoto(id, path) {
+  if (!confirm('Supprimer cette photo ?')) return
+  await sb.storage.from('homepage-photos').remove([path])
+  await sb.from('homepage_photos').delete().eq('id', id)
+  toast('Photo supprimée')
+  loadHomepagePhotosAdmin()
+}
+
+// ── PHOTO ÉTABLISSEMENT ────────────────────────────────────────
+function openEstabPhotoPanel(id, name, currentPhotoUrl) {
+  document.getElementById('estab-photo-target-id').value = id
+  document.getElementById('estab-photo-panel-name').textContent = `Photo — ${name}`
+  document.getElementById('estab-photo-file').value = ''
+  document.getElementById('estab-photo-preview').style.display = 'none'
+  const currentDiv = document.getElementById('estab-photo-current')
+  if (currentPhotoUrl) {
+    currentDiv.innerHTML = `
+      <div style="margin-bottom:1rem">
+        <p style="font-size:.78rem;font-weight:600;color:var(--gray-500);margin-bottom:.5rem">PHOTO ACTUELLE</p>
+        <div style="border-radius:10px;overflow:hidden;height:120px;position:relative">
+          <img src="${currentPhotoUrl}" style="width:100%;height:100%;object-fit:cover" alt="">
+        </div>
+      </div>`
+  } else {
+    currentDiv.innerHTML = '<p style="font-size:.82rem;color:var(--gray-500);margin-bottom:.75rem">Aucune photo pour cet établissement.</p>'
+  }
+  const panel = document.getElementById('estab-photo-panel')
+  panel.style.display = 'block'
+  panel.scrollIntoView({ behavior: 'smooth', block: 'start' })
+}
+
+function previewEstabPhoto(input) {
+  if (!input.files?.length) return
+  const url = URL.createObjectURL(input.files[0])
+  document.getElementById('estab-photo-preview-img').src = url
+  document.getElementById('estab-photo-preview').style.display = 'block'
+}
+
+function clearEstabPhotoPreview() {
+  document.getElementById('estab-photo-file').value = ''
+  document.getElementById('estab-photo-preview').style.display = 'none'
+}
+
+async function uploadEstabPhoto() {
+  const file = document.getElementById('estab-photo-file').files?.[0]
+  const estabId = document.getElementById('estab-photo-target-id').value
+  if (!file) { toast('Sélectionnez une photo', 'error'); return }
+  const btn = document.getElementById('estab-photo-submit')
+  btn.disabled = true
+  btn.innerHTML = '<div class="btn-spinner"></div> Envoi...'
+  try {
+    const ext = file.name.split('.').pop() || 'jpg'
+    const path = `establishments/${estabId}/${Date.now()}.${ext}`
+    const { error: upErr } = await sb.storage.from('establishments').upload(path, file, { contentType: file.type, upsert: true })
+    if (upErr) throw upErr
+    const { data: urlData } = sb.storage.from('establishments').getPublicUrl(path)
+    const { error: dbErr } = await sb.from('establishments').update({ photo_url: urlData.publicUrl }).eq('id', estabId)
+    if (dbErr) throw dbErr
+    toast('Photo mise à jour ! 🎉')
+    document.getElementById('estab-photo-panel').style.display = 'none'
+    loadAdminEstablishments()
+  } catch(e) {
+    toast(e.message || 'Erreur lors de l\'upload', 'error')
+  } finally {
+    btn.disabled = false
+    btn.textContent = 'Enregistrer la photo'
+  }
+}
+
 
 async function loadAdminDeclarations() {
   const { data } = await sb.from('declarations').select('*, matched_object:objects(title)').order('created_at',{ascending:false}).limit(50)
@@ -1928,7 +2154,7 @@ async function exportCSV(type) {
     ? await sb.from('objects').select('title,category,status,found_at,establishment:establishments(name,city)').order('found_at',{ascending:false})
     : await sb.from('claims').select('full_name,email,status,ai_match_score,created_at,object:objects(title)').order('created_at',{ascending:false})
   if (!data?.length) { toast('Aucune donnée à exporter','info'); return }
-  const headers = type === 'objects' ? ['Titre','Catégorie','Statut','Trouvé le','Établissement','Ville'] : ['Nom','Email','Statut','Score IA','Objet','Date']
+  const headers = type === 'objects' ? ['Titre','Catégorie','Statut','Trouvé le','Établissement','Ville'] : ['Nom','Email','Statut','Score','Objet','Date']
   const rows = data.map(d => type === 'objects'
     ? [d.title, d.category, d.status, new Date(d.found_at).toLocaleDateString('fr-FR'), d.establishment?.name||'', d.establishment?.city||'']
     : [d.full_name, d.email, d.status, d.ai_match_score ? Math.round(d.ai_match_score*100)+'%' : '', d.object?.title||'', new Date(d.created_at).toLocaleDateString('fr-FR')]
