@@ -246,7 +246,11 @@ textarea.form-input{resize:vertical}
 .spinner{width:36px;height:36px;border:3px solid var(--green-200);border-top-color:var(--green-700);border-radius:50%;animation:spin .7s linear infinite}
 @keyframes spin{to{transform:rotate(360deg)}}
 .btn-spinner{width:16px;height:16px;border:2px solid rgba(255,255,255,.4);border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite;flex-shrink:0}
-footer{background:var(--gray-900);color:rgba(255,255,255,.6);padding:4rem 5vw 2rem}
+.lang-switcher{display:flex;align-items:center;background:var(--gray-100);border-radius:var(--radius-full);padding:3px;gap:2px;border:1px solid var(--gray-200)}
+.lang-btn{padding:.3rem .7rem;border-radius:var(--radius-full);border:none;background:transparent;font-size:.75rem;font-weight:700;cursor:pointer;color:var(--gray-500);transition:all var(--transition)}
+.lang-btn.active{background:#fff;color:var(--green-700);box-shadow:0 1px 4px rgba(0,0,0,.1)}
+.lang-btn:hover:not(.active){color:var(--gray-700)}
+
 .footer-inner{max-width:1200px;margin:0 auto}
 .footer-grid{display:grid;grid-template-columns:1.5fr 1fr 1fr 1fr;gap:3rem;margin-bottom:3rem}
 .footer-logo-text{font-size:1.2rem;font-weight:800;color:var(--green-200);letter-spacing:-0.03em}
@@ -304,12 +308,18 @@ const CONFIG = {
     <span class="nav-logo-text">Re<span>perdu</span></span>
   </div>
   <div class="nav-links">
-    <a onclick="navigate('home')" id="nav-home">Accueil</a>
-    <a onclick="navigate('explorer')" id="nav-explorer">Explorer</a>
-    <a onclick="navigate('home'); scrollToSection('#comment')" id="nav-comment">Comment ça marche</a>
-    <a onclick="navigate('home'); scrollToSection('#etablissements')" id="nav-estab">Établissements</a>
+    <a onclick="navigate('home')" id="nav-home" data-i18n="nav_home">Accueil</a>
+    <a onclick="navigate('explorer')" id="nav-explorer" data-i18n="nav_explorer">Explorer</a>
+    <a onclick="navigate('home'); scrollToSection('#comment')" id="nav-comment" data-i18n="nav_how">Comment ça marche</a>
+    <a onclick="navigate('home'); scrollToSection('#etablissements')" id="nav-estab" data-i18n="nav_estabs">Établissements</a>
   </div>
-  <div class="nav-actions" id="nav-actions"></div>
+  <div style="display:flex;align-items:center;gap:.5rem">
+    <div class="lang-switcher">
+      <button class="lang-btn active" onclick="setLang('fr')" id="lang-fr">🇫🇷 FR</button>
+      <button class="lang-btn" onclick="setLang('en')" id="lang-en">🇬🇧 EN</button>
+    </div>
+    <div class="nav-actions" id="nav-actions"></div>
+  </div>
 </nav>
 
 <!-- PAGE: HOME -->
@@ -320,7 +330,7 @@ const CONFIG = {
       <h1>On a tous perdu<br>quelque chose un soir.<br><span class="accent">On vous aide à le retrouver.</span></h1>
       <p class="hero-sub">Reperdu connecte les clients avec les établissements. Déclarez votre perte, nos équipes cherchent pour vous — gratuitement.</p>
       <div class="hero-cta">
-        <button class="btn btn-primary" onclick="navigate('explorer')">🔍 Voir les objets trouvés</button>
+        <button class="btn btn-primary" id="hero-btn-explore" onclick="navigate('explorer')">🔍 Voir les objets trouvés</button>
         <button class="btn btn-secondary" onclick="currentUser ? navigate('declarer') : openModal('modal-login')" id="hero-declare-btn">✍️ Déclarer un objet perdu</button>
       </div>
       <div style="display:flex;align-items:center;gap:.75rem;margin-bottom:2rem">
@@ -330,7 +340,7 @@ const CONFIG = {
           <img src="https://i.pravatar.cc/32?img=9" style="width:32px;height:32px;border-radius:50%;border:2px solid #fff;margin-right:-8px" alt="">
           <img src="https://i.pravatar.cc/32?img=12" style="width:32px;height:32px;border-radius:50%;border:2px solid #fff" alt="">
         </div>
-        <span style="font-size:.82rem;color:var(--gray-500)"><strong style="color:var(--gray-700)">+2 400 personnes</strong> ont retrouvé leur objet</span>
+        <span style="font-size:.82rem;color:var(--gray-500)" id="hero-social-text"><strong style="color:var(--gray-700)">+2 400 personnes</strong> ont retrouvé leur objet</span>
       </div>
       <div class="hero-stats">
         <div><div class="hero-stat-num" id="stat-total">—</div><div class="hero-stat-label">Objets trouvés</div></div>
@@ -355,13 +365,13 @@ const CONFIG = {
 
   <div style="background:var(--gray-100);border-top:1px solid var(--gray-200);border-bottom:1px solid var(--gray-200);padding:1.25rem 5vw">
     <div style="max-width:1100px;margin:0 auto;display:flex;align-items:center;justify-content:center;gap:2rem;flex-wrap:wrap">
-      <span style="font-size:.75rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--gray-500)">Ils nous font confiance</span>
+      <span style="font-size:.75rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--gray-500)" id="trust-label">Ils nous font confiance</span>
       <span style="color:var(--gray-700);font-weight:600;font-size:.88rem">🎵 Rex Club</span>
       <span style="color:var(--gray-700);font-weight:600;font-size:.88rem">🏨 Hôtel du Nord</span>
       <span style="color:var(--gray-700);font-weight:600;font-size:.88rem">🍸 Le Comptoir</span>
       <span style="color:var(--gray-700);font-weight:600;font-size:.88rem">🎵 Social Club</span>
       <span style="color:var(--gray-700);font-weight:600;font-size:.88rem">🏨 Hôtel Acanthe</span>
-      <span style="color:var(--gray-500);font-size:.82rem">+ <span id="trust-count">—</span> établissements</span>
+      <span style="color:var(--gray-500);font-size:.82rem">+ <span id="trust-count">—</span> <span id="trust-suffix">établissements</span></span>
     </div>
   </div>
 
@@ -369,7 +379,7 @@ const CONFIG = {
     <div class="inner">
       <div class="section-label">Processus simple</div>
       <h2>Comment ça marche ?</h2>
-      <p style="color:var(--gray-500);margin-top:.5rem;margin-bottom:2.5rem;max-width:560px">En moins de 2 minutes, votre déclaration est transmise à nos équipes qui commencent les recherches.</p>
+      <p id="how-sub" style="color:var(--gray-500);margin-top:.5rem;margin-bottom:2.5rem;max-width:560px">En moins de 2 minutes, votre déclaration est transmise à nos équipes qui commencent les recherches.</p>
       <div class="steps-grid">
         <div class="step-card">
           <img src="https://images.unsplash.com/photo-1512486130939-2c4f79935e4f?w=400&q=80" alt="Formulaire" style="width:100%;height:140px;object-fit:cover;border-radius:10px;margin-bottom:1.2rem">
@@ -400,32 +410,32 @@ const CONFIG = {
   <section style="padding:5rem 5vw;background:#fff">
     <div style="max-width:1100px;margin:0 auto">
       <div style="text-align:center;margin-bottom:3rem">
-        <div class="section-label" style="justify-content:center">Ils ont retrouvé leur objet</div>
-        <h2>Ce qu'ils en disent</h2>
+        <div class="section-label" style="justify-content:center" id="tm-label">Ils ont retrouvé leur objet</div>
+        <h2 id="tm-title">Ce qu'ils en disent</h2>
       </div>
       <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:1.5rem">
         <div class="card" style="padding:1.75rem">
           <div style="display:flex;gap:.6rem;margin-bottom:.75rem">⭐⭐⭐⭐⭐</div>
-          <p style="font-size:.9rem;line-height:1.7;color:var(--gray-700);margin-bottom:1.2rem">"J'avais perdu mon portefeuille au Rex Club un vendredi soir. J'y croyais plus du tout... et deux jours après, Reperdu m'a envoyé un email avec une correspondance. Bluffant !"</p>
+          <p class="testimonial-text" style="font-size:.9rem;line-height:1.7;color:var(--gray-700);margin-bottom:1.2rem">"J'avais perdu mon portefeuille au Rex Club un vendredi soir. J'y croyais plus du tout... et deux jours après, Reperdu m'a envoyé un email avec une correspondance. Bluffant !"</p>
           <div style="display:flex;align-items:center;gap:.75rem">
             <img src="https://i.pravatar.cc/40?img=3" style="width:40px;height:40px;border-radius:50%" alt="">
-            <div><div style="font-size:.85rem;font-weight:700">Lucas M.</div><div style="font-size:.73rem;color:var(--gray-500)">Paris · Portefeuille retrouvé</div></div>
+            <div><div class="testimonial-name" style="font-size:.85rem;font-weight:700">Lucas M.</div><div class="testimonial-sub" style="font-size:.73rem;color:var(--gray-500)">Paris · Portefeuille retrouvé</div></div>
           </div>
         </div>
         <div class="card" style="padding:1.75rem;border-color:var(--green-200);background:var(--green-50)">
           <div style="display:flex;gap:.6rem;margin-bottom:.75rem">⭐⭐⭐⭐⭐</div>
-          <p style="font-size:.9rem;line-height:1.7;color:var(--gray-700);margin-bottom:1.2rem">"Mon téléphone était à l'hôtel depuis 3 jours sans que personne ne le signale. Grâce à Reperdu, j'ai pu le récupérer en 10 minutes. Service incroyable."</p>
+          <p class="testimonial-text" style="font-size:.9rem;line-height:1.7;color:var(--gray-700);margin-bottom:1.2rem">"Mon téléphone était à l'hôtel depuis 3 jours sans que personne ne le signale. Grâce à Reperdu, j'ai pu le récupérer en 10 minutes. Service incroyable."</p>
           <div style="display:flex;align-items:center;gap:.75rem">
             <img src="https://i.pravatar.cc/40?img=7" style="width:40px;height:40px;border-radius:50%" alt="">
-            <div><div style="font-size:.85rem;font-weight:700">Sarah K.</div><div style="font-size:.73rem;color:var(--gray-500)">Lyon · iPhone retrouvé</div></div>
+            <div><div class="testimonial-name" style="font-size:.85rem;font-weight:700">Sarah K.</div><div class="testimonial-sub" style="font-size:.73rem;color:var(--gray-500)">Lyon · iPhone retrouvé</div></div>
           </div>
         </div>
         <div class="card" style="padding:1.75rem">
           <div style="display:flex;gap:.6rem;margin-bottom:.75rem">⭐⭐⭐⭐⭐</div>
-          <p style="font-size:.9rem;line-height:1.7;color:var(--gray-700);margin-bottom:1.2rem">"En tant que gérant de bar, Reperdu nous a changé la vie. On dépose les objets en 30 secondes et les clients sont prévenus automatiquement. Zéro friction."</p>
+          <p class="testimonial-text" style="font-size:.9rem;line-height:1.7;color:var(--gray-700);margin-bottom:1.2rem">"En tant que gérant de bar, Reperdu nous a changé la vie. On dépose les objets en 30 secondes et les clients sont prévenus automatiquement. Zéro friction."</p>
           <div style="display:flex;align-items:center;gap:.75rem">
             <img src="https://i.pravatar.cc/40?img=11" style="width:40px;height:40px;border-radius:50%" alt="">
-            <div><div style="font-size:.85rem;font-weight:700">Antoine R.</div><div style="font-size:.73rem;color:var(--gray-500)">Gérant · Le Comptoir, Paris</div></div>
+            <div><div class="testimonial-name" style="font-size:.85rem;font-weight:700">Antoine R.</div><div class="testimonial-sub" style="font-size:.73rem;color:var(--gray-500)">Gérant · Le Comptoir, Paris</div></div>
           </div>
         </div>
       </div>
@@ -435,8 +445,8 @@ const CONFIG = {
   <section style="padding:5rem 5vw">
     <div style="max-width:1200px;margin:0 auto">
       <div style="display:flex;align-items:end;justify-content:space-between;margin-bottom:2rem;flex-wrap:wrap;gap:1rem">
-        <div><div class="section-label">Objets trouvés</div><h2 style="margin-top:.3rem">Derniers objets disponibles</h2></div>
-        <button class="btn btn-secondary" onclick="navigate('explorer')">Voir tout →</button>
+        <div><div class="section-label" id="latest-label">Objets trouvés</div><h2 id="latest-title" style="margin-top:.3rem">Derniers objets disponibles</h2></div>
+        <button class="btn btn-secondary" id="latest-btn" onclick="navigate('explorer')">Voir tout →</button>
       </div>
       <div class="objects-grid" id="home-objects-grid"><div class="loader"><div class="spinner"></div></div></div>
     </div>
@@ -453,7 +463,7 @@ const CONFIG = {
 
   <section style="padding:5rem 5vw;background:var(--gray-100)" id="etablissements">
     <div style="max-width:1200px;margin:0 auto">
-      <div style="text-align:center;margin-bottom:3rem"><div class="section-label" style="justify-content:center">Réseau partenaire</div><h2>Établissements partenaires</h2><p style="color:var(--gray-500);margin-top:.5rem">Bars, boîtes de nuit et hôtels qui font confiance à Reperdu</p></div>
+      <div style="text-align:center;margin-bottom:3rem"><div class="section-label" id="estabs-label" style="justify-content:center">Réseau partenaire</div><h2 id="estabs-title">Établissements partenaires</h2><p id="estabs-sub" style="color:var(--gray-500);margin-top:.5rem">Bars, boîtes de nuit et hôtels qui font confiance à Reperdu</p></div>
       <div class="objects-grid" id="home-estabs-grid"><div class="loader"><div class="spinner"></div></div></div>
     </div>
   </section>
@@ -461,11 +471,11 @@ const CONFIG = {
   <section class="cta-section">
     <div class="cta-box">
       <div style="font-size:3rem;margin-bottom:1rem">🏢</div>
-      <h2>Votre établissement perd des objets chaque soir ?</h2>
-      <p>Rejoignez le réseau Reperdu. QR code, dashboard, notifications automatiques, matching humain — tout est inclus. Vos clients vous remercieront.</p>
+      <h2 id="cta-title">Votre établissement perd des objets chaque soir ?</h2>
+      <p id="cta-sub">Rejoignez le réseau Reperdu. QR code, dashboard, notifications automatiques, matching humain — tout est inclus. Vos clients vous remercieront.</p>
       <div class="cta-actions">
-        <button class="btn btn-white" onclick="openModal('modal-login')">Devenir partenaire →</button>
-        <button class="btn btn-outline-white" onclick="navigate('explorer')">🔍 Chercher un objet</button>
+        <button class="btn btn-white" id="cta-partner-btn" onclick="openModal('modal-login')">Devenir partenaire →</button>
+        <button class="btn btn-outline-white" id="cta-search-btn" onclick="navigate('explorer')">🔍 Chercher un objet</button>
       </div>
     </div>
   </section>
@@ -475,14 +485,14 @@ const CONFIG = {
       <div class="footer-grid">
         <div>
           <div style="display:flex;align-items:center;gap:8px;margin-bottom:.75rem"><div class="nav-logo-mark">R</div><span class="footer-logo-text">Re<span>perdu</span></span></div>
-          <p class="footer-desc">La plateforme intelligente pour retrouver vos objets perdus dans les établissements partenaires.</p>
+          <p class="footer-desc" id="footer-desc">La plateforme intelligente pour retrouver vos objets perdus dans les établissements partenaires.</p>
         </div>
-        <div class="footer-col"><h4>Plateforme</h4><a onclick="navigate('explorer')">Explorer les objets</a><a onclick="currentUser ? navigate('declarer') : openModal('modal-login')">Déclarer un objet</a><a onclick="navigate('home');scrollToSection('#comment')">Comment ça marche</a><a onclick="navigate('user-dashboard')">Mon espace</a></div>
-        <div class="footer-col"><h4>Établissements</h4><a onclick="openModal('modal-login')">Devenir partenaire</a><a onclick="navigate('admin')">Dashboard admin</a><a onclick="navigate('home');scrollToSection('#etablissements')">Partenaires actuels</a></div>
-        <div class="footer-col"><h4>Entreprise</h4><a>À propos</a><a>FAQ</a><a>Contact</a><a>Mentions légales</a></div>
+        <div class="footer-col"><h4 id="footer-h-platform">Plateforme</h4><a onclick="navigate('explorer')" id="footer-explore">Explorer les objets</a><a onclick="currentUser ? navigate('declarer') : openModal('modal-login')" id="footer-declare">Déclarer un objet</a><a onclick="navigate('home');scrollToSection('#comment')" id="footer-how">Comment ça marche</a><a onclick="navigate('user-dashboard')" id="footer-myspace">Mon espace</a></div>
+        <div class="footer-col"><h4 id="footer-h-estabs">Établissements</h4><a onclick="openModal('modal-login')" id="footer-partner">Devenir partenaire</a><a onclick="navigate('admin')">Dashboard admin</a><a onclick="navigate('home');scrollToSection('#etablissements')" id="footer-current-partners">Partenaires actuels</a></div>
+        <div class="footer-col"><h4 id="footer-h-company">Entreprise</h4><a id="footer-about">À propos</a><a id="footer-faq">FAQ</a><a id="footer-contact">Contact</a><a id="footer-legal">Mentions légales</a></div>
       </div>
       <div class="footer-bottom">
-        <span>© 2026 Reperdu. Tous droits réservés.</span>
+        <span id="footer-copy">© 2026 Reperdu. Tous droits réservés.</span>
         <div class="footer-bottom-links"><a>Confidentialité</a><a>CGU</a><a>Cookies</a></div>
       </div>
     </div>
@@ -535,8 +545,8 @@ const CONFIG = {
   <div style="background:linear-gradient(135deg,var(--green-700),var(--green-600));padding:2.5rem 5vw;text-align:center">
     <div style="max-width:600px;margin:0 auto">
       <div style="font-size:2.5rem;margin-bottom:.5rem">🔍</div>
-      <h2 style="color:#fff;margin-bottom:.4rem">Déclarer un objet perdu</h2>
-      <p style="color:rgba(255,255,255,.8);font-size:.9rem">Décrivez votre objet avec précision. Nos équipes consultent tous nos établissements partenaires et vous notifient par email dès qu'une correspondance est trouvée.</p>
+      <h2 id="declare-page-title" style="color:#fff;margin-bottom:.4rem">Déclarer un objet perdu</h2>
+      <p id="declare-page-sub" style="color:rgba(255,255,255,.8);font-size:.9rem">Décrivez votre objet avec précision. Nos équipes consultent tous nos établissements partenaires et vous notifient par email dès qu'une correspondance est trouvée.</p>
     </div>
   </div>
   <div style="max-width:680px;margin:0 auto;padding:2.5rem 5vw">
@@ -622,6 +632,7 @@ const CONFIG = {
         <button class="sidebar-item" onclick="switchAdminSection('admin-establishments',this)"><span class="icon">🏢</span> Établissements</button>
         <button class="sidebar-item" onclick="switchAdminSection('admin-declarations',this)"><span class="icon">📋</span> Déclarations</button>
         <button class="sidebar-item" onclick="switchAdminSection('admin-photos',this)"><span class="icon">🖼️</span> Photos accueil</button>
+        <button class="sidebar-item" onclick="switchAdminSection('admin-qr',this)"><span class="icon">📱</span> QR Codes</button>
       </nav>
       <div class="sidebar-footer">
         <button class="sidebar-item" onclick="signOut()" style="color:#ef4444"><span class="icon">🚪</span> Déconnexion</button>
@@ -698,7 +709,86 @@ const CONFIG = {
           <div id="admin-declarations-content"><div class="loader"><div class="spinner"></div></div></div>
         </div>
 
-        <!-- SECTION PHOTOS D'ACCUEIL -->
+        <!-- SECTION QR CODES -->
+        <div id="admin-qr" style="display:none">
+          <h2 style="margin-bottom:.5rem">QR Codes — Chambres & Espaces</h2>
+          <p style="color:var(--gray-500);font-size:.875rem;margin-bottom:1.5rem">Générez des QR codes à imprimer et placer dans les chambres ou espaces de vos établissements partenaires. En scannant, les clients arrivent directement sur Reperdu.</p>
+
+          <!-- Générateur -->
+          <div class="card" style="padding:1.5rem;margin-bottom:1.5rem">
+            <h3 style="font-size:1rem;margin-bottom:1.2rem">Générer un QR code</h3>
+            <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:1rem;margin-bottom:1rem">
+              <div class="form-group">
+                <label class="form-label">Établissement *</label>
+                <select class="form-input form-select" id="qr-estab-select" onchange="updateQRPreview()">
+                  <option value="">Choisir...</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Type d'espace</label>
+                <select class="form-input form-select" id="qr-space-type" onchange="updateQRPreview()">
+                  <option value="">Général</option>
+                  <option value="chambre">🛏️ Chambre</option>
+                  <option value="bar">🍸 Bar</option>
+                  <option value="restaurant">🍽️ Restaurant</option>
+                  <option value="reception">🏨 Réception</option>
+                  <option value="salle">🎵 Salle principale</option>
+                  <option value="vestiaire">🧥 Vestiaire</option>
+                  <option value="toilettes">🚻 Toilettes</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Numéro / Nom (optionnel)</label>
+                <input class="form-input" id="qr-room-num" placeholder="Ex : 204, Suite Prestige..." oninput="updateQRPreview()">
+              </div>
+            </div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1rem">
+              <div class="form-group">
+                <label class="form-label">Langue du QR code</label>
+                <select class="form-input form-select" id="qr-lang" onchange="updateQRPreview()">
+                  <option value="fr">🇫🇷 Français</option>
+                  <option value="en">🇬🇧 English</option>
+                  <option value="both">🇫🇷🇬🇧 Bilingue</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Taille d'impression</label>
+                <select class="form-input form-select" id="qr-size">
+                  <option value="200">Petite (sticker)</option>
+                  <option value="300" selected>Moyenne (carte)</option>
+                  <option value="400">Grande (affiche)</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <!-- Prévisualisation + téléchargement -->
+          <div style="display:grid;grid-template-columns:1fr 1.4fr;gap:1.5rem;align-items:start">
+            <div class="card" style="padding:1.5rem;text-align:center">
+              <h3 style="font-size:.9rem;margin-bottom:1rem;color:var(--gray-500);text-transform:uppercase;letter-spacing:.06em">Aperçu</h3>
+              <div id="qr-preview-card" style="background:white;border-radius:12px;padding:1.5rem;border:1px solid var(--gray-200);display:inline-block;min-width:200px">
+                <div id="qr-preview-logo" style="font-size:1.1rem;font-weight:800;color:var(--green-900);margin-bottom:.5rem">Re<span style="color:var(--green-400)">perdu</span></div>
+                <div id="qr-preview-img" style="width:160px;height:160px;background:var(--gray-100);border-radius:8px;margin:0 auto .75rem;display:flex;align-items:center;justify-content:center;font-size:3rem">📱</div>
+                <div id="qr-preview-title" style="font-size:.8rem;font-weight:700;color:var(--gray-900);margin-bottom:.25rem">Scannez moi</div>
+                <div id="qr-preview-sub" style="font-size:.7rem;color:var(--gray-500);line-height:1.5">Vous avez perdu un objet ?<br>Déclarez-le en 2 minutes.</div>
+              </div>
+              <div style="display:flex;flex-direction:column;gap:.5rem;margin-top:1rem">
+                <button class="btn btn-primary btn-full" onclick="generateAdminQR()">🖨️ Générer & Télécharger</button>
+                <button class="btn btn-secondary btn-full" onclick="generateAdminQRPDF()">📄 Fiche complète PDF</button>
+              </div>
+            </div>
+
+            <!-- QR générés récemment -->
+            <div class="card" style="padding:1.5rem">
+              <h3 style="font-size:1rem;margin-bottom:1rem">QR codes générés</h3>
+              <div id="qr-history" style="display:flex;flex-direction:column;gap:.6rem">
+                <div style="color:var(--gray-500);font-size:.875rem">Générez votre premier QR code →</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        
         <div id="admin-photos" style="display:none">
           <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:.5rem">
             <h2>Photos de la page d'accueil</h2>
@@ -1404,7 +1494,494 @@ document.addEventListener('click', e => {
   })
 })
 
-// ── LOAD ESTABLISSEMENTS INTO SELECT ──────────────────────────
+// ══════════════════════════════════════════════════
+// INTERNATIONALISATION (FR / EN)
+// ══════════════════════════════════════════════════
+const TRANSLATIONS = {
+  fr: {
+    nav_home: 'Accueil',
+    nav_explorer: 'Explorer',
+    nav_how: 'Comment ça marche',
+    nav_estabs: 'Établissements',
+    hero_eyebrow: 'Plateforme objets trouvés N°1',
+    hero_h1: 'On a tous perdu<br>quelque chose un soir.<br><span class="accent">On vous aide à le retrouver.</span>',
+    hero_sub: 'Reperdu connecte les clients avec les établissements. Déclarez votre perte, nos équipes cherchent pour vous — gratuitement.',
+    hero_social: '+2 400 personnes ont retrouvé leur objet',
+    hero_btn_explore: '🔍 Voir les objets trouvés',
+    hero_btn_declare: '✍️ Déclarer un objet perdu',
+    hero_stat_found: 'Objets trouvés',
+    hero_stat_rate: 'Taux de récupération',
+    hero_stat_estabs: 'Établissements',
+    trust_label: 'Ils nous font confiance',
+    trust_count_suffix: 'établissements',
+    how_label: 'Processus simple',
+    how_title: 'Comment ça marche ?',
+    how_sub: 'En moins de 2 minutes, votre déclaration est transmise à nos équipes qui commencent les recherches.',
+    step1_title: 'Déclarez votre objet',
+    step1_desc: 'Remplissez un formulaire rapide : description, date, lieu. Plus votre description est précise, plus nos équipes peuvent chercher efficacement.',
+    step2_title: 'Nos équipes cherchent pour vous',
+    step2_desc: 'Nos équipes consultent l\'ensemble des objets collectés dans tous nos établissements partenaires et vérifient chaque correspondance possible.',
+    step3_title: 'Notification instantanée',
+    step3_desc: 'Dès une correspondance, vous êtes alerté par email. Convenez d\'un retrait sur place — c\'est aussi simple que ça.',
+    testimonials_label: 'Ils ont retrouvé leur objet',
+    testimonials_title: 'Ce qu\'ils en disent',
+    t1_text: '"J\'avais perdu mon portefeuille au Rex Club un vendredi soir. J\'y croyais plus du tout... et deux jours après, Reperdu m\'a envoyé un email avec une correspondance. Bluffant !"',
+    t1_name: 'Lucas M.', t1_sub: 'Paris · Portefeuille retrouvé',
+    t2_text: '"Mon téléphone était à l\'hôtel depuis 3 jours sans que personne ne le signale. Grâce à Reperdu, j\'ai pu le récupérer en 10 minutes. Service incroyable."',
+    t2_name: 'Sarah K.', t2_sub: 'Lyon · iPhone retrouvé',
+    t3_text: '"En tant que gérant de bar, Reperdu nous a changé la vie. On dépose les objets en 30 secondes et les clients sont prévenus automatiquement. Zéro friction."',
+    t3_name: 'Antoine R.', t3_sub: 'Gérant · Le Comptoir, Paris',
+    latest_label: 'Objets trouvés',
+    latest_title: 'Derniers objets disponibles',
+    see_all: 'Voir tout →',
+    banner_total: 'Objets répertoriés',
+    banner_rate: 'Taux de récupération',
+    banner_estabs: 'Établissements partenaires',
+    banner_rating: 'Note moyenne',
+    estabs_label: 'Réseau partenaire',
+    estabs_title: 'Établissements partenaires',
+    estabs_sub: 'Bars, boîtes de nuit et hôtels qui font confiance à Reperdu',
+    cta_title: 'Votre établissement perd des objets chaque soir ?',
+    cta_sub: 'Rejoignez le réseau Reperdu. QR code, dashboard, notifications, matching humain — tout est inclus. Vos clients vous remercieront.',
+    cta_partner: 'Devenir partenaire →',
+    cta_search: '🔍 Chercher un objet',
+    notif_match: 'Correspondance trouvée !',
+    declare_page_title: 'Déclarer un objet perdu',
+    declare_page_sub: 'Décrivez votre objet avec précision. Nos équipes consultent tous nos établissements partenaires et vous notifient par email dès qu\'une correspondance est trouvée.',
+    explorer_title: 'Explorer les objets',
+    explorer_sub: 'Parcourez les objets trouvés dans nos établissements partenaires',
+    search_placeholder: 'Rechercher un objet...',
+    search_btn: 'Chercher',
+    footer_desc: 'La plateforme pour retrouver vos objets perdus dans les établissements partenaires.',
+    footer_platform: 'Plateforme',
+    footer_explore: 'Explorer les objets',
+    footer_declare: 'Déclarer un objet',
+    footer_how: 'Comment ça marche',
+    footer_myspace: 'Mon espace',
+    footer_estabs: 'Établissements',
+    footer_partner: 'Devenir partenaire',
+    footer_company: 'Entreprise',
+    footer_about: 'À propos',
+    footer_faq: 'FAQ',
+    footer_contact: 'Contact',
+    footer_legal: 'Mentions légales',
+    footer_copy: '© 2026 Reperdu. Tous droits réservés.',
+    login_title: 'Connexion',
+    login_sub: 'Accédez à votre espace Reperdu',
+    tab_login: 'Connexion',
+    tab_signup: 'Inscription',
+  },
+  en: {
+    nav_home: 'Home',
+    nav_explorer: 'Explore',
+    nav_how: 'How it works',
+    nav_estabs: 'Venues',
+    hero_eyebrow: '#1 Lost & Found Platform',
+    hero_h1: 'We\'ve all lost something<br>on a night out.<br><span class="accent">We help you get it back.</span>',
+    hero_sub: 'Reperdu connects guests with venues. Report your lost item and our team searches for you — for free.',
+    hero_social: '+2,400 people have recovered their belongings',
+    hero_btn_explore: '🔍 Browse found items',
+    hero_btn_declare: '✍️ Report a lost item',
+    hero_stat_found: 'Items found',
+    hero_stat_rate: 'Recovery rate',
+    hero_stat_estabs: 'Partner venues',
+    trust_label: 'They trust us',
+    trust_count_suffix: 'venues',
+    how_label: 'Simple process',
+    how_title: 'How does it work?',
+    how_sub: 'In under 2 minutes, your report is sent to our team who start searching right away.',
+    step1_title: 'Report your item',
+    step1_desc: 'Fill in a quick form: description, date, location. The more detail you give, the better our team can search.',
+    step2_title: 'Our team searches for you',
+    step2_desc: 'Our team reviews all items collected across every partner venue and checks every possible match.',
+    step3_title: 'Instant notification',
+    step3_desc: 'As soon as a match is found, you\'re notified by email. Arrange a pickup — it\'s that simple.',
+    testimonials_label: 'They got their items back',
+    testimonials_title: 'What they say',
+    t1_text: '"I lost my wallet at Rex Club on a Friday night. I\'d given up hope... two days later, Reperdu emailed me with a match. Unbelievable!"',
+    t1_name: 'Lucas M.', t1_sub: 'Paris · Wallet recovered',
+    t2_text: '"My phone had been at the hotel for 3 days with no one flagging it. Thanks to Reperdu, I got it back in 10 minutes. Incredible service."',
+    t2_name: 'Sarah K.', t2_sub: 'Lyon · iPhone recovered',
+    t3_text: '"As a bar manager, Reperdu changed everything. We log items in 30 seconds and guests are automatically notified. Zero friction."',
+    t3_name: 'Antoine R.', t3_sub: 'Manager · Le Comptoir, Paris',
+    latest_label: 'Found items',
+    latest_title: 'Latest available items',
+    see_all: 'See all →',
+    banner_total: 'Items listed',
+    banner_rate: 'Recovery rate',
+    banner_estabs: 'Partner venues',
+    banner_rating: 'Average rating',
+    estabs_label: 'Partner network',
+    estabs_title: 'Partner venues',
+    estabs_sub: 'Bars, nightclubs and hotels that trust Reperdu',
+    cta_title: 'Does your venue lose items every night?',
+    cta_sub: 'Join the Reperdu network. QR code, dashboard, automatic notifications, human matching — all included. Your guests will thank you.',
+    cta_partner: 'Become a partner →',
+    cta_search: '🔍 Search for an item',
+    notif_match: 'Match found!',
+    declare_page_title: 'Report a lost item',
+    declare_page_sub: 'Describe your item clearly. Our team checks all partner venues and notifies you by email as soon as a match is found.',
+    explorer_title: 'Browse lost & found',
+    explorer_sub: 'Browse items found at our partner venues',
+    search_placeholder: 'Search for an item...',
+    search_btn: 'Search',
+    footer_desc: 'The smart platform to recover lost items at partner venues.',
+    footer_platform: 'Platform',
+    footer_explore: 'Browse items',
+    footer_declare: 'Report a lost item',
+    footer_how: 'How it works',
+    footer_myspace: 'My account',
+    footer_estabs: 'Venues',
+    footer_partner: 'Become a partner',
+    footer_company: 'Company',
+    footer_about: 'About',
+    footer_faq: 'FAQ',
+    footer_contact: 'Contact',
+    footer_legal: 'Legal notice',
+    footer_copy: '© 2026 Reperdu. All rights reserved.',
+    login_title: 'Sign in',
+    login_sub: 'Access your Reperdu account',
+    tab_login: 'Sign in',
+    tab_signup: 'Sign up',
+  }
+}
+
+let currentLang = localStorage.getItem('reperdu_lang') || 'fr'
+
+function t(key) {
+  return TRANSLATIONS[currentLang][key] || TRANSLATIONS['fr'][key] || key
+}
+
+function setLang(lang) {
+  currentLang = lang
+  localStorage.setItem('reperdu_lang', lang)
+  document.getElementById('lang-fr').classList.toggle('active', lang === 'fr')
+  document.getElementById('lang-en').classList.toggle('active', lang === 'en')
+  applyTranslations()
+}
+
+function applyTranslations() {
+  const l = currentLang
+
+  // Navbar
+  document.querySelector('[data-i18n="nav_home"]').textContent = t('nav_home')
+  document.querySelector('[data-i18n="nav_explorer"]').textContent = t('nav_explorer')
+  document.querySelector('[data-i18n="nav_how"]').textContent = t('nav_how')
+  document.querySelector('[data-i18n="nav_estabs"]').textContent = t('nav_estabs')
+
+  // Hero
+  const heroEyebrow = document.querySelector('.hero-eyebrow')
+  if (heroEyebrow) heroEyebrow.innerHTML = `<div class="hero-dot"></div>${t('hero_eyebrow')}`
+  const heroH1 = document.querySelector('.hero h1')
+  if (heroH1) heroH1.innerHTML = t('hero_h1')
+  const heroSub = document.querySelector('.hero-sub')
+  if (heroSub) heroSub.textContent = t('hero_sub')
+  const heroSocial = document.getElementById('hero-social-text')
+  if (heroSocial) heroSocial.innerHTML = `<strong style="color:var(--gray-700)">${t('hero_social')}</strong>`
+  const heroBtnExplore = document.getElementById('hero-btn-explore')
+  if (heroBtnExplore) heroBtnExplore.textContent = t('hero_btn_explore')
+  const heroBtnDeclare = document.getElementById('hero-declare-btn')
+  if (heroBtnDeclare) heroBtnDeclare.textContent = t('hero_btn_declare')
+  document.querySelectorAll('.hero-stat-label').forEach((el, i) => {
+    const keys = ['hero_stat_found', 'hero_stat_rate', 'hero_stat_estabs']
+    if (keys[i]) el.textContent = t(keys[i])
+  })
+
+  // Trust banner
+  const trustLabel = document.getElementById('trust-label')
+  if (trustLabel) trustLabel.textContent = t('trust_label')
+  const trustSuffix = document.getElementById('trust-suffix')
+  if (trustSuffix) trustSuffix.textContent = t('trust_count_suffix')
+
+  // How it works
+  const howLabel = document.querySelector('.steps-section .section-label')
+  if (howLabel) howLabel.innerHTML = `<span></span>${t('how_label')}`
+  const howH2 = document.querySelector('.steps-section h2')
+  if (howH2) howH2.textContent = t('how_title')
+  const howSub = document.querySelector('#how-sub')
+  if (howSub) howSub.textContent = t('how_sub')
+  const stepTitles = document.querySelectorAll('.step-card h3')
+  const stepDescs = document.querySelectorAll('.step-card .step-desc')
+  const stepKeys = [['step1_title','step1_desc'],['step2_title','step2_desc'],['step3_title','step3_desc']]
+  stepTitles.forEach((el, i) => { if (stepKeys[i]) el.textContent = t(stepKeys[i][0]) })
+  stepDescs.forEach((el, i) => { if (stepKeys[i]) el.textContent = t(stepKeys[i][1]) })
+
+  // Testimonials
+  const tmLabel = document.getElementById('tm-label')
+  if (tmLabel) tmLabel.textContent = t('testimonials_label')
+  const tmTitle = document.getElementById('tm-title')
+  if (tmTitle) tmTitle.textContent = t('testimonials_title')
+  const tmTexts = document.querySelectorAll('.testimonial-text')
+  const tmNames = document.querySelectorAll('.testimonial-name')
+  const tmSubs = document.querySelectorAll('.testimonial-sub')
+  ;[1,2,3].forEach((n,i) => {
+    if (tmTexts[i]) tmTexts[i].textContent = t(`t${n}_text`)
+    if (tmNames[i]) tmNames[i].textContent = t(`t${n}_name`)
+    if (tmSubs[i]) tmSubs[i].textContent = t(`t${n}_sub`)
+  })
+
+  // Latest objects section
+  const latestLabel = document.getElementById('latest-label')
+  if (latestLabel) latestLabel.textContent = t('latest_label')
+  const latestTitle = document.getElementById('latest-title')
+  if (latestTitle) latestTitle.textContent = t('latest_title')
+  const latestBtn = document.getElementById('latest-btn')
+  if (latestBtn) latestBtn.textContent = t('see_all')
+
+  // Stats banner
+  document.querySelectorAll('.banner-label').forEach((el, i) => {
+    const keys = ['banner_total','banner_rate','banner_estabs','banner_rating']
+    if (keys[i]) el.textContent = t(keys[i])
+  })
+
+  // Estabs section
+  const estabsLabel = document.getElementById('estabs-label')
+  if (estabsLabel) estabsLabel.textContent = t('estabs_label')
+  const estabsTitle = document.getElementById('estabs-title')
+  if (estabsTitle) estabsTitle.textContent = t('estabs_title')
+  const estabsSub = document.getElementById('estabs-sub')
+  if (estabsSub) estabsSub.textContent = t('estabs_sub')
+
+  // CTA
+  const ctaTitle = document.getElementById('cta-title')
+  if (ctaTitle) ctaTitle.textContent = t('cta_title')
+  const ctaSub = document.getElementById('cta-sub')
+  if (ctaSub) ctaSub.textContent = t('cta_sub')
+  const ctaPartner = document.getElementById('cta-partner-btn')
+  if (ctaPartner) ctaPartner.textContent = t('cta_partner')
+  const ctaSearch = document.getElementById('cta-search-btn')
+  if (ctaSearch) ctaSearch.textContent = t('cta_search')
+
+  // Explorer page
+  const explorerTitle = document.querySelector('.explorer-header h1')
+  if (explorerTitle) explorerTitle.textContent = t('explorer_title')
+  const explorerSub = document.querySelector('.explorer-header p')
+  if (explorerSub) explorerSub.textContent = t('explorer_sub')
+  const searchInput = document.getElementById('search-input')
+  if (searchInput) searchInput.placeholder = t('search_placeholder')
+  const searchBtn = document.querySelector('.filters-search .btn-primary')
+  if (searchBtn) searchBtn.textContent = t('search_btn')
+
+  // Declare page
+  const declarePageTitle = document.getElementById('declare-page-title')
+  if (declarePageTitle) declarePageTitle.textContent = t('declare_page_title')
+  const declarePageSub = document.getElementById('declare-page-sub')
+  if (declarePageSub) declarePageSub.textContent = t('declare_page_sub')
+
+  // Footer
+  const footerDesc = document.getElementById('footer-desc')
+  if (footerDesc) footerDesc.textContent = t('footer_desc')
+  const footerCopy = document.getElementById('footer-copy')
+  if (footerCopy) footerCopy.textContent = t('footer_copy')
+  const fhPlatform = document.getElementById('footer-h-platform')
+  if (fhPlatform) fhPlatform.textContent = t('footer_platform')
+  const fExplore = document.getElementById('footer-explore')
+  if (fExplore) fExplore.textContent = t('footer_explore')
+  const fDeclare = document.getElementById('footer-declare')
+  if (fDeclare) fDeclare.textContent = t('footer_declare')
+  const fHow = document.getElementById('footer-how')
+  if (fHow) fHow.textContent = t('footer_how')
+  const fMyspace = document.getElementById('footer-myspace')
+  if (fMyspace) fMyspace.textContent = t('footer_myspace')
+  const fhEstabs = document.getElementById('footer-h-estabs')
+  if (fhEstabs) fhEstabs.textContent = t('footer_estabs')
+  const fPartner = document.getElementById('footer-partner')
+  if (fPartner) fPartner.textContent = t('footer_partner')
+  const fhCompany = document.getElementById('footer-h-company')
+  if (fhCompany) fhCompany.textContent = t('footer_company')
+  const fAbout = document.getElementById('footer-about')
+  if (fAbout) fAbout.textContent = t('footer_about')
+  const fFaq = document.getElementById('footer-faq')
+  if (fFaq) fFaq.textContent = t('footer_faq')
+  const fContact = document.getElementById('footer-contact')
+  if (fContact) fContact.textContent = t('footer_contact')
+  const fLegal = document.getElementById('footer-legal')
+  if (fLegal) fLegal.textContent = t('footer_legal')
+
+  // Hero notif
+  const heroNotif = document.querySelector('.hero-notif strong')
+  if (heroNotif) heroNotif.textContent = t('notif_match')
+
+  // Login modal
+  const loginTitle = document.querySelector('#modal-login .modal-title')
+  if (loginTitle) loginTitle.textContent = t('login_title')
+  const loginSub = document.querySelector('#modal-login .modal-sub')
+  if (loginSub) loginSub.textContent = t('login_sub')
+}
+
+// ══════════════════════════════════════════════════
+// QR CODES ADMIN
+// ══════════════════════════════════════════════════
+let qrHistory = []
+
+async function loadQREstabSelect() {
+  const sel = document.getElementById('qr-estab-select')
+  if (!sel) return
+  const { data } = await sb.from('establishments').select('id,name,city').eq('is_active',true).order('name')
+  if (!data?.length) return
+  sel.innerHTML = '<option value="">Choisir...</option>' +
+    data.map(e => `<option value="${e.id}" data-name="${e.name}" data-city="${e.city}">${e.name} — ${e.city}</option>`).join('')
+}
+
+function updateQRPreview() {
+  const sel = document.getElementById('qr-estab-select')
+  const opt = sel?.options[sel.selectedIndex]
+  const estabName = opt?.dataset.name || ''
+  const spaceType = document.getElementById('qr-space-type')?.value || ''
+  const roomNum = document.getElementById('qr-room-num')?.value || ''
+  const lang = document.getElementById('qr-lang')?.value || 'fr'
+
+  let titleText, subText
+  if (lang === 'en') {
+    titleText = 'Scan me'
+    subText = estabName ? `Lost something at ${estabName}?` : 'Lost something?'
+    if (spaceType) subText += `\n${spaceType}${roomNum ? ' ' + roomNum : ''}`
+    subText += '\nReport it in 2 minutes.'
+  } else if (lang === 'both') {
+    titleText = 'Scannez-moi / Scan me'
+    subText = 'Objet perdu ? / Lost something?\nDéclarez en 2 min.'
+  } else {
+    titleText = 'Scannez-moi'
+    subText = estabName ? `Vous avez perdu quelque chose\nà ${estabName} ?` : 'Vous avez perdu un objet ?'
+    subText += '\nDéclarez-le en 2 minutes.'
+  }
+
+  document.getElementById('qr-preview-title').textContent = titleText
+  document.getElementById('qr-preview-sub').innerHTML = subText.replace(/\n/g, '<br>')
+
+  // Génère QR si établissement sélectionné
+  if (opt?.value) {
+    const params = new URLSearchParams({ estab: opt.value })
+    if (spaceType) params.set('space', spaceType)
+    if (roomNum) params.set('room', roomNum)
+    if (lang !== 'fr') params.set('lang', lang)
+    const url = `${window.location.origin}${window.location.pathname}?${params.toString()}`
+    const size = document.getElementById('qr-size')?.value || '200'
+    const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=${size}x${size}&data=${encodeURIComponent(url)}&color=2E7D32&margin=8`
+    document.getElementById('qr-preview-img').innerHTML = `<img src="${qrUrl}" style="width:100%;height:100%;object-fit:contain;border-radius:6px" alt="QR">`
+  } else {
+    document.getElementById('qr-preview-img').innerHTML = '<span style="font-size:3rem">📱</span>'
+  }
+}
+
+function generateAdminQR() {
+  const sel = document.getElementById('qr-estab-select')
+  const opt = sel?.options[sel.selectedIndex]
+  if (!opt?.value) { toast('Sélectionnez un établissement', 'error'); return }
+
+  const spaceType = document.getElementById('qr-space-type')?.value || ''
+  const roomNum = document.getElementById('qr-room-num')?.value || ''
+  const lang = document.getElementById('qr-lang')?.value || 'fr'
+  const size = document.getElementById('qr-size')?.value || '300'
+
+  const params = new URLSearchParams({ estab: opt.value })
+  if (spaceType) params.set('space', spaceType)
+  if (roomNum) params.set('room', roomNum)
+  if (lang !== 'fr') params.set('lang', lang)
+  const url = `${window.location.origin}${window.location.pathname}?${params.toString()}`
+  const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=${size}x${size}&data=${encodeURIComponent(url)}&color=2E7D32&margin=10`
+
+  // Téléchargement direct
+  const a = document.createElement('a')
+  a.href = qrUrl
+  const label = [opt.dataset.name, spaceType, roomNum].filter(Boolean).join('-').replace(/\s+/g,'-')
+  a.download = `reperdu-qr-${label}.png`
+  a.click()
+
+  // Ajouter à l'historique
+  const entry = { id: Date.now(), name: opt.dataset.name, space: spaceType, room: roomNum, lang, url, qrUrl, size }
+  qrHistory.unshift(entry)
+  renderQRHistory()
+  toast('QR code téléchargé ! 🎉')
+}
+
+function generateAdminQRPDF() {
+  const sel = document.getElementById('qr-estab-select')
+  const opt = sel?.options[sel.selectedIndex]
+  if (!opt?.value) { toast('Sélectionnez un établissement', 'error'); return }
+
+  const spaceType = document.getElementById('qr-space-type')?.value || ''
+  const roomNum = document.getElementById('qr-room-num')?.value || ''
+  const lang = document.getElementById('qr-lang')?.value || 'fr'
+
+  const params = new URLSearchParams({ estab: opt.value })
+  if (spaceType) params.set('space', spaceType)
+  if (roomNum) params.set('room', roomNum)
+  if (lang !== 'fr') params.set('lang', lang)
+  const url = `${window.location.origin}${window.location.pathname}?${params.toString()}`
+  const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=400x400&data=${encodeURIComponent(url)}&color=2E7D32&margin=12`
+
+  const isBilingual = lang === 'both'
+  const isEn = lang === 'en'
+
+  const label1 = isEn ? 'Lost something?' : isBilingual ? 'Objet perdu ? / Lost something?' : 'Vous avez perdu un objet ?'
+  const label2 = isEn ? `At ${opt.dataset.name}` : `À ${opt.dataset.name}`
+  const spaceLabel = spaceType ? (isEn ? `${spaceType}${roomNum?' '+roomNum:''}` : `${spaceType}${roomNum?' '+roomNum:''}`) : ''
+  const label3 = isEn ? 'Report it in 2 minutes on Reperdu.' : isBilingual ? 'Déclarez-le en 2 min. / Report it in 2 min.' : 'Déclarez-le en 2 minutes sur Reperdu.'
+  const stepLabel = isEn
+    ? ['1. Scan the QR code','2. Fill in the form','3. Our team searches for you']
+    : isBilingual
+    ? ['1. Scannez / Scan','2. Remplissez / Fill in','3. Nos équipes cherchent / Our team searches']
+    : ['1. Scannez le QR code','2. Remplissez le formulaire','3. Nos équipes cherchent pour vous']
+
+  const win = window.open('', '_blank')
+  win.document.write(`<!DOCTYPE html><html><head><meta charset="UTF-8">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    *{margin:0;padding:0;box-sizing:border-box}
+    body{font-family:'Poppins',sans-serif;background:#fff;display:flex;align-items:center;justify-content:center;min-height:100vh;padding:2rem}
+    .card{width:420px;border:2px solid #A5D6A7;border-radius:24px;padding:2.5rem;text-align:center;box-shadow:0 8px 32px rgba(46,125,50,.12)}
+    .logo{font-size:1.5rem;font-weight:800;color:#1B5E20;margin-bottom:.25rem}
+    .logo span{color:#66BB6A}
+    .tagline{font-size:.75rem;color:#9E9E9E;margin-bottom:1.5rem;text-transform:uppercase;letter-spacing:.06em}
+    .qr-wrap{background:#F1F8F1;border-radius:16px;padding:1.25rem;display:inline-block;margin-bottom:1.5rem}
+    .qr-wrap img{display:block;width:220px;height:220px}
+    h2{font-size:1.15rem;font-weight:800;color:#1B5E20;margin-bottom:.35rem}
+    .venue{font-size:.95rem;font-weight:600;color:#424242;margin-bottom:.25rem}
+    .space-label{display:inline-block;background:#E8F5E9;color:#2E7D32;font-size:.72rem;font-weight:700;padding:.2rem .75rem;border-radius:999px;margin-bottom:.75rem;text-transform:uppercase;letter-spacing:.05em}
+    p{font-size:.85rem;color:#616161;line-height:1.65;margin-bottom:1.5rem}
+    .steps{display:flex;flex-direction:column;gap:.4rem;text-align:left;background:#F5F5F5;border-radius:12px;padding:1rem 1.25rem;margin-bottom:1.5rem}
+    .step{font-size:.78rem;color:#424242;font-weight:500}
+    .url{font-size:.65rem;color:#9E9E9E;word-break:break-all;border-top:1px solid #EEE;padding-top:.75rem;margin-top:.25rem}
+    @media print{body{padding:0}.card{box-shadow:none;border-color:#ccc}}
+  </style></head><body>
+  <div class="card">
+    <div class="logo">Re<span>perdu</span></div>
+    <div class="tagline">Lost & Found Platform</div>
+    <div class="qr-wrap"><img src="${qrUrl}" alt="QR Code"></div>
+    <h2>${label1}</h2>
+    <div class="venue">${label2}</div>
+    ${spaceLabel ? `<div class="space-label">${spaceLabel}</div>` : ''}
+    <p>${label3}</p>
+    <div class="steps">
+      ${stepLabel.map(s => `<div class="step">✓ ${s}</div>`).join('')}
+    </div>
+    <div class="url">${url}</div>
+  </div>
+  <script>window.onload=()=>{setTimeout(()=>window.print(),800)}<\/script>
+  </body></html>`)
+  win.document.close()
+}
+
+function renderQRHistory() {
+  const el = document.getElementById('qr-history')
+  if (!el) return
+  if (!qrHistory.length) { el.innerHTML = '<div style="color:var(--gray-500);font-size:.875rem">Aucun QR généré pour l\'instant.</div>'; return }
+  el.innerHTML = qrHistory.slice(0,8).map(q => `
+    <div style="display:flex;align-items:center;gap:.75rem;padding:.6rem;background:var(--gray-100);border-radius:10px">
+      <img src="${q.qrUrl}" style="width:44px;height:44px;border-radius:6px;flex-shrink:0" alt="">
+      <div style="flex:1;min-width:0">
+        <div style="font-size:.82rem;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${q.name}${q.space?' · '+q.space:''}${q.room?' '+q.room:''}</div>
+        <div style="font-size:.7rem;color:var(--gray-500)">Lang: ${q.lang} · ${q.size}px</div>
+      </div>
+      <div style="display:flex;gap:.3rem;flex-shrink:0">
+        <a href="${q.qrUrl}" download="reperdu-qr.png" class="btn btn-secondary btn-sm">⬇️</a>
+        <button class="btn btn-secondary btn-sm" onclick="navigator.clipboard?.writeText('${q.url}');toast('Lien copié !')">📋</button>
+      </div>
+    </div>`).join('')
+}
+
+
 async function loadEstabsIntoSelect(selectId) {
   const sel = document.getElementById(selectId)
   if (!sel) return
@@ -1726,6 +2303,7 @@ function switchAdminSection(id, btn) {
   if (id === 'admin-declarations') loadAdminDeclarations()
   if (id === 'admin-overview') loadAdminOverview()
   if (id === 'admin-photos') loadHomepagePhotosAdmin()
+  if (id === 'admin-qr') { loadQREstabSelect(); renderQRHistory() }
 }
 
 async function loadAdminObjects() {
@@ -2277,6 +2855,10 @@ window.addEventListener('scroll', () => {
 
 function handleURLParams() {
   const params = new URLSearchParams(window.location.search)
+  if (params.get('lang')) {
+    const l = params.get('lang')
+    if (l === 'en' || l === 'fr') { currentLang = l; localStorage.setItem('reperdu_lang', l) }
+  }
   if (params.get('object')) { navigate('object', params.get('object')); return }
   if (params.get('estab')) { activeCategory = 'all'; navigate('explorer'); return }
   navigate('home')
@@ -2286,6 +2868,7 @@ function handleURLParams() {
   wakeN8N()
   await initAuth()
   handleURLParams()
+  setLang(currentLang)
 })()
 </script>
 </body>
